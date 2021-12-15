@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 
 group :development do
-  gem 'minitest' # Helps solargraph with code insight when you write unit tests.
-  gem 'rubocop', '~> 0.93.0' # Static analysis of Ruby Code.
-  gem 'rubocop-sketchup', '~> 0.19.0' # Static analysis of SketchUp extensions.
-  gem 'sketchup-api-stubs' # Auto-complete for the SketchUp Rub API.
-  gem 'skippy', '~> 0.4.1.a' # Aid with common SketchUp extension tasks.
-  gem 'solargraph' # For code-insight and RuboCop integration with VSCode.
+  gem 'minitest'
+  gem 'rubocop', '>= 0.82', '< 2.0'
+  gem 'rubocop-sketchup', '~> 1.1.0'
+  gem 'sketchup-api-stubs'
+  gem 'skippy', '~> 0.4.1.a'
+  gem 'solargraph'
 end

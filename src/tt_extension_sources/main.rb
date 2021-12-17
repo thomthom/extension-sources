@@ -3,50 +3,23 @@ require 'sketchup.rb'
 require 'json'
 
 require 'tt_extension_sources/debug'
+require 'tt_extension_sources/extension_source'
+require 'tt_extension_sources/extension_sources_dialog'
 
 module TT::Plugins::ExtensionSources
 
   # Track startup timings. Keep raw log. Keep separate cache of average.
 
-  class ExtensionSource
-
-    attr_accessor :path, :enabled
-
-    # @param [String] path
-    # @param [Boolean] enabled
-    def initialize(path:, enabled: true)
-      @data = {
-        path: path,
-        enabled: enabled,
-      }
-    end
-
-    # @return [Hash]
-    def to_hash
-      @data.dup
-    end
-
-    # @return [Hash]
-    def as_json(options={})
-      # https://stackoverflow.com/a/40642530/486990
-      to_hash
-    end
-
-    # @return [String]
-    def to_json(*args)
-      @data.to_json(*args)
-    end
-
-  end # class
-
   def self.open_extension_sources_dialog
-    puts 'Extension Sources...'
-    [
-      {
-        path: 'C:/Users/Thomas/SourceTree/TrueBend/src',
-        enabled: true,
-      }
-    ]
+    # puts 'Extension Sources...'
+    # [
+    #   {
+    #     path: 'C:/Users/Thomas/SourceTree/TrueBend/src',
+    #     enabled: true,
+    #   }
+    # ]
+    @dialog ||= ExtensionSourcesDialog.new
+    @dialog.show
   end
 
   unless file_loaded?(__FILE__)

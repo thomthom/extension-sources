@@ -1,6 +1,18 @@
 module TT::Plugins::ExtensionSources
 
-  # @note Debug method to reload the plugin.
+  # @note Debug method to reset and reload the extension.
+  #
+  # @example
+  #   TT::Plugins::ExtensionSources.reset
+  #
+  # @return [Integer] Number of files reloaded.
+  def self.reset
+    @extension_sources_manager = nil
+    @extension_sources_dialog = nil
+    self.reload
+  end
+
+  # @note Debug method to reload the extension.
   #
   # @example
   #   TT::Plugins::ExtensionSources.reload

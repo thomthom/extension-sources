@@ -13,6 +13,11 @@
 <body>
   <div id="app">
     {{ message }}
+    <ul>
+      <li v-for="source in sources">
+        {{ source.path }} (Enabled: {{ source.enabled }})
+      </li>
+    </ul>
   </div>
 
   <script src="../js/extension_sources.js"></script>

@@ -8,7 +8,13 @@ require 'tt_extension_sources/extension_sources_dialog'
 
 module TT::Plugins::ExtensionSources
 
-  # Track startup timings. Keep raw log. Keep separate cache of average.
+  # * Track startup timings. Keep raw log. Keep separate cache of average.
+  # * Reload function.
+
+  def self.extension_sources_manager
+    @extension_sources_manager ||= ExtensionSourcesManager.new
+    @extension_sources_manager
+  end
 
   def self.open_extension_sources_dialog
     # puts 'Extension Sources...'
@@ -18,8 +24,12 @@ module TT::Plugins::ExtensionSources
     #     enabled: true,
     #   }
     # ]
-    @dialog ||= ExtensionSourcesDialog.new
-    @dialog.show
+    @extension_sources_dialog ||= ExtensionSourcesDialog.new
+    @extension_sources_dialog.on(:boot) do |dialog|
+      sources = self.extension_sources_manager.sources
+      dialog.update(sources)
+    end
+    @extension_sources_dialog.show
   end
 
   unless file_loaded?(__FILE__)

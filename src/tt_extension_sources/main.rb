@@ -6,6 +6,8 @@ require 'tt_extension_sources/debug'
 
 module TT::Plugins::ExtensionSources
 
+  # Track startup timings. Keep raw log. Keep separate cache of average.
+
   class ExtensionSource
 
     attr_accessor :path, :enabled

@@ -5,6 +5,7 @@ require 'json'
 require 'tt_extension_sources/debug'
 require 'tt_extension_sources/extension_source'
 require 'tt_extension_sources/extension_sources_dialog'
+require 'tt_extension_sources/extension_sources_manager'
 
 module TT::Plugins::ExtensionSources
 

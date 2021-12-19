@@ -6,20 +6,59 @@
 
   <title>Extension Sources</title>
 
+  <link rel="stylesheet" href="../css/modus.min-1.3.1.css">
+  <link rel="stylesheet" href="https://modus.trimble.com/css/modus-layout.min-1.3.1.css"><!-- Optional Layout -->
+  <link rel="stylesheet" href="https://modus.trimble.com/assets/0.5.1/fonts/modus-icons.css">
   <link rel="stylesheet" href="../css/extension_sources.css" />
   <script src="../js/vue.js"></script>
 </head>
 
 <body>
-  <div id="app">
-    {{ message }}
-    <ul>
-      <li v-for="source in sources">
-        {{ source.path }} (Enabled: {{ source.enabled }})
-      </li>
-    </ul>
+  <div id="app" class="div.modus-layout">
+    <div class="modus-body">
+      <div class="modus-content-rows">
+        <div class="modus-toolbar">
+          <h4>{{ message }}</h4>
+          <button class="btn btn-text-dark btn-lg btn-icon-only">
+            <i class="modus-icons">circle_add_outline</i>
+          </button>
+          <button class="btn btn-text-dark btn-lg btn-icon-only">
+            <i class="modus-icons">circle_close_outline</i>
+          </button>
+        </div>
+        <div class="modus-content-columns">
+          <div class="modus-content">
+            <ul class="list-group">
+              <li v-for="source in sources" class="list-group-item list-item-left-control">
+                <div class="custom-control custom-switch custom-control-inline">
+                  <input type="checkbox" v-model="source.enabled" class="custom-control-input" id="listSwitch1">
+                  <label class="custom-control-label" for="listSwitch1"></label>
+                </div>
+                <span>{{ source.path }}
+                  <button class="btn btn-text-dark btn-ms btn-icon-only">
+                    <i class="modus-icons">refresh</i>
+                  </button>
+                  <button class="btn btn-text-dark btn-ms btn-icon-only">
+                    <i class="modus-icons">edit</i>
+                  </button>
+                  <button class="btn btn-text-danger btn-msr btn-icon-only">
+                    <i class="modus-icons">trash</i>
+                  </button>
+                  <button class="btn btn-text-dark btn-ms btn-icon-only">
+                    <i class="modus-icons">expand_more</i>
+                  </button>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <script src="../js/jquery.slim.min.js"></script>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="https://modus.trimble.com/css/modus-layout.min-1.3.1.js"></script><!-- Optional Layout -->
   <script src="../js/extension_sources.js"></script>
 </body>
 

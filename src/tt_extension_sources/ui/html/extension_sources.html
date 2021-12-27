@@ -34,20 +34,23 @@
                   <input type="checkbox" v-model="source.enabled" class="custom-control-input" id="listSwitch1">
                   <label class="custom-control-label" for="listSwitch1"></label>
                 </div>
-                <span>{{ source.path }}
-                  <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload">
-                    <i class="modus-icons">refresh</i>
-                  </button>
-                  <button class="btn btn-text-dark btn-ms btn-icon-only" title="Edit">
-                    <i class="modus-icons">edit</i>
-                  </button>
-                  <button class="btn btn-text-danger btn-msr btn-icon-only" title="Remove load path">
-                    <i class="modus-icons">trash</i>
-                  </button>
-                  <button class="btn btn-text-dark btn-ms btn-icon-only" title="Expand">
-                    <i class="modus-icons">expand_more</i>
-                  </button>
-                </span>
+                <div class="d-flex bd-highlight" style>
+                  <div class="flex-grow-1 pt-1">{{ source.path }}</div>
+                  <div>
+                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload">
+                      <i class="modus-icons">refresh</i>
+                    </button>
+                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Edit">
+                      <i class="modus-icons">edit</i>
+                    </button>
+                    <button class="btn btn-text-danger btn-msr btn-icon-only" title="Remove load path">
+                      <i class="modus-icons">trash</i>
+                    </button>
+                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Expand">
+                      <i class="modus-icons">expand_more</i>
+                    </button>
+                  </div>
+                </div>
               </li>
             </ul>
           </div>

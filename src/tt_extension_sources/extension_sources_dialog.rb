@@ -75,7 +75,7 @@ module TT::Plugins::ExtensionSources
       {
         dialog_title: 'Extension Sources',
         preferences_key: 'TT_ExtensionSourcesDialog',
-        scrollable: true,
+        scrollable: false,
         resizable: true,
         width: 600,
         height: 400,

@@ -53,6 +53,18 @@ module TT::Plugins::ExtensionSources
           path: 'C:/Users/Thomas/SourceTree/SolidInspector/src',
           enabled: true,
         },
+        {
+          path: 'C:/Users/Thomas/SourceTree/quadface-tools/src',
+          enabled: true,
+        },
+        {
+          path: 'C:/Users/Thomas/SourceTree/SpeedUp/src',
+          enabled: false,
+        },
+        {
+          path: 'C:/Users/Thomas/SourceTree/architect-tools/src',
+          enabled: true,
+        },
       ]
     end
 

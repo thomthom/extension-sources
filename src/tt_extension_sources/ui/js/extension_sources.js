@@ -11,11 +11,14 @@ let app = new Vue({
     add_path() {
       sketchup.add_path();
     },
-    remove_path(path) {
-      sketchup.remove_path(path);
+    edit_path(path_id) {
+      sketchup.edit_path(path_id);
     },
-    reload_path(path) {
-      sketchup.reload_path(path);
+    remove_path(path_id) {
+      sketchup.remove_path(path_id);
+    },
+    reload_path(path_id) {
+      sketchup.reload_path(path_id);
     }
   },
   mounted: function () {

@@ -11,6 +11,16 @@ module TT::Plugins::ExtensionSources
 
   # * Track startup timings. Keep raw log. Keep separate cache of average.
   # * Reload function.
+  # * Reorder source paths.
+  # * Import/export function.
+  # * Undo/redo function.
+
+  def self.sync_dialog(dialog)
+    # TODO: Use events to update dialog when manager changes. (Bulk updates?)
+    sources = self.extension_sources_manager.sources
+    dialog.update(sources)
+    nil
+  end
 
   # @param [ExtensionSourcesDialog] dialog
   def self.add_path(dialog)
@@ -19,9 +29,35 @@ module TT::Plugins::ExtensionSources
 
     return unless self.extension_sources_manager.add(path)
 
-    # TODO: Use events to update dialog when manager changes. (Bulk updates?)
-    sources = self.extension_sources_manager.sources
-    dialog.update(sources)
+    self.sync_dialog(dialog)
+  end
+
+  # @param [ExtensionSourcesDialog] dialog
+  # @param [String] path_id
+  def self.edit_path(dialog, path_id)
+    source = self.extension_sources_manager.find_by_path_id(path_id)
+    raise "found no source path for: #{path_id}" if source.nil?
+
+    title = "Select Extension Source Directory"
+    path = loop do
+      path = UI.select_directory(title: title, directory: source.path)
+      return if path.nil?
+
+      if self.extension_sources_manager.include_path?(path)
+        message = "Source path '#{path}' already exists. Choose a different path?"
+        result = UI.messagebox(message, MB_OKCANCEL)
+        next if result == IDOK
+
+        return
+      end
+
+      break path
+    end
+
+    # TODO: Use notifications on ExtensionSource to manage updates?
+    return unless self.extension_sources_manager.update(path_id: path_id, path: path)
+
+    self.sync_dialog(dialog)
   end
 
   # @param [ExtensionSourcesDialog] dialog
@@ -30,9 +66,7 @@ module TT::Plugins::ExtensionSources
     source = self.extension_sources_manager.remove(path_id)
     raise "found no source path for: #{path_id}" if source.nil?
 
-    # TODO: Use events to update dialog when manager changes. (Bulk updates?)
-    sources = self.extension_sources_manager.sources
-    dialog.update(sources)
+    self.sync_dialog(dialog)
   end
 
   # @param [ExtensionSourcesDialog] dialog
@@ -53,11 +87,13 @@ module TT::Plugins::ExtensionSources
     }
   end
 
+  # @return [ExtensionSourcesManager]
   def self.extension_sources_manager
     @extension_sources_manager ||= ExtensionSourcesManager.new
     @extension_sources_manager
   end
 
+  # @return [ExtensionSourcesDialog]
   def self.open_extension_sources_dialog
     @extension_sources_dialog ||= ExtensionSourcesDialog.new
 
@@ -70,6 +106,10 @@ module TT::Plugins::ExtensionSources
       self.add_path(dialog)
     end
 
+    @extension_sources_dialog.on(:edit_path) do |dialog, path|
+      self.edit_path(dialog, path)
+    end
+
     @extension_sources_dialog.on(:remove_path) do |dialog, path|
       self.remove_path(dialog, path)
     end
@@ -79,6 +119,7 @@ module TT::Plugins::ExtensionSources
     end
 
     @extension_sources_dialog.show
+    @extension_sources_dialog
   end
 
   unless file_loaded?(__FILE__)

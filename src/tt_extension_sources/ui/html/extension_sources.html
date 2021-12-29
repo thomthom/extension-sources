@@ -40,7 +40,8 @@
                       v-on:click="reload_path(source.path_id)">
                       <i class="modus-icons">refresh</i>
                     </button>
-                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Edit">
+                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Edit"
+                      v-on:click="edit_path(source.path_id)">
                       <i class="modus-icons">edit</i>
                     </button>
                     <button class="btn btn-text-danger btn-msr btn-icon-only" title="Remove load path"

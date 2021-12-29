@@ -6,6 +6,7 @@ module TT::Plugins::ExtensionSources
       @events = {
         boot: [],
         add_path: [],
+        edit_path: [],
         remove_path: [],
         reload_path: [],
       }
@@ -106,11 +107,14 @@ module TT::Plugins::ExtensionSources
       dialog.add_action_callback('add_path') do
         trigger(:add_path, self)
       end
-      dialog.add_action_callback('remove_path') do |context, path|
-        trigger(:remove_path, self, path)
+      dialog.add_action_callback('edit_path') do |context, path_id|
+        trigger(:edit_path, self, path_id)
       end
-      dialog.add_action_callback('reload_path') do |context, path|
-        trigger(:reload_path, self, path)
+      dialog.add_action_callback('remove_path') do |context, path_id|
+        trigger(:remove_path, self, path_id)
+      end
+      dialog.add_action_callback('reload_path') do |context, path_id|
+        trigger(:reload_path, self, path_id)
       end
     end
 

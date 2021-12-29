@@ -19,11 +19,27 @@ module TT::Plugins::ExtensionSources
       source
     end
 
-    # @param [String] path_id
+    # @param [Integer] path_id
     # @return [ExtensionSource, nil]
     def remove(path_id)
       source = find_by_path_id(path_id)
       @data.delete(source)
+      source
+    end
+
+    # @param [Integer] path_id
+    # @param [String] path
+    # @param [Boolean] enabled
+    # @return [ExtensionSource]
+    def update(path_id:, path: nil, enabled: nil)
+      source = find_by_path_id(path_id)
+      raise IndexError, "source path id #{path_id} not found" unless source
+
+      # TODO: Use custom errors.
+      raise "path '#{path}' already exists" if path && include_path?(path)
+
+      source.path = path unless path.nil?
+      source.enabled = enabled unless enabled.nil?
       source
     end
 

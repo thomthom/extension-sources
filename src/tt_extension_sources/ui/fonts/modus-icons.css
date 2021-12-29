@@ -1,0 +1,33 @@
+@font-face {
+	font-family: "modus-icons";
+	src: url("modus-icons.eot?50783e4f41ce4a8b1c9426e5c9375829?#iefix") format("embedded-opentype"),
+url("modus-icons.woff2?50783e4f41ce4a8b1c9426e5c9375829") format("woff2"),
+url("modus-icons.woff?50783e4f41ce4a8b1c9426e5c9375829") format("woff"),
+url("modus-icons.ttf?50783e4f41ce4a8b1c9426e5c9375829") format("truetype"),
+url("modus-icons.svg?50783e4f41ce4a8b1c9426e5c9375829#modus-icons") format("svg");
+}
+
+.modus-icons {
+	font-family: "modus-icons";
+	font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}

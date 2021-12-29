@@ -8,6 +8,18 @@ let app = new Vue({
     update(sources) {
       this.sources = sources;
     },
+    undo() {
+      sketchup.undo();
+    },
+    redo() {
+      sketchup.redo();
+    },
+    import_paths() {
+      sketchup.import_paths();
+    },
+    export_paths() {
+      sketchup.export_paths();
+    },
     add_path() {
       sketchup.add_path();
     },

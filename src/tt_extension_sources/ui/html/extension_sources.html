@@ -17,10 +17,31 @@
     <div class="modus-body">
       <div class="modus-content-rows">
         <div class="modus-toolbar d-flex">
-          <h4>{{ message }}</h4>
-          <button class="btn btn-text-dark btn-lg btn-icon-only ml-auto" v-on:click="add_path">
+          <h4 class="">{{ message }}</h4>
+          <!-- Undo/Redo -->
+          <button class="btn btn-text-dark btn-lg btn-icon-only ml-4" v-on:click="undo">
+            <!-- TODO: Undo icon -->
+            <i class="modus-icons">arrow_left_bold</i>
+          </button>
+          <button class="btn btn-text-dark btn-lg btn-icon-only mr-auto" v-on:click="redo">
+            <!-- TODO: Redo icon -->
+            <i class="modus-icons">arrow_right_bold</i>
+          </button>
+          <!-- Add Path -->
+          <button class="btn btn-text-dark btn-lg btn-icon-only ml-4" v-on:click="add_path">
             <i class="modus-icons">circle_add_outline</i>
           </button>
+          <!-- More... -->
+          <div class="dropdown">
+            <button class="btn btn-text-dark btn-lg btn-icon-only" id="dropdownMenuButton" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              <i class="modus-icons">more_vertical</i>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#" v-on:click.prevent="import_paths">Import Paths</a>
+              <a class="dropdown-item" href="#" v-on:click.prevent="export_paths">Export Paths</a>
+            </div>
+          </div>
         </div>
         <div class="modus-content-columns">
           <div class="modus-content">
@@ -32,9 +53,9 @@
                 </div>
                 <div class="d-flex">
                   <!-- pt-1 is a hack to nudge the text to be vertically center-ish. Better way? -->
-                  <div class="pt-1">{{ source.path }}</div>
+                  <div class="flex-grow-1 pt-1">{{ source.path }}</div>
                   <!-- ml-auto vs flex-grow-1? -->
-                  <div class="ml-auto">
+                  <div>
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload"
                       v-on:click="reload_path(source.path_id)">
                       <i class="modus-icons">refresh</i>

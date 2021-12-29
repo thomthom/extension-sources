@@ -3,13 +3,18 @@ module TT::Plugins::ExtensionSources
   class ExtensionSourcesDialog
 
     def initialize
-      @events = {
-        boot: [],
-        add_path: [],
-        edit_path: [],
-        remove_path: [],
-        reload_path: [],
-      }
+      event_names = [
+        :boot,
+        :undo,
+        :redo,
+        :import_paths,
+        :export_paths,
+        :add_path,
+        :edit_path,
+        :remove_path,
+        :reload_path,
+      ]
+      @events = setup_events(event_names)
       @dialog = create_dialog
     end
 
@@ -54,6 +59,12 @@ module TT::Plugins::ExtensionSources
     end
 
     private
+
+    # @param [Array<Symbol>] event_names
+    # @return [Hash]
+    def setup_events(event_names)
+      Hash[event_names.map { |key| [key, []] }]
+    end
 
     def init_and_show
       raise "don't initialize if dialog is shown" if @dialog.visible?
@@ -103,6 +114,18 @@ module TT::Plugins::ExtensionSources
     def init_action_callbacks(dialog)
       dialog.add_action_callback('ready') do
         trigger(:boot, self)
+      end
+      dialog.add_action_callback('undo') do
+        trigger(:undo, self)
+      end
+      dialog.add_action_callback('redo') do
+        trigger(:redo, self)
+      end
+      dialog.add_action_callback('import_paths') do
+        trigger(:import_paths, self)
+      end
+      dialog.add_action_callback('export_paths') do
+        trigger(:export_paths, self)
       end
       dialog.add_action_callback('add_path') do
         trigger(:add_path, self)

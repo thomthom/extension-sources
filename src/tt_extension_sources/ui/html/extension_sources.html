@@ -17,9 +17,9 @@
   <div id="app" class="modus-layout">
     <div class="modus-body">
       <div class="modus-content-rows">
-        <div class="modus-toolbar">
-          <h4 class="flex-grow-1">{{ message }}</h4>
-          <button class="btn btn-text-dark btn-lg btn-icon-only">
+        <div class="modus-toolbar d-flex">
+          <h4>{{ message }}</h4>
+          <button class="btn btn-text-dark btn-lg btn-icon-only ml-auto">
             <i class="modus-icons">circle_add_outline</i>
           </button>
         </div>
@@ -31,9 +31,11 @@
                   <input type="checkbox" v-model="source.enabled" class="custom-control-input" id="listSwitch1">
                   <label class="custom-control-label" for="listSwitch1"></label>
                 </div>
-                <div class="d-flex bd-highlight" style>
-                  <div class="flex-grow-1 pt-1">{{ source.path }}</div>
-                  <div>
+                <div class="d-flex">
+                  <!-- pt-1 is a hack to nudge the text to be vertically center-ish. Better way? -->
+                  <div class="pt-1">{{ source.path }}</div>
+                  <!-- ml-auto vs flex-grow-1? -->
+                  <div class="ml-auto">
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload">
                       <i class="modus-icons">refresh</i>
                     </button>

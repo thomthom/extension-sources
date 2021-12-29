@@ -9,6 +9,42 @@ module TT::Plugins::ExtensionSources
       @data = from_hash(dummy_extension_sources)
     end
 
+    # @param [String] path
+    # @return [ExtensionSource, nil]
+    def add(path)
+      return nil if include_path?(path)
+
+      source = ExtensionSource.new(path: path)
+      @data << source
+      source
+    end
+
+    # @param [String] path_id
+    # @return [ExtensionSource, nil]
+    def remove(path_id)
+      source = find_by_path_id(path_id)
+      @data.delete(source)
+      source
+    end
+
+    # @param [Integer] path_id
+    # @return [ExtensionSource]
+    def find_by_path_id(path_id)
+      @data.find { |source| source.path_id == path_id }
+    end
+
+    # @param [String] path
+    # @return [ExtensionSource]
+    def find_by_path(path)
+      @data.find { |source| source.path == path }
+    end
+
+    # @param [String] path
+    # @return [Boolean]
+    def include_path?(path)
+      !find_by_path(path).nil?
+    end
+
     # @return [Array<ExtensionSource>]
     def sources
       @data

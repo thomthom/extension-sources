@@ -3,15 +3,46 @@ require 'json'
 module TT::Plugins::ExtensionSources
   class ExtensionSource
 
-    attr_accessor :path, :enabled
+    # @param [String] path
+    # return [Integer]
+    def self.path_id(path)
+      path.hash
+    end
 
     # @param [String] path
     # @param [Boolean] enabled
     def initialize(path:, enabled: true)
       @data = {
+        path_id: self.class.path_id(path),
         path: path,
         enabled: enabled,
       }
+    end
+
+    # @return [String]
+    def path_id
+      @data[:path_id]
+    end
+
+    # @return [String]
+    def path
+      @data[:path]
+    end
+
+    # @param [String] value
+    def path=(value)
+      @data[:path_id] = self.class.path_id(value)
+      @data[:path] = value
+    end
+
+    # @return [Boolean]
+    def enabled?
+      @data[:enabled]
+    end
+
+    # @param [Boolean] value
+    def enabled=(value)
+      @data[:enabled] = value
     end
 
     # @return [Hash]

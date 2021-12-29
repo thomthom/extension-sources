@@ -33,9 +33,13 @@ module TT::Plugins::ExtensionSources
       nil
     end
 
+    # @return [Boolean]
     def close
-      @dialog.close
-      nil
+      if @dialog.visible?
+        @dialog.close
+        return true
+      end
+      false
     end
 
     # @param [Boolean]
@@ -102,10 +106,10 @@ module TT::Plugins::ExtensionSources
       dialog.add_action_callback('add_path') do
         trigger(:add_path, self)
       end
-      dialog.add_action_callback('remove_path') do |path|
+      dialog.add_action_callback('remove_path') do |context, path|
         trigger(:remove_path, self, path)
       end
-      dialog.add_action_callback('reload_path') do |path|
+      dialog.add_action_callback('reload_path') do |context, path|
         trigger(:reload_path, self, path)
       end
     end

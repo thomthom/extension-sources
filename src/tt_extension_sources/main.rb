@@ -5,11 +5,12 @@ require 'tt_extension_sources/extension_sources_controller'
 
 module TT::Plugins::ExtensionSources
 
-  # * Reorder source paths.
   # * Import/export function.
+  # * Reorder source paths.
   # * Undo/redo function.
   # * Options
   #   * Open Ruby Console at Startup
+  # * Select/multi select.
   # * Track startup timings. Keep raw log. Keep separate cache of average.
 
   # @return [ExtensionSourcesController]

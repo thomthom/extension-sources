@@ -8,6 +8,15 @@ let app = new Vue({
     update(sources) {
       this.sources = sources;
     },
+    add_path() {
+      sketchup.add_path();
+    },
+    remove_path(path) {
+      sketchup.remove_path(path);
+    },
+    reload_path(path) {
+      sketchup.reload_path(path);
+    }
   },
   mounted: function () {
     sketchup.ready();

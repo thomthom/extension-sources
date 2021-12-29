@@ -19,7 +19,7 @@
       <div class="modus-content-rows">
         <div class="modus-toolbar d-flex">
           <h4>{{ message }}</h4>
-          <button class="btn btn-text-dark btn-lg btn-icon-only ml-auto">
+          <button class="btn btn-text-dark btn-lg btn-icon-only ml-auto" v-on:click="add_path">
             <i class="modus-icons">circle_add_outline</i>
           </button>
         </div>
@@ -36,13 +36,15 @@
                   <div class="pt-1">{{ source.path }}</div>
                   <!-- ml-auto vs flex-grow-1? -->
                   <div class="ml-auto">
-                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload">
+                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload"
+                      v-on:click="reload_path(source.path)">
                       <i class="modus-icons">refresh</i>
                     </button>
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Edit">
                       <i class="modus-icons">edit</i>
                     </button>
-                    <button class="btn btn-text-danger btn-msr btn-icon-only" title="Remove load path">
+                    <button class="btn btn-text-danger btn-msr btn-icon-only" title="Remove load path"
+                      v-on:click="remove_path(source.path)">
                       <i class="modus-icons">trash</i>
                     </button>
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Expand">

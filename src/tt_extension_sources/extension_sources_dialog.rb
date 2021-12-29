@@ -5,6 +5,9 @@ module TT::Plugins::ExtensionSources
     def initialize
       @events = {
         boot: [],
+        add_path: [],
+        remove_path: [],
+        reload_path: [],
       }
       @dialog = create_dialog
     end
@@ -65,6 +68,7 @@ module TT::Plugins::ExtensionSources
     # @param [Symbol] event
     def trigger(event, *args)
       raise "unknown event: #{event}" unless @events.key?(event)
+      warn "event without listeners: #{event}" if @events[event].empty?
 
       @events[event].each { |callback| callback.call(*args) }
     end
@@ -94,6 +98,15 @@ module TT::Plugins::ExtensionSources
     def init_action_callbacks(dialog)
       dialog.add_action_callback('ready') do
         trigger(:boot, self)
+      end
+      dialog.add_action_callback('add_path') do
+        trigger(:add_path, self)
+      end
+      dialog.add_action_callback('remove_path') do |path|
+        trigger(:remove_path, self, path)
+      end
+      dialog.add_action_callback('reload_path') do |path|
+        trigger(:reload_path, self, path)
       end
     end
 

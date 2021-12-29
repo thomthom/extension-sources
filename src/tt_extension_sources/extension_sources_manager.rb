@@ -11,14 +11,15 @@ module TT::Plugins::ExtensionSources
 
     # @param [String] source_path
     # @return [ExtensionSource, nil]
-    def add(source_path)
+    def add(source_path, enabled: true)
       raise "Path doesn't exist: #{source_path}" unless File.exist?(source_path)
 
       return nil if include_path?(source_path)
 
-      source = ExtensionSource.new(path: source_path)
+      source = ExtensionSource.new(path: source_path, enabled: enabled)
       @data << source
 
+      # TODO: Account for enabled state.
       add_load_path(source.path)
       require_sources(source.path)
 
@@ -53,10 +54,38 @@ module TT::Plugins::ExtensionSources
       source.path = path unless path.nil?
       source.enabled = enabled unless enabled.nil?
 
+      # TODO: Account for enabled state.
       add_load_path(source.path) if path
-      require_sources(source.path)
+      require_sources(source.path) if path && source.enabled?
 
       source
+    end
+
+    # @param [String] export_path
+    def export(export_path)
+      data = as_json
+      data.each { |path| path.delete(:path_id) }
+      json = JSON.pretty_generate(data)
+      File.open(export_path, "w:UTF-8") do |file|
+        file.write(json)
+      end
+      nil
+    end
+
+    # @param [String] import_path
+    def import(import_path)
+      json = File.open(import_path, "r:UTF-8", &:read)
+      data = JSON.parse(json, symbolize_names: true)
+      data.each { |item|
+        unless File.exist?(item[:path])
+          # TODO: Still display paths not found?
+          warn "Path not found: #{item[:path]}"
+          next
+        end
+
+        source = add(item[:path], enabled: item[:enabled])
+      }
+      nil
     end
 
     # @param [Integer] path_id
@@ -90,7 +119,7 @@ module TT::Plugins::ExtensionSources
     # @return [Hash]
     def as_json(options={})
       # https://stackoverflow.com/a/40642530/486990
-      to_hash
+      to_hash.map(&:to_hash)
     end
 
     # @return [String]

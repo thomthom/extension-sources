@@ -35,6 +35,14 @@ module TT::Plugins::ExtensionSources
           reload_path(dialog, path)
         end
 
+        extension_sources_dialog.on(:import_paths) do |dialog|
+          import_paths(dialog)
+        end
+
+        extension_sources_dialog.on(:export_paths) do |dialog|
+          export_paths(dialog)
+        end
+
       end
 
       extension_sources_dialog.show
@@ -122,6 +130,33 @@ module TT::Plugins::ExtensionSources
         $VERBOSE = original_verbose
       end
       puts "> Reloaded #{num_files} files"
+    end
+
+    # @param [ExtensionSourcesDialog] dialog
+    def export_paths(dialog)
+      path = UI.savepanel("Export Source Paths", nil, "extension_source_paths.json")
+      return if path.nil?
+
+      if File.exist?(path)
+        # TODO: Prompt to overwrite.
+        warn "Overwriting existing file: #{path}"
+      end
+
+      puts "Exporting to: #{path}"
+      extension_sources_manager.export(path)
+    end
+
+    # @param [ExtensionSourcesDialog] dialog
+    def import_paths(dialog)
+      path = UI.openpanel("Import Source Paths", nil, "extension_source_paths.json")
+      return if path.nil?
+
+      raise "path not found: #{path}" unless File.exist?(path)
+
+      puts "Importing from: #{path}"
+      extension_sources_manager.import(path)
+
+      sync_dialog(dialog)
     end
 
     # @return [ExtensionSourcesManager]

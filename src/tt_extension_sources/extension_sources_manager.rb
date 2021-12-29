@@ -16,6 +16,10 @@ module TT::Plugins::ExtensionSources
 
       source = ExtensionSource.new(path: path)
       @data << source
+
+      # TODO: Add to load path.
+      # TODO: Require root files.
+
       source
     end
 
@@ -23,6 +27,9 @@ module TT::Plugins::ExtensionSources
     # @return [ExtensionSource, nil]
     def remove(path_id)
       source = find_by_path_id(path_id)
+
+      # TODO: Remove from load path.
+
       @data.delete(source)
       source
     end
@@ -40,6 +47,10 @@ module TT::Plugins::ExtensionSources
 
       source.path = path unless path.nil?
       source.enabled = enabled unless enabled.nil?
+
+      # TODO: Update load path.
+      # TODO: Require root files.
+
       source
     end
 

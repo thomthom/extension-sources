@@ -8,6 +8,9 @@ let app = new Vue({
     update(sources) {
       this.sources = sources;
     },
+    options() {
+      sketchup.options();
+    },
     undo() {
       sketchup.undo();
     },

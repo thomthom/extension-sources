@@ -5,6 +5,7 @@ module TT::Plugins::ExtensionSources
     def initialize
       event_names = [
         :boot,
+        :options,
         :undo,
         :redo,
         :import_paths,
@@ -114,6 +115,9 @@ module TT::Plugins::ExtensionSources
     def init_action_callbacks(dialog)
       dialog.add_action_callback('ready') do
         trigger(:boot, self)
+      end
+      dialog.add_action_callback('options') do
+        trigger(:options, self)
       end
       dialog.add_action_callback('undo') do
         trigger(:undo, self)

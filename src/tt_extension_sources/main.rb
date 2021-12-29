@@ -8,6 +8,8 @@ module TT::Plugins::ExtensionSources
   # * Reorder source paths.
   # * Import/export function.
   # * Undo/redo function.
+  # * Options
+  #   * Open Ruby Console at Startup
   # * Track startup timings. Keep raw log. Keep separate cache of average.
 
   # @return [ExtensionSourcesController]

@@ -5,11 +5,10 @@ require 'tt_extension_sources/extension_sources_controller'
 
 module TT::Plugins::ExtensionSources
 
-  # * Track startup timings. Keep raw log. Keep separate cache of average.
-  # * Reload function.
   # * Reorder source paths.
   # * Import/export function.
   # * Undo/redo function.
+  # * Track startup timings. Keep raw log. Keep separate cache of average.
 
   # @return [ExtensionSourcesController]
   def self.extension_sources_controller

@@ -105,14 +105,23 @@ module TT::Plugins::ExtensionSources
       source = extension_sources_manager.find_by_path_id(path_id)
       raise "found no source path for: #{path_id}" if source.nil?
 
-      puts "> path: #{source.path}"
+      puts "> Path: #{source.path}"
 
       pattern = "#{source.path}/**/*.rb"
-      Dir.glob(pattern) { |path|
-        puts "  > #{path}"
-        # TODO: try/rescue -> report errors (Open Ruby Console)
-        # load path
-      }
+      num_files = begin
+        original_verbose = $VERBOSE
+        $VERBOSE = nil
+        Dir.glob(pattern).each { |path|
+          # puts "  * #{path}"
+          load path
+        }.size
+      rescue Exception
+        SKETCHUP_CONSOLE.show
+        raise
+      ensure
+        $VERBOSE = original_verbose
+      end
+      puts "> Reloaded #{num_files} files"
     end
 
     # @return [ExtensionSourcesManager]

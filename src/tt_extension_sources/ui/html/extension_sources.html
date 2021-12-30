@@ -19,11 +19,11 @@
         <div class="modus-toolbar d-flex">
           <h4 class="">{{ message }}</h4>
           <!-- Undo/Redo -->
-          <button class="btn btn-text-dark btn-lg btn-icon-only ml-4" v-on:click="undo">
+          <button class="btn btn-text-dark btn-lg btn-icon-only ml-4" v-on:click="undo" title="Undo">
             <!-- TODO: Undo icon -->
             <i class="modus-icons">arrow_left_bold</i>
           </button>
-          <button class="btn btn-text-dark btn-lg btn-icon-only mr-auto" v-on:click="redo">
+          <button class="btn btn-text-dark btn-lg btn-icon-only mr-auto" v-on:click="redo" title="Redo">
             <!-- TODO: Redo icon -->
             <i class="modus-icons">arrow_right_bold</i>
           </button>
@@ -31,7 +31,7 @@
           <form class="form-inline flex-grow-1">
             <div class="form-group w-100">
               <div class="input-with-icon-left w-100">
-                <input class="form-control w-100" placeholder="Type to filter source paths...">
+                <input class="form-control w-100" placeholder="Type to filter source paths…">
                 <div class="input-icon">
                   <i class="modus-icons">search</i>
                 </div>
@@ -39,13 +39,13 @@
             </div>
           </form>
           <!-- Add Path -->
-          <button class="btn btn-text-dark btn-lg btn-icon-only" v-on:click="add_path">
+          <button class="btn btn-text-dark btn-lg btn-icon-only" v-on:click="add_path" title="Add Path">
             <i class="modus-icons">circle_add_outline</i>
           </button>
           <!-- More... -->
           <div class="dropdown">
             <button class="btn btn-text-dark btn-lg btn-icon-only" id="dropdownMenuButton" data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false">
+              aria-haspopup="true" aria-expanded="false" title="More…">
               <i class="modus-icons">more_vertical</i>
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -62,7 +62,7 @@
           <div class="modus-content">
             <ul class="list-group">
               <li v-for="source in sources" v-bind:key="source.path_id" class="list-group-item list-item-left-control">
-                <div class="custom-control custom-switch custom-control-inline">
+                <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading">
                   <input type="checkbox" v-model="source.enabled" class="custom-control-input" id="listSwitch1">
                   <label class="custom-control-label" for="listSwitch1"></label>
                 </div>

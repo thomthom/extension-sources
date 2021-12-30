@@ -18,12 +18,12 @@ AllCops:
   - src/*/vendor/**/* # Exclude skippy vendor folder
   SketchUp:
     SourcePath: src
-    TargetSketchUpVersion: 2014
+    TargetSketchUpVersion: 2017 # UI::HtmlDialog.
     Exclude: # Exclude common folders.
     - profiling/
     - skippy/
     - tests/
-  TargetRubyVersion: 2.4 # Should have been 2.0 but RuboCop dropped support.
+  TargetRubyVersion: 2.5 # Should have been 2.2 but RuboCop dropped support.
 
 
 # If DisabledByDefault is set to true then we need to enable the SketchUp
@@ -43,3 +43,9 @@ SketchupSuggestions:
 
 SketchupBugs:
   Enabled: true
+
+
+# This extension must make changes to the $LOAD_PATH for it to operate as expected.
+SketchupRequirements/LoadPath:
+  Exclude:
+  - src/tt_extension_sources/extension_sources_manager.rb

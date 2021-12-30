@@ -49,10 +49,12 @@
               <i class="modus-icons">more_vertical</i>
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#" v-on:click.prevent="import_paths">Import Paths</a>
-              <a class="dropdown-item" href="#" v-on:click.prevent="export_paths">Export Paths</a>
-              <div class="dropdown-divider">Options</div>
-              <a class="dropdown-item" href="#" v-on:click.prevent="options">Options</a>
+              <a class="dropdown-item" href="#" v-on:click.prevent="import_paths">Import Paths…</a>
+              <a class="dropdown-item" href="#" v-on:click.prevent="export_paths">Export Paths…</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#" v-on:click.prevent="scan_paths">Scan for Paths…</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#" v-on:click.prevent="options">Options…</a>
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ module TT::Plugins::ExtensionSources
         :options,
         :undo,
         :redo,
+        :scan_paths,
         :import_paths,
         :export_paths,
         :add_path,
@@ -124,6 +125,9 @@ module TT::Plugins::ExtensionSources
       end
       dialog.add_action_callback('redo') do
         trigger(:redo, self)
+      end
+      dialog.add_action_callback('scan_paths') do
+        trigger(:scan_paths, self)
       end
       dialog.add_action_callback('import_paths') do
         trigger(:import_paths, self)

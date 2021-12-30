@@ -17,6 +17,9 @@ let app = new Vue({
     redo() {
       sketchup.redo();
     },
+    scan_paths() {
+      sketchup.scan_paths();
+    },
     import_paths() {
       sketchup.import_paths();
     },

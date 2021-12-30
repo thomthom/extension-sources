@@ -25,7 +25,7 @@ module TT::Plugins::ExtensionSources
     # @param [String] source_path
     # @return [ExtensionSource, nil]
     def add(source_path, enabled: true)
-      raise "Path doesn't exist: #{source_path}" unless File.exist?(source_path)
+      warn "Path doesn't exist: #{source_path}" unless File.exist?(source_path)
 
       return nil if include_path?(source_path)
 
@@ -76,8 +76,7 @@ module TT::Plugins::ExtensionSources
 
     # @param [String] export_path
     def export(export_path)
-      data = as_json
-      data.each { |path| path.delete(:path_id) }
+      data = serialize_as_hash
       json = JSON.pretty_generate(data)
       File.open(export_path, "w:UTF-8") do |file|
         file.write(json)
@@ -90,12 +89,6 @@ module TT::Plugins::ExtensionSources
       json = File.open(import_path, "r:UTF-8", &:read)
       data = JSON.parse(json, symbolize_names: true)
       data.each { |item|
-        unless File.exist?(item[:path])
-          # TODO: Still display paths not found?
-          warn "Path not found: #{item[:path]}"
-          next
-        end
-
         source = add(item[:path], enabled: item[:enabled])
       }
       nil
@@ -147,6 +140,11 @@ module TT::Plugins::ExtensionSources
 
     private
 
+    # @return [Hash]
+    def serialize_as_hash
+      @data.map(&:serialize_as_hash)
+    end
+
     # @param [String] source_path
     # @return [Array<String>]
     def require_sources(source_path)
@@ -174,6 +172,7 @@ module TT::Plugins::ExtensionSources
     # @param [Array<Hash>] data
     # @return [Array<ExtensionSource>]
     def from_hash(data)
+      # TODO: Unused?
       data.map { |hash| ExtensionSource.new(**hash) }
     end
 

@@ -6,7 +6,7 @@ module TT::Plugins::ExtensionSources
   class ExtensionSourcesController
 
     def initialize
-      @extension_sources_manager = nil
+      @extension_sources_manager = nil # TODO: Init here, boots the rb loading.
       @extension_sources_dialog = nil
     end
 
@@ -134,7 +134,8 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     def export_paths(dialog)
-      path = UI.savepanel("Export Source Paths", nil, "extension_source_paths.json")
+      default_file = ExtensionSourcesManager::EXTENSION_SOURCES_JSON
+      path = UI.savepanel("Export Source Paths", nil, default_file)
       return if path.nil?
 
       if File.exist?(path)
@@ -148,7 +149,8 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     def import_paths(dialog)
-      path = UI.openpanel("Import Source Paths", nil, "extension_source_paths.json")
+      default_file = ExtensionSourcesManager::EXTENSION_SOURCES_JSON
+      path = UI.openpanel("Import Source Paths", nil, default_file)
       return if path.nil?
 
       raise "path not found: #{path}" unless File.exist?(path)
@@ -172,6 +174,7 @@ module TT::Plugins::ExtensionSources
     end
 
     def sync_dialog(dialog)
+      extension_sources_manager.save
       # TODO: Use events to update dialog when manager changes. (Bulk updates?)
       sources = extension_sources_manager.sources
       dialog.update(sources)

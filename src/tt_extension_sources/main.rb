@@ -6,6 +6,7 @@ require 'tt_extension_sources/extension_sources_controller'
 module TT::Plugins::ExtensionSources
 
   # * Import/export function.
+  # * Scan for source paths (find .rb files with Sketchup.register_extension)
   # * Reorder source paths.
   # * Undo/redo function.
   # * Options

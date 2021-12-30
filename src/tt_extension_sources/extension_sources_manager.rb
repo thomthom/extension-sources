@@ -1,12 +1,25 @@
+require 'fileutils'
 require 'json'
 
 require 'tt_extension_sources/extension_source'
+require 'tt_extension_sources/os'
 
 module TT::Plugins::ExtensionSources
   class ExtensionSourcesManager
 
+    EXTENSION_SOURCES_JSON = 'extension_sources.json'.freeze
+
     def initialize
-      @data = from_hash(dummy_extension_sources)
+      # TODO:
+      # Parse startup args:
+      # "Config=${input:buildType};Path=${workspaceRoot}/ruby"
+      #
+      # Skip loading from paths in ARGV.
+      #
+      # "Bootloader=ExtensionSources;Config=${input:buildType};Path=${workspaceRoot}/ruby"
+      # @data = from_hash(dummy_extension_sources)
+      @data = []
+      deserialize
     end
 
     # @param [String] source_path
@@ -127,6 +140,11 @@ module TT::Plugins::ExtensionSources
       @data.to_json(*args)
     end
 
+    def save
+      # TODO: Solve by notifications.
+      serialize
+    end
+
     private
 
     # @param [String] source_path
@@ -157,6 +175,33 @@ module TT::Plugins::ExtensionSources
     # @return [Array<ExtensionSource>]
     def from_hash(data)
       data.map { |hash| ExtensionSource.new(**hash) }
+    end
+
+    # @return [String]
+    def storage_path
+      File.join(OS.app_data_path, 'CookieWare', 'Extension Source Manager')
+    end
+
+    # @return [String]
+    def sources_json_path
+      File.join(storage_path, EXTENSION_SOURCES_JSON)
+    end
+
+    def serialize
+      puts "STATUS: serializing to '#{sources_json_path}'..."
+      unless File.directory?(storage_path)
+        FileUtils.mkdir_p(storage_path)
+      end
+      warn "Storage path missing: #{storage_path}" unless File.directory?(storage_path)
+
+      export(sources_json_path)
+      puts "STATUS: serializing done: #{sources_json_path}"
+    end
+
+    def deserialize
+      puts "STATUS: deserializing from '#{sources_json_path}'..."
+      import(sources_json_path) if File.exist?(sources_json_path)
+      puts "STATUS: deserializing done: #{sources_json_path}"
     end
 
     # @return [Array<Hash>]

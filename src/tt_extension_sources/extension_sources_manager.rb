@@ -88,6 +88,7 @@ module TT::Plugins::ExtensionSources
     def import(import_path)
       json = File.open(import_path, "r:UTF-8", &:read)
       data = JSON.parse(json, symbolize_names: true)
+      # TODO: First add all load paths, then require.
       data.each { |item|
         source = add(item[:path], enabled: item[:enabled])
       }
@@ -228,6 +229,10 @@ module TT::Plugins::ExtensionSources
         },
         {
           path: 'C:/Users/Thomas/SourceTree/architect-tools/src',
+          enabled: true,
+        },
+        {
+          path: '"C:/Users/Thomas/SourceTree/tt-library-2',
           enabled: true,
         },
       ]

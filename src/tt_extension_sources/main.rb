@@ -27,11 +27,22 @@ module TT::Plugins::ExtensionSources
   end
 
   unless file_loaded?(__FILE__)
-    menu_name = Sketchup.version.to_f < 21.1 ? 'Plugins' : 'Developer'
-    menu = UI.menu(menu_name)
-    menu.add_item('Extension Sources…') {
+    cmd = UI::Command.new('Extension Sources…') {
       self.open_extension_sources_dialog
     }
+    cmd.tooltip = 'Extension Sources'
+    cmd.status_bar_text = 'Open the Extension Sources Dialog.'
+    # TODO: Toolbar icons. Icon idea: $: (alias for $LOAD_PATH)
+    cmd_open_extension_sources_dialog = cmd
+
+    menu_name = Sketchup.version.to_f < 21.1 ? 'Plugins' : 'Developer'
+    menu = UI.menu(menu_name)
+    menu.add_item(cmd_open_extension_sources_dialog)
+
+    toolbar = UI::Toolbar.new('Extension Sources')
+    toolbar.add_item(cmd_open_extension_sources_dialog)
+    toolbar.show if toolbar.get_last_state != TB_HIDDEN
+
     file_loaded(__FILE__)
   end
 

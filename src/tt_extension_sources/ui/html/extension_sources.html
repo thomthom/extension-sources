@@ -24,11 +24,11 @@
         <div class="modus-toolbar d-flex">
           <h4 class="">{{ message }}</h4>
           <!-- Undo/Redo -->
-          <button class="btn btn-text-dark btn-lg btn-icon-only ml-4" v-on:click="undo" title="Undo">
+          <button class="btn btn-text-dark btn-lg btn-icon-only ml-4" v-on:click="undo" title="Undo" disabled>
             <!-- TODO: Undo icon -->
             <i class="modus-icons">arrow_left_bold</i>
           </button>
-          <button class="btn btn-text-dark btn-lg btn-icon-only mr-auto" v-on:click="redo" title="Redo">
+          <button class="btn btn-text-dark btn-lg btn-icon-only mr-auto" v-on:click="redo" title="Redo" disabled>
             <!-- TODO: Redo icon -->
             <i class="modus-icons">arrow_right_bold</i>
           </button>

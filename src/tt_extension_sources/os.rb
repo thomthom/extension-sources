@@ -1,7 +1,18 @@
 module TT::Plugins::ExtensionSources
   module OS
 
+    IS_PLATFORM_WINDOWS = Sketchup.platform == :platform_win
+    IS_PLATFORM_MAC = Sketchup.platform == :platform_osx
+
     class << self
+
+    def windows?
+      IS_PLATFORM_WINDOWS
+    end
+
+    def mac?
+      IS_PLATFORM_MAC
+    end
 
     # @return [String]
     def app_data_path

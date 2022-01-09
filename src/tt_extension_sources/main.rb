@@ -55,6 +55,8 @@ module TT::Plugins::ExtensionSources
     toolbar.show if toolbar.get_last_state != TB_HIDDEN
 
     file_loaded(__FILE__)
+
+    self.extension_sources_controller.boot
   end
 
 end # module

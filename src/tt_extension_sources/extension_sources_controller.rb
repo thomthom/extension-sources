@@ -10,6 +10,12 @@ module TT::Plugins::ExtensionSources
       @extension_sources_dialog = nil
     end
 
+    def boot
+      # This will init the extension sources manager.
+      manager = self.extension_sources_manager
+      nil
+    end
+
     # @return [ExtensionSourcesDialog]
     def open_extension_sources_dialog
       unless extension_sources_dialog.visible?

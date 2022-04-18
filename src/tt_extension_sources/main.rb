@@ -41,7 +41,6 @@ module TT::Plugins::ExtensionSources
     }
     cmd.tooltip = 'Extension Sources'
     cmd.status_bar_text = 'Open the Extension Sources Dialog.'
-    # TODO: PDF version for mac.
     cmd.large_icon = self.toolbar_icon('extension_sources-32x32')
     cmd.small_icon = self.toolbar_icon('extension_sources-32x32')
     cmd_open_extension_sources_dialog = cmd

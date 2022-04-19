@@ -66,7 +66,8 @@
         <div class="modus-content-columns">
           <div class="modus-content">
             <ul class="list-group">
-              <li v-for="source in sources" v-bind:key="source.path_id" class="list-group-item list-item-left-control">
+              <li v-for="source in sources" v-bind:key="source.source_id"
+                class="list-group-item list-item-left-control">
                 <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading">
                   <input type="checkbox" v-model="source.enabled" class="custom-control-input" id="listSwitch1">
                   <label class="custom-control-label" for="listSwitch1"></label>
@@ -83,15 +84,15 @@
                   <!-- ml-auto vs flex-grow-1? -->
                   <div>
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload"
-                      v-on:click="reload_path(source.path_id)">
+                      v-on:click="reload_path(source.source_id)">
                       <i class="modus-icons">refresh</i>
                     </button>
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Edit"
-                      v-on:click="edit_path(source.path_id)">
+                      v-on:click="edit_path(source.source_id)">
                       <i class="modus-icons">edit</i>
                     </button>
                     <button class="btn btn-text-danger btn-msr btn-icon-only" title="Remove load path"
-                      v-on:click="remove_path(source.path_id)">
+                      v-on:click="remove_path(source.source_id)">
                       <i class="modus-icons">trash</i>
                     </button>
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Expand">

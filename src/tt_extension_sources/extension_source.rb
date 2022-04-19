@@ -3,38 +3,30 @@ require 'json'
 module TT::Plugins::ExtensionSources
   class ExtensionSource
 
-    # @param [String] path
     # return [Integer]
-    def self.path_id(path)
-      path.hash
+    def self.generate_source_id
+      @source_id ||= 0
+      @source_id += 1
     end
+
+    # A unique ID for this object. This differs from {Object#object_id} in that
+    # the sequence is unique for this class and kept as small as possible.
+    # @return [Numeric]
+    attr_reader :source_id
+
+    # @return [String]
+    attr_accessor :path
 
     # @param [String] path
     # @param [Boolean] enabled
     def initialize(path:, enabled: true)
-      @path_id = self.class.path_id(path)
+      @source_id = self.class.generate_source_id
       @path = path
       @enabled = enabled
     end
 
-    # @return [String]
-    def path_id
-      @path_id
-    end
-
     def path_exist?
       File.exist?(@path)
-    end
-
-    # @return [String]
-    def path
-      @path
-    end
-
-    # @param [String] value
-    def path=(value)
-      @path_id = self.class.path_id(value)
-      @path = value
     end
 
     # @return [Boolean]
@@ -50,7 +42,7 @@ module TT::Plugins::ExtensionSources
     # @return [Hash]
     def to_hash
       {
-        path_id: path_id,
+        source_id: source_id,
         path_exist: path_exist?,
         path: path,
         enabled: enabled?,
@@ -66,7 +58,7 @@ module TT::Plugins::ExtensionSources
     end
 
     # @return [Hash]
-    def as_json(options={})
+    def as_json(options = {})
       # https://stackoverflow.com/a/40642530/486990
       to_hash
     end

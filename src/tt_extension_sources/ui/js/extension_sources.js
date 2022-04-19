@@ -29,14 +29,14 @@ let app = new Vue({
     add_path() {
       sketchup.add_path();
     },
-    edit_path(path_id) {
-      sketchup.edit_path(path_id);
+    edit_path(source_id) {
+      sketchup.edit_path(source_id);
     },
-    remove_path(path_id) {
-      sketchup.remove_path(path_id);
+    remove_path(source_id) {
+      sketchup.remove_path(source_id);
     },
-    reload_path(path_id) {
-      sketchup.reload_path(path_id);
+    reload_path(source_id) {
+      sketchup.reload_path(source_id);
     }
   },
   mounted: function () {

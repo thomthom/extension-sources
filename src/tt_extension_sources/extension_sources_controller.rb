@@ -75,10 +75,10 @@ module TT::Plugins::ExtensionSources
     end
 
     # @param [ExtensionSourcesDialog] dialog
-    # @param [String] path_id
-    def edit_path(dialog, path_id)
-      source = extension_sources_manager.find_by_path_id(path_id)
-      raise "found no source path for: #{path_id}" if source.nil?
+    # @param [Integer] source_id
+    def edit_path(dialog, source_id)
+      source = extension_sources_manager.find_by_source_id(source_id)
+      raise "found no source path for: #{source_id}" if source.nil?
 
       title = "Select Extension Source Directory"
       path = loop do
@@ -97,27 +97,27 @@ module TT::Plugins::ExtensionSources
       end
 
       # TODO: Use notifications on ExtensionSource to manage updates?
-      return unless extension_sources_manager.update(path_id: path_id, path: path)
+      return unless extension_sources_manager.update(source_id: source_id, path: path)
 
       sync_dialog(dialog)
     end
 
     # @param [ExtensionSourcesDialog] dialog
-    # @param [String] path_id
-    def remove_path(dialog, path_id)
-      source = extension_sources_manager.remove(path_id)
-      raise "found no source path for: #{path_id}" if source.nil?
+    # @param [Integer] source_id
+    def remove_path(dialog, source_id)
+      source = extension_sources_manager.remove(source_id)
+      raise "found no source path for: #{source_id}" if source.nil?
 
       sync_dialog(dialog)
     end
 
     # @param [ExtensionSourcesDialog] dialog
-    # @param [String] path_id
-    def reload_path(dialog, path_id)
-      puts "reload_path(#{path_id})"
+    # @param [Integer] source_id
+    def reload_path(dialog, source_id)
+      puts "reload_path(#{source_id})"
 
-      source = extension_sources_manager.find_by_path_id(path_id)
-      raise "found no source path for: #{path_id}" if source.nil?
+      source = extension_sources_manager.find_by_source_id(source_id)
+      raise "found no source path for: #{source_id}" if source.nil?
 
       puts "> Path: #{source.path}"
 

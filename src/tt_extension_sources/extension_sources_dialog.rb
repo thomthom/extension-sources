@@ -138,14 +138,14 @@ module TT::Plugins::ExtensionSources
       dialog.add_action_callback('add_path') do
         trigger(:add_path, self)
       end
-      dialog.add_action_callback('edit_path') do |context, path_id|
-        trigger(:edit_path, self, path_id)
+      dialog.add_action_callback('edit_path') do |context, source_id|
+        trigger(:edit_path, self, source_id.to_i) # JS returns Float.
       end
-      dialog.add_action_callback('remove_path') do |context, path_id|
-        trigger(:remove_path, self, path_id)
+      dialog.add_action_callback('remove_path') do |context, source_id|
+        trigger(:remove_path, self, source_id.to_i) # JS returns Float.
       end
-      dialog.add_action_callback('reload_path') do |context, path_id|
-        trigger(:reload_path, self, path_id)
+      dialog.add_action_callback('reload_path') do |context, source_id|
+        trigger(:reload_path, self, source_id.to_i) # JS returns Float.
       end
     end
 

@@ -39,11 +39,11 @@ module TT::Plugins::ExtensionSources
       source
     end
 
-    # @param [Integer] path_id
+    # @param [Integer] source_id
     # @return [ExtensionSource, nil]
-    def remove(path_id)
-      source = find_by_path_id(path_id)
-      raise IndexError, "source path id #{path_id} not found" unless source
+    def remove(source_id)
+      source = find_by_source_id(source_id)
+      raise IndexError, "source id #{source_id} not found" unless source
 
       @data.delete_if { |item| item.path == source.path }
       remove_load_path(source.path)
@@ -51,13 +51,13 @@ module TT::Plugins::ExtensionSources
       source
     end
 
-    # @param [Integer] path_id
+    # @param [Integer] source_id
     # @param [String] path
     # @param [Boolean] enabled
     # @return [ExtensionSource]
-    def update(path_id:, path: nil, enabled: nil)
-      source = find_by_path_id(path_id)
-      raise IndexError, "source path id #{path_id} not found" unless source
+    def update(source_id:, path: nil, enabled: nil)
+      source = find_by_source_id(source_id)
+      raise IndexError, "source id #{source_id} not found" unless source
 
       # TODO: Use custom errors.
       raise "path '#{path}' already exists" if path && include_path?(path)
@@ -100,10 +100,10 @@ module TT::Plugins::ExtensionSources
       nil
     end
 
-    # @param [Integer] path_id
+    # @param [Integer] source_id
     # @return [ExtensionSource]
-    def find_by_path_id(path_id)
-      @data.find { |source| source.path_id == path_id }
+    def find_by_source_id(source_id)
+      @data.find { |source| source.source_id == source_id }
     end
 
     # @param [String] path

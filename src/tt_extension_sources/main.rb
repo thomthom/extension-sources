@@ -1,4 +1,4 @@
-require 'sketchup.rb'
+require 'sketchup'
 
 require 'tt_extension_sources/debug'
 require 'tt_extension_sources/extension_sources_controller'

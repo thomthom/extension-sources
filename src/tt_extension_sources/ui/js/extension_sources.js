@@ -5,6 +5,9 @@ let app = new Vue({
     sources: [],
   },
   methods: {
+    source_enabled_id(source_id) {
+      return `sourceEnabled${source_id}`;
+    },
     update(sources) {
       this.sources = sources;
     },

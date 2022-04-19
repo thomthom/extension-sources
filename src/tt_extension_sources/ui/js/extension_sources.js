@@ -41,7 +41,7 @@ let app = new Vue({
       sketchup.reload_path(source_id);
     }
   },
-  mounted: function () {
+  mounted() {
     sketchup.ready();
   },
 });

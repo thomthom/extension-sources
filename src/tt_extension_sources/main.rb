@@ -7,7 +7,7 @@ require 'tt_extension_sources/os'
 module TT::Plugins::ExtensionSources
 
   IMAGES_PATH = File.join(PATH, 'images').freeze
-  TOOLBAR_IMAGE_EXTENSION = OS.windows? ? 'svg' : 'pdf'
+  TOOLBAR_IMAGE_EXTENSION = OS.mac? ? 'pdf' : 'svg'
 
   # @return [ExtensionSourcesController]
   def self.extension_sources_controller

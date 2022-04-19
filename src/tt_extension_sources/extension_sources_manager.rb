@@ -16,8 +16,7 @@ module TT::Plugins::ExtensionSources
       #
       # Skip loading from paths in ARGV.
       #
-      # "Bootloader=ExtensionSources;Config=${input:buildType};Path=${workspaceRoot}/ruby"
-      # @data = from_hash(dummy_extension_sources)
+      # "BootLoader=ExtensionSources;Config=${input:buildType};Path=${workspaceRoot}/ruby"
       @data = []
       deserialize
     end
@@ -207,40 +206,6 @@ module TT::Plugins::ExtensionSources
       puts "STATUS: deserializing from '#{sources_json_path}'..."
       import(sources_json_path) if File.exist?(sources_json_path)
       puts "STATUS: deserializing done: #{sources_json_path}"
-    end
-
-    # @return [Array<Hash>]
-    def dummy_extension_sources
-      [
-        {
-          path: 'C:/Users/Thomas/SourceTree/TrueBend/src',
-          enabled: true,
-        },
-        {
-          path: 'C:/Users/Thomas/SourceTree/CleanUp/src',
-          enabled: false,
-        },
-        {
-          path: 'C:/Users/Thomas/SourceTree/SolidInspector/src',
-          enabled: true,
-        },
-        {
-          path: 'C:/Users/Thomas/SourceTree/quadface-tools/src',
-          enabled: true,
-        },
-        {
-          path: 'C:/Users/Thomas/SourceTree/SpeedUp/src',
-          enabled: false,
-        },
-        {
-          path: 'C:/Users/Thomas/SourceTree/architect-tools/src',
-          enabled: true,
-        },
-        {
-          path: '"C:/Users/Thomas/SourceTree/tt-library-2',
-          enabled: true,
-        },
-      ]
     end
 
   end # class

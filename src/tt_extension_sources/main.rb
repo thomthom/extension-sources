@@ -9,15 +9,6 @@ module TT::Plugins::ExtensionSources
   IMAGES_PATH = File.join(PATH, 'images').freeze
   TOOLBAR_IMAGE_EXTENSION = OS.windows? ? 'svg' : 'pdf'
 
-  # * Import/export function.
-  # * Scan for source paths (find .rb files with Sketchup.register_extension)
-  # * Reorder source paths.
-  # * Undo/redo function.
-  # * Options
-  #   * Open Ruby Console at Startup
-  # * Select/multi select.
-  # * Track startup timings. Keep raw log. Keep separate cache of average.
-
   # @return [ExtensionSourcesController]
   def self.extension_sources_controller
     @extension_sources_controller ||= ExtensionSourcesController.new

@@ -21,6 +21,8 @@ module TT::Plugins::ExtensionSources
     app.open_extension_sources_dialog
   end
 
+  # @param [String] basename Base name for toolbar icon resource.
+  # @return [String] Absolute path to toolbar icon resource.
   def self.toolbar_icon(basename)
     filename = "#{basename}.#{TOOLBAR_IMAGE_EXTENSION}"
     File.join(IMAGES_PATH, filename)

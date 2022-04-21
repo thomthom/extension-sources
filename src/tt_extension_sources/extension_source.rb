@@ -4,7 +4,7 @@ require 'observer'
 module TT::Plugins::ExtensionSources
   class ExtensionSource
 
-    # return [Integer]
+    # @return [Integer]
     def self.generate_source_id
       @source_id ||= 0
       @source_id += 1
@@ -12,18 +12,17 @@ module TT::Plugins::ExtensionSources
 
     include Observable
 
-    # A unique ID for this object. This differs from {Object#object_id} in that
+    # A unique ID for this object. This differs from `Object#object_id` in that
     # the sequence is unique for this class and kept as small as possible.
+    #
+    # The purpose is to be able to pass an ID to JavaScript (`UI::HtmlDialog`)
+    # without generating potentially large integers that `Object#object_id` or
+    # `String#hash` might do. These large integers would exceed the maximum safe
+    # integer values of JavaScript and might loose precision. (You read that
+    # correctly.)
+    #
     # @return [Numeric]
     attr_reader :source_id
-
-    # @!attribute path
-    # property :path
-
-    # @!attribute [r] enabled?
-    #   @return [Boolean]
-    # @!attribute [w] enabled
-    # property :enabled?
 
     # @param [String] path
     # @param [Boolean] enabled

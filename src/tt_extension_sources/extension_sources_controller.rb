@@ -22,6 +22,8 @@ module TT::Plugins::ExtensionSources
       @sync = Execution::Debounce.new(0.0, &method(:sync))
     end
 
+    # This will boot the extension sources manager and load files from the
+    # list of additional load-paths.
     def boot
       # This will init the extension sources manager.
       manager = self.extension_sources_manager

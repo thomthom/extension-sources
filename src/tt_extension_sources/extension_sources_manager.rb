@@ -151,9 +151,13 @@ module TT::Plugins::ExtensionSources
       @data.to_json(*args)
     end
 
+    # Serializes the state of the extension manager.
+    #
+    # @return [nil]
     def save
       puts "STATUS: #{self.class.name.split('::').last} save"
       serialize
+      nil
     end
 
     # @param [ExtensionSource] source
@@ -189,7 +193,7 @@ module TT::Plugins::ExtensionSources
       true
     end
 
-    # @param [String] source
+    # @param [String] source_path
     # @return [Boolean]
     def remove_load_path(source_path)
       !$LOAD_PATH.delete(source_path).nil?

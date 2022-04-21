@@ -32,10 +32,12 @@ module TT::Plugins::ExtensionSources
       call_js('app.update', sources)
     end
 
+    # @return [nil]
     def bring_to_front
       @dialog.bring_to_front
     end
 
+    # @return [nil]
     def show
       visible? ? bring_to_front : init_and_show
       nil
@@ -50,11 +52,11 @@ module TT::Plugins::ExtensionSources
       false
     end
 
-    # @param [Boolean]
     def visible?
       @dialog.visible?
     end
 
+    # @return [Boolean] The resulting visibility state.
     def toggle
       visible? ? close : show
       visible?
@@ -76,7 +78,7 @@ module TT::Plugins::ExtensionSources
     end
 
     # @param [String] function
-    # @param [Array<#to_json>] params
+    # @param [Array<#to_json>] args
     def call_js(function, *args)
       params = args.map(&:to_json).join(',')
       @dialog.execute_script("app.update(#{params})")

@@ -1,0 +1,5 @@
+--no-private
+--markup markdown
+src/**/*.rb
+-
+README.md

@@ -1,3 +1,4 @@
+require 'tt_extension_sources/execution'
 require 'tt_extension_sources/extension_source'
 require 'tt_extension_sources/extension_sources_dialog'
 require 'tt_extension_sources/extension_sources_manager'
@@ -5,9 +6,20 @@ require 'tt_extension_sources/extension_sources_manager'
 module TT::Plugins::ExtensionSources
   class ExtensionSourcesController
 
+    # TODO: Use Logger
+    # https://stackoverflow.com/a/36659911/486990
+    #
+    # def initialize(log_device: nil)
+    #   @logger = Logger.new(log_device)
+    #
+    # def initialize(logger: nil)
+    #   @logger = logger || Logger.new(nil)
+
     def initialize
       @extension_sources_manager = nil # TODO: Init here, boots the rb loading.
       @extension_sources_dialog = nil
+
+      @sync = Execution::Debounce.new(0.0, &method(:sync))
     end
 
     def boot
@@ -62,6 +74,14 @@ module TT::Plugins::ExtensionSources
       @extension_sources_dialog&.close
     end
 
+    # @param [ExtensionSourcesManager] sources_manager
+    # @param [Symbol] event
+    # @param [ExtensionSource] source
+    def on_sources_changed(sources_manager, event, source)
+      puts "STATUS: #{self.class.name.split('::').last} on_sources_changed: #{event} - ##{source&.source_id}: #{source&.path}"
+      @sync.call
+    end
+
     private
 
     # @param [ExtensionSourcesDialog] dialog
@@ -69,9 +89,7 @@ module TT::Plugins::ExtensionSources
       path = UI.select_directory(title: "Select Extension Source Directory")
       return if path.nil?
 
-      return unless extension_sources_manager.add(path)
-
-      sync_dialog(dialog)
+      extension_sources_manager.add(path)
     end
 
     # @param [ExtensionSourcesDialog] dialog
@@ -96,10 +114,7 @@ module TT::Plugins::ExtensionSources
         break path
       end
 
-      # TODO: Use notifications on ExtensionSource to manage updates?
-      return unless extension_sources_manager.update(source_id: source_id, path: path)
-
-      sync_dialog(dialog)
+      extension_sources_manager.update(source_id: source_id, path: path)
     end
 
     # @param [ExtensionSourcesDialog] dialog
@@ -107,8 +122,6 @@ module TT::Plugins::ExtensionSources
     def remove_path(dialog, source_id)
       source = extension_sources_manager.remove(source_id)
       raise "found no source path for: #{source_id}" if source.nil?
-
-      sync_dialog(dialog)
     end
 
     # @param [ExtensionSourcesDialog] dialog
@@ -163,13 +176,13 @@ module TT::Plugins::ExtensionSources
 
       puts "Importing from: #{path}"
       extension_sources_manager.import(path)
-
-      sync_dialog(dialog)
     end
 
     # @return [ExtensionSourcesManager]
     def extension_sources_manager
-      @extension_sources_manager ||= ExtensionSourcesManager.new
+      @extension_sources_manager ||= ExtensionSourcesManager.new.tap { |manager|
+        manager.add_observer(self, :on_sources_changed)
+      }
       @extension_sources_manager
     end
 
@@ -179,9 +192,15 @@ module TT::Plugins::ExtensionSources
       @extension_sources_dialog
     end
 
-    def sync_dialog(dialog)
+    def sync
+      puts "STATUS: #{self.class.name.split('::').last} sync"
       extension_sources_manager.save
-      # TODO: Use events to update dialog when manager changes. (Bulk updates?)
+      sync_dialog(extension_sources_dialog)
+      nil
+    end
+
+    def sync_dialog(dialog)
+      puts "STATUS: #{self.class.name.split('::').last} sync_dialog"
       sources = extension_sources_manager.sources
       dialog.update(sources)
       nil

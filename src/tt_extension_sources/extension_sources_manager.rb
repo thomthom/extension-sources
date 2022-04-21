@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'json'
+require 'observer'
 
 require 'tt_extension_sources/extension_source'
 require 'tt_extension_sources/os'
@@ -8,6 +9,8 @@ module TT::Plugins::ExtensionSources
   class ExtensionSourcesManager
 
     EXTENSION_SOURCES_JSON = 'extension_sources.json'.freeze
+
+    include Observable
 
     def initialize
       # TODO:
@@ -35,6 +38,11 @@ module TT::Plugins::ExtensionSources
       add_load_path(source.path)
       require_sources(source.path)
 
+      source.add_observer(self, :on_source_changed)
+
+      changed
+      notify_observers(self, :added, source)
+
       source
     end
 
@@ -46,6 +54,11 @@ module TT::Plugins::ExtensionSources
 
       @data.delete_if { |item| item.path == source.path }
       remove_load_path(source.path)
+
+      source.delete_observer(self)
+
+      changed
+      notify_observers(self, :removed, source)
 
       source
     end
@@ -139,8 +152,16 @@ module TT::Plugins::ExtensionSources
     end
 
     def save
-      # TODO: Solve by notifications.
+      puts "STATUS: #{self.class.name.split('::').last} save"
       serialize
+    end
+
+    # @param [ExtensionSource] source
+    # @param [Symbol] event
+    def on_source_changed(event, source)
+      puts "STATUS: #{self.class.name.split('::').last} on_source_changed: ##{source&.source_id}: #{source&.path}"
+      changed
+      notify_observers(self, :changed, source)
     end
 
     private
@@ -192,20 +213,20 @@ module TT::Plugins::ExtensionSources
     end
 
     def serialize
-      puts "STATUS: serializing to '#{sources_json_path}'..."
+      puts "STATUS: #{self.class.name.split('::').last} serializing to '#{sources_json_path}'..."
       unless File.directory?(storage_path)
         FileUtils.mkdir_p(storage_path)
       end
       warn "Storage path missing: #{storage_path}" unless File.directory?(storage_path)
 
       export(sources_json_path)
-      puts "STATUS: serializing done: #{sources_json_path}"
+      puts "STATUS: #{self.class.name.split('::').last} serializing done: #{sources_json_path}"
     end
 
     def deserialize
-      puts "STATUS: deserializing from '#{sources_json_path}'..."
+      puts "STATUS: #{self.class.name.split('::').last} deserializing from '#{sources_json_path}'..."
       import(sources_json_path) if File.exist?(sources_json_path)
-      puts "STATUS: deserializing done: #{sources_json_path}"
+      puts "STATUS: #{self.class.name.split('::').last} deserializing done: #{sources_json_path}"
     end
 
   end # class

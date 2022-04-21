@@ -1,4 +1,5 @@
 require 'json'
+require 'observer'
 
 module TT::Plugins::ExtensionSources
   class ExtensionSource
@@ -9,13 +10,20 @@ module TT::Plugins::ExtensionSources
       @source_id += 1
     end
 
+    include Observable
+
     # A unique ID for this object. This differs from {Object#object_id} in that
     # the sequence is unique for this class and kept as small as possible.
     # @return [Numeric]
     attr_reader :source_id
 
-    # @return [String]
-    attr_accessor :path
+    # @!attribute path
+    # property :path
+
+    # @!attribute [r] enabled?
+    #   @return [Boolean]
+    # @!attribute [w] enabled
+    # property :enabled?
 
     # @param [String] path
     # @param [Boolean] enabled
@@ -29,6 +37,20 @@ module TT::Plugins::ExtensionSources
       File.exist?(@path)
     end
 
+    # @return [String]
+    def path
+      @path
+    end
+
+    # @param [String] value
+    def path=(value)
+      return if value == @path
+
+      @path = value
+      changed
+      notify_observers(:path, self)
+    end
+
     # @return [Boolean]
     def enabled?
       @enabled
@@ -36,7 +58,11 @@ module TT::Plugins::ExtensionSources
 
     # @param [Boolean] value
     def enabled=(value)
+      return if value == @enabled
+
       @enabled = value
+      changed
+      notify_observers(:enabled, self)
     end
 
     # @return [Hash]

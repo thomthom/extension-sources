@@ -2,6 +2,7 @@ require 'json'
 require 'observer'
 
 module TT::Plugins::ExtensionSources
+  # Represents an additional load-path from which to load source files from.
   class ExtensionSource
 
     # @return [Integer]

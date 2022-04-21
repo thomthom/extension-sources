@@ -1,7 +1,11 @@
 module TT::Plugins::ExtensionSources
+  # Utilities for interacting with the OS.
   module OS
 
+    # `true` if the current platform is Windows.
     IS_PLATFORM_WINDOWS = Sketchup.platform == :platform_win
+
+    # `true` if the current platform is macOS.
     IS_PLATFORM_MAC = Sketchup.platform == :platform_osx
 
     class << self

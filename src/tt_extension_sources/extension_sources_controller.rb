@@ -4,6 +4,7 @@ require 'tt_extension_sources/extension_sources_dialog'
 require 'tt_extension_sources/extension_sources_manager'
 
 module TT::Plugins::ExtensionSources
+  # Application logic binding the extension sources manager with the UI.
   class ExtensionSourcesController
 
     # TODO: Use Logger

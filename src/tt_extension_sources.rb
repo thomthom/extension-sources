@@ -3,9 +3,9 @@ require 'json'
 require 'extensions'
 require 'sketchup'
 
-module TT
-module Plugins
-module ExtensionSources
+module TT # Root namespace for thomthom's extensions.
+module Plugins # Intermediate namespace for thomthom's extensions.
+module ExtensionSources # Base namespace for Extension Sources.
 
   file = __FILE__.dup
   # Account for Ruby encoding bug under Windows.
@@ -19,9 +19,9 @@ module ExtensionSources
   # Path to the support folder.
   PATH = File.join(PATH_ROOT, folder_name).freeze
 
-  # Extension information.
   extension_json_file = File.join(PATH, 'extension.json')
   extension_json = File.read(extension_json_file)
+  # Extension meta-data.
   EXTENSION = ::JSON.parse(extension_json, symbolize_names: true).freeze
 
   unless file_loaded?(__FILE__)

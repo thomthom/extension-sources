@@ -6,8 +6,10 @@ require 'tt_extension_sources/extension_source'
 require 'tt_extension_sources/os'
 
 module TT::Plugins::ExtensionSources
+  # Manages the list of additional extension load-paths.
   class ExtensionSourcesManager
 
+    # Filename, excluding path, of the JSON file to serialize to/from.
     EXTENSION_SOURCES_JSON = 'extension_sources.json'.freeze
 
     include Observable

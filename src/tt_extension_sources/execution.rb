@@ -1,4 +1,5 @@
 module TT::Plugins::ExtensionSources
+  # Utilities for deferring code execution.
   module Execution
 
     # @param [Float] seconds
@@ -17,7 +18,42 @@ module TT::Plugins::ExtensionSources
       self.delay(0.0, &block)
     end
 
-
+    # Debounces the block given to the {Debounce} instance.
+    #
+    # @example
+    #   class Counter
+    #
+    #     def initialize
+    #       @value = 0
+    #       @update = Execution::Debounce.new(0.0) do
+    #         update
+    #       end
+    #     end
+    #
+    #     def increment
+    #       @value += 1
+    #       puts 'Increment...'
+    #       @update.call
+    #     end
+    #
+    #     private
+    #
+    #     def update
+    #       puts 'Update!'
+    #     end
+    #
+    #   end
+    #
+    #   counter = Counter.new
+    #   3.times do
+    #     counter.increment
+    #   end
+    #
+    #   # Output:
+    #   #   Increment...
+    #   #   Increment...
+    #   #   Increment...
+    #   #   Update!
     class Debounce
 
       # @param [Float] delay in seconds

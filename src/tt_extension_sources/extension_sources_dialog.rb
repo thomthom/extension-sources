@@ -1,5 +1,5 @@
 module TT::Plugins::ExtensionSources
-
+  # A dialog the user interacts with to manage additional load-paths.
   class ExtensionSourcesDialog
 
     def initialize

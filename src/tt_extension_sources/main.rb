@@ -6,7 +6,10 @@ require 'tt_extension_sources/os'
 
 module TT::Plugins::ExtensionSources
 
+  # Absolute path to location of image resources.
   IMAGES_PATH = File.join(PATH, 'images').freeze
+
+  # File extension for toolbar images on the current OS.
   TOOLBAR_IMAGE_EXTENSION = OS.mac? ? 'pdf' : 'svg'
 
   # @return [ExtensionSourcesController]

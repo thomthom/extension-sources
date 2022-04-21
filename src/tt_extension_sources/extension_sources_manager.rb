@@ -65,6 +65,8 @@ module TT::Plugins::ExtensionSources
       source
     end
 
+    # Updates properties of the given source path.
+    #
     # @param [Integer] source_id
     # @param [String] path
     # @param [Boolean] enabled
@@ -72,6 +74,9 @@ module TT::Plugins::ExtensionSources
     def update(source_id:, path: nil, enabled: nil)
       source = find_by_source_id(source_id)
       raise IndexError, "source id #{source_id} not found" unless source
+
+      # TODO: Short circuit if no properties are updates.
+      # TODO: Don't update if no properties actually changes values.
 
       # TODO: Use custom errors.
       raise "path '#{path}' already exists" if path && include_path?(path)
@@ -213,11 +218,14 @@ module TT::Plugins::ExtensionSources
       File.join(OS.app_data_path, 'CookieWare', 'Extension Source Manager')
     end
 
+    # The absolute path where the manager will serialize to/from.
+    #
     # @return [String]
     def sources_json_path
       File.join(storage_path, EXTENSION_SOURCES_JSON)
     end
 
+    # Serializes the state of the manager to {sources_json_path}.
     def serialize
       puts "STATUS: #{self.class.name.split('::').last} serializing to '#{sources_json_path}'..."
       unless File.directory?(storage_path)
@@ -229,6 +237,7 @@ module TT::Plugins::ExtensionSources
       puts "STATUS: #{self.class.name.split('::').last} serializing done: #{sources_json_path}"
     end
 
+    # Deserializes the state of the manager from {sources_json_path}.
     def deserialize
       puts "STATUS: #{self.class.name.split('::').last} deserializing from '#{sources_json_path}'..."
       import(sources_json_path) if File.exist?(sources_json_path)

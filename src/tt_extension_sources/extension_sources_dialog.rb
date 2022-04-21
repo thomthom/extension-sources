@@ -70,15 +70,21 @@ module TT::Plugins::ExtensionSources
       Hash[event_names.map { |key| [key, []] }]
     end
 
+    # Ensures that the action callbacks are initialized before showing the
+    # dialog.
+    #
+    # @return [nil]
     def init_and_show
       raise "don't initialize if dialog is shown" if @dialog.visible?
 
       init_action_callbacks(@dialog)
       @dialog.show
+      nil
     end
 
     # @param [String] function
     # @param [Array<#to_json>] args
+    # @return [nil]
     def call_js(function, *args)
       params = args.map(&:to_json).join(',')
       @dialog.execute_script("app.update(#{params})")
@@ -86,11 +92,13 @@ module TT::Plugins::ExtensionSources
     end
 
     # @param [Symbol] event
+    # @return [nil]
     def trigger(event, *args)
       raise "unknown event: #{event}" unless @events.key?(event)
       warn "event without listeners: #{event}" if @events[event].empty?
 
       @events[event].each { |callback| callback.call(*args) }
+      nil
     end
 
     # @return [UI::HtmlDialog]

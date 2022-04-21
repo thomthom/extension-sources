@@ -8,13 +8,13 @@ module TT::Plugins::ExtensionSources
   class ExtensionSourcesController
 
     # TODO: Use Logger
-    # https://stackoverflow.com/a/36659911/486990
+    #   https://stackoverflow.com/a/36659911/486990
     #
-    # def initialize(log_device: nil)
-    #   @logger = Logger.new(log_device)
+    #     def initialize(log_device: nil)
+    #       @logger = Logger.new(log_device)
     #
-    # def initialize(logger: nil)
-    #   @logger = logger || Logger.new(nil)
+    #     def initialize(logger: nil)
+    #       @logger = logger || Logger.new(nil)
 
     def initialize
       @extension_sources_manager = nil # TODO: Init here, boots the rb loading.
@@ -195,6 +195,13 @@ module TT::Plugins::ExtensionSources
       @extension_sources_dialog
     end
 
+    # Call whenever extension sources has changed. This will update the UI and
+    # serialize the changes to file.
+    #
+    # @note This should be called via an {Execution::Debounce} to avoid
+    #   unnecessary update.
+    #
+    # @return [nil]
     def sync
       puts "STATUS: #{self.class.name.split('::').last} sync"
       extension_sources_manager.save
@@ -202,6 +209,9 @@ module TT::Plugins::ExtensionSources
       nil
     end
 
+    # Call whenever the Extension Sources dialog needs to update.
+    #
+    # @return [nil]
     def sync_dialog(dialog)
       puts "STATUS: #{self.class.name.split('::').last} sync_dialog"
       sources = extension_sources_manager.sources

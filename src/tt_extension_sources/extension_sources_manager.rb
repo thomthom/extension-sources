@@ -15,8 +15,7 @@ module TT::Plugins::ExtensionSources
     include Observable
 
     def initialize
-      # TODO:
-      # Parse startup args:
+      # TODO: Parse startup args:
       # "Config=${input:buildType};Path=${workspaceRoot}/ruby"
       #
       # Skip loading from paths in ARGV.

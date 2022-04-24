@@ -17,9 +17,11 @@ module TT::Plugins::ExtensionSources
     # Filename, excluding path, of the JSON file to serialize to/from.
     EXTENSION_SOURCES_JSON = 'extension_sources.json'.freeze
 
+    # @param [Array] load_path
     # @param [Logger] logger
-    def initialize(logger: Logger.new(nil))
+    def initialize(load_path: $LOAD_PATH, logger: Logger.new(nil))
       @logger = logger
+      @load_path = load_path
       # TODO: Parse startup args:
       # "Config=${input:buildType};Path=${workspaceRoot}/ruby"
       #
@@ -198,16 +200,16 @@ module TT::Plugins::ExtensionSources
     # @param [String] source_path
     # @return [Boolean]
     def add_load_path(source_path)
-      return false if $LOAD_PATH.include?(source_path)
+      return false if @load_path.include?(source_path)
 
-      $LOAD_PATH << source_path
+      @load_path << source_path
       true
     end
 
     # @param [String] source_path
     # @return [Boolean]
     def remove_load_path(source_path)
-      !$LOAD_PATH.delete(source_path).nil?
+      !@load_path.delete(source_path).nil?
     end
 
     # @param [Array<Hash>] data

@@ -1,22 +1,21 @@
+require 'logger'
+
 require 'tt_extension_sources/execution'
 require 'tt_extension_sources/extension_source'
 require 'tt_extension_sources/extension_sources_dialog'
 require 'tt_extension_sources/extension_sources_manager'
+require 'tt_extension_sources/inspection'
 
 module TT::Plugins::ExtensionSources
   # Application logic binding the extension sources manager with the UI.
   class ExtensionSourcesController
 
-    # TODO: Use Logger
-    #   https://stackoverflow.com/a/36659911/486990
-    #
-    #     def initialize(log_device: nil)
-    #       @logger = Logger.new(log_device)
-    #
-    #     def initialize(logger: nil)
-    #       @logger = logger || Logger.new(nil)
+    include Inspection
 
-    def initialize
+    # @param [Logger] logger
+    def initialize(logger: Logger.new(nil))
+      @logger = logger
+      @logger.debug { "#{self.class.object_name} initialize" }
       @extension_sources_manager = nil # TODO: Init here, boots the rb loading.
       @extension_sources_dialog = nil
 
@@ -26,6 +25,7 @@ module TT::Plugins::ExtensionSources
     # This will boot the extension sources manager and load files from the
     # list of additional load-paths.
     def boot
+      @logger.debug { "#{self.class.object_name} boot" }
       # This will init the extension sources manager.
       manager = self.extension_sources_manager
       nil
@@ -81,7 +81,7 @@ module TT::Plugins::ExtensionSources
     # @param [Symbol] event
     # @param [ExtensionSource] source
     def on_sources_changed(sources_manager, event, source)
-      puts "STATUS: #{self.class.name.split('::').last} on_sources_changed: #{event} - ##{source&.source_id}: #{source&.path}"
+      @logger.debug { "#{self.class.object_name} on_sources_changed: #{event} - ##{source&.source_id}: #{source&.path}" }
       @sync.call
     end
 
@@ -130,19 +130,19 @@ module TT::Plugins::ExtensionSources
     # @param [ExtensionSourcesDialog] dialog
     # @param [Integer] source_id
     def reload_path(dialog, source_id)
-      puts "reload_path(#{source_id})"
+      @logger.info { "#{self.class.object_name} reload_path(#{source_id})" }
 
       source = extension_sources_manager.find_by_source_id(source_id)
       raise "found no source path for: #{source_id}" if source.nil?
 
-      puts "> Path: #{source.path}"
+      @logger.info { "#{self.class.object_name} > Path: #{source.path}" }
 
       pattern = "#{source.path}/**/*.rb"
       num_files = begin
         original_verbose = $VERBOSE
         $VERBOSE = nil
         Dir.glob(pattern).each { |path|
-          # puts "  * #{path}"
+          # @logger.debug { "#{self.class.object_name} * #{path}" }
           load path
         }.size
       rescue Exception
@@ -151,7 +151,7 @@ module TT::Plugins::ExtensionSources
       ensure
         $VERBOSE = original_verbose
       end
-      puts "> Reloaded #{num_files} files"
+      @logger.info { "#{self.class.object_name} > Reloaded #{num_files} files" }
     end
 
     # @param [ExtensionSourcesDialog] dialog
@@ -165,7 +165,7 @@ module TT::Plugins::ExtensionSources
         warn "Overwriting existing file: #{path}"
       end
 
-      puts "Exporting to: #{path}"
+      @logger.info { "#{self.class.object_name} Exporting to: #{path}" }
       extension_sources_manager.export(path)
     end
 
@@ -177,13 +177,13 @@ module TT::Plugins::ExtensionSources
 
       raise "path not found: #{path}" unless File.exist?(path)
 
-      puts "Importing from: #{path}"
+      @logger.info { "#{self.class.object_name} Importing from: #{path}" }
       extension_sources_manager.import(path)
     end
 
     # @return [ExtensionSourcesManager]
     def extension_sources_manager
-      @extension_sources_manager ||= ExtensionSourcesManager.new.tap { |manager|
+      @extension_sources_manager ||= ExtensionSourcesManager.new(logger: @logger).tap { |manager|
         manager.add_observer(self, :on_sources_changed)
       }
       @extension_sources_manager
@@ -203,7 +203,7 @@ module TT::Plugins::ExtensionSources
     #
     # @return [nil]
     def sync
-      puts "STATUS: #{self.class.name.split('::').last} sync"
+      @logger.debug { "#{self.class.object_name} sync" }
       extension_sources_manager.save
       sync_dialog(extension_sources_dialog)
       nil
@@ -213,7 +213,7 @@ module TT::Plugins::ExtensionSources
     #
     # @return [nil]
     def sync_dialog(dialog)
-      puts "STATUS: #{self.class.name.split('::').last} sync_dialog"
+      @logger.debug { "#{self.class.object_name} sync_dialog" }
       sources = extension_sources_manager.sources
       dialog.update(sources)
       nil

@@ -1,20 +1,25 @@
 require 'fileutils'
 require 'json'
+require 'logger'
 require 'observer'
 
 require 'tt_extension_sources/extension_source'
+require 'tt_extension_sources/inspection'
 require 'tt_extension_sources/os'
 
 module TT::Plugins::ExtensionSources
   # Manages the list of additional extension load-paths.
   class ExtensionSourcesManager
 
+    include Inspection
+    include Observable
+
     # Filename, excluding path, of the JSON file to serialize to/from.
     EXTENSION_SOURCES_JSON = 'extension_sources.json'.freeze
 
-    include Observable
-
-    def initialize
+    # @param [Logger] logger
+    def initialize(logger: Logger.new(nil))
+      @logger = logger
       # TODO: Parse startup args:
       # "Config=${input:buildType};Path=${workspaceRoot}/ruby"
       #
@@ -161,7 +166,7 @@ module TT::Plugins::ExtensionSources
     #
     # @return [nil]
     def save
-      puts "STATUS: #{self.class.name.split('::').last} save"
+      @logger.debug { "#{self.class.object_name} save" }
       serialize
       nil
     end
@@ -169,7 +174,7 @@ module TT::Plugins::ExtensionSources
     # @param [ExtensionSource] source
     # @param [Symbol] event
     def on_source_changed(event, source)
-      puts "STATUS: #{self.class.name.split('::').last} on_source_changed: ##{source&.source_id}: #{source&.path}"
+      @logger.debug { "#{self.class.object_name} on_source_changed: ##{source&.source_id}: #{source&.path}" }
       changed
       notify_observers(self, :changed, source)
     end
@@ -226,21 +231,21 @@ module TT::Plugins::ExtensionSources
 
     # Serializes the state of the manager to {sources_json_path}.
     def serialize
-      puts "STATUS: #{self.class.name.split('::').last} serializing to '#{sources_json_path}'..."
+      @logger.info { "#{self.class.object_name} serializing to '#{sources_json_path}'..." }
       unless File.directory?(storage_path)
         FileUtils.mkdir_p(storage_path)
       end
       warn "Storage path missing: #{storage_path}" unless File.directory?(storage_path)
 
       export(sources_json_path)
-      puts "STATUS: #{self.class.name.split('::').last} serializing done: #{sources_json_path}"
+      @logger.info { "#{self.class.object_name} serializing done: #{sources_json_path}" }
     end
 
     # Deserializes the state of the manager from {sources_json_path}.
     def deserialize
-      puts "STATUS: #{self.class.name.split('::').last} deserializing from '#{sources_json_path}'..."
+      @logger.info { "#{self.class.object_name} deserializing from '#{sources_json_path}'..." }
       import(sources_json_path) if File.exist?(sources_json_path)
-      puts "STATUS: #{self.class.name.split('::').last} deserializing done: #{sources_json_path}"
+      @logger.info { "#{self.class.object_name} deserializing done: #{sources_json_path}" }
     end
 
   end # class

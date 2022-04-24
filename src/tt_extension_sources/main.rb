@@ -1,5 +1,8 @@
 require 'sketchup'
 
+require 'logger'
+
+require 'tt_extension_sources/console'
 require 'tt_extension_sources/debug'
 require 'tt_extension_sources/extension_sources_controller'
 require 'tt_extension_sources/os'
@@ -14,7 +17,15 @@ module TT::Plugins::ExtensionSources
 
   # @return [ExtensionSourcesController]
   def self.extension_sources_controller
-    @extension_sources_controller ||= ExtensionSourcesController.new
+    console = SketchUpConsole.new(SKETCHUP_CONSOLE)
+
+    @logger = Logger.new(console)
+    @logger.level = Logger::DEBUG # TODO: From settings.
+    @logger.formatter = proc do |severity, datetime, progname, msg|
+      "#{severity}: #{msg}\n"
+    end
+
+    @extension_sources_controller ||= ExtensionSourcesController.new(logger: @logger)
     @extension_sources_controller
   end
 

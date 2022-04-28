@@ -7,5 +7,5 @@ Manage additional sources to load extensions from.
 ### List undocumented code
 
 ```sh
-bundle exec yard --list-undoc
+bundle exec yard stats --list-undoc
 ```

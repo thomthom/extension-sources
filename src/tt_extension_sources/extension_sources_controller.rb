@@ -16,7 +16,7 @@ module TT::Plugins::ExtensionSources
     def initialize(logger: Logger.new(nil))
       @logger = logger
       @logger.debug { "#{self.class.object_name} initialize" }
-      @extension_sources_manager = nil # TODO: Init here, boots the rb loading.
+      @extension_sources_manager = nil
       @extension_sources_dialog = nil
 
       @sync = Execution::Debounce.new(0.0, &method(:sync))
@@ -26,8 +26,7 @@ module TT::Plugins::ExtensionSources
     # list of additional load-paths.
     def boot
       @logger.debug { "#{self.class.object_name} boot" }
-      # This will init the extension sources manager.
-      self.extension_sources_manager
+      @extension_sources_manager ||= create_extension_sources_manager
       nil
     end
 
@@ -104,6 +103,7 @@ module TT::Plugins::ExtensionSources
 
       @logger.info { "#{self.class.object_name} > Path: #{source.path}" }
 
+      # TODO: Should this be done by the manager?
       pattern = "#{source.path}/**/*.rb"
       num_files = begin
         original_verbose = $VERBOSE
@@ -150,10 +150,15 @@ module TT::Plugins::ExtensionSources
 
     # @return [ExtensionSourcesManager]
     def extension_sources_manager
-      @extension_sources_manager ||= ExtensionSourcesManager.new(logger: @logger).tap { |manager|
+      raise '`boot` has not been called yet' if @extension_sources_manager.nil?
+      @extension_sources_manager
+    end
+
+    # @return [ExtensionSourcesManager]
+    def create_extension_sources_manager
+      ExtensionSourcesManager.new(logger: @logger).tap { |manager|
         manager.add_observer(self, :on_sources_changed)
       }
-      @extension_sources_manager
     end
 
     # @return [ExtensionSourcesDialog]

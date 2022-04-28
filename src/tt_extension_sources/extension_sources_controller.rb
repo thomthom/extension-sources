@@ -27,45 +27,12 @@ module TT::Plugins::ExtensionSources
     def boot
       @logger.debug { "#{self.class.object_name} boot" }
       # This will init the extension sources manager.
-      manager = self.extension_sources_manager
+      self.extension_sources_manager
       nil
     end
 
     # @return [ExtensionSourcesDialog]
     def open_extension_sources_dialog
-      unless extension_sources_dialog.visible?
-
-        extension_sources_dialog.on(:boot) do |dialog|
-          sources = extension_sources_manager.sources
-          dialog.update(sources)
-        end
-
-        extension_sources_dialog.on(:add_path) do |dialog|
-          add_path(dialog)
-        end
-
-        extension_sources_dialog.on(:edit_path) do |dialog, path|
-          edit_path(dialog, path)
-        end
-
-        extension_sources_dialog.on(:remove_path) do |dialog, path|
-          remove_path(dialog, path)
-        end
-
-        extension_sources_dialog.on(:reload_path) do |dialog, path|
-          reload_path(dialog, path)
-        end
-
-        extension_sources_dialog.on(:import_paths) do |dialog|
-          import_paths(dialog)
-        end
-
-        extension_sources_dialog.on(:export_paths) do |dialog|
-          export_paths(dialog)
-        end
-
-      end
-
       extension_sources_dialog.show
       extension_sources_dialog
     end
@@ -191,8 +158,44 @@ module TT::Plugins::ExtensionSources
 
     # @return [ExtensionSourcesDialog]
     def extension_sources_dialog
-      @extension_sources_dialog ||= ExtensionSourcesDialog.new
+      @extension_sources_dialog ||= create_extension_sources_dialog
       @extension_sources_dialog
+    end
+
+    # @return [ExtensionSourcesDialog]
+    def create_extension_sources_dialog
+      dialog = ExtensionSourcesDialog.new
+
+      dialog.on(:boot) do |dialog|
+        sources = extension_sources_manager.sources
+        dialog.update(sources)
+      end
+
+      dialog.on(:add_path) do |dialog|
+        add_path(dialog)
+      end
+
+      dialog.on(:edit_path) do |dialog, path|
+        edit_path(dialog, path)
+      end
+
+      dialog.on(:remove_path) do |dialog, path|
+        remove_path(dialog, path)
+      end
+
+      dialog.on(:reload_path) do |dialog, path|
+        reload_path(dialog, path)
+      end
+
+      dialog.on(:import_paths) do |dialog|
+        import_paths(dialog)
+      end
+
+      dialog.on(:export_paths) do |dialog|
+        export_paths(dialog)
+      end
+
+      dialog
     end
 
     # Call whenever extension sources has changed. This will update the UI and

@@ -5,10 +5,14 @@ require 'tt_extension_sources/extension_source'
 require 'tt_extension_sources/extension_sources_dialog'
 require 'tt_extension_sources/extension_sources_manager'
 require 'tt_extension_sources/inspection'
+require 'tt_extension_sources/os'
 
 module TT::Plugins::ExtensionSources
   # Application logic binding the extension sources manager with the UI.
   class ExtensionSourcesController
+
+    # Filename, excluding path, of the JSON file to serialize to/from.
+    EXTENSION_SOURCES_JSON = 'extension_sources.json'.freeze
 
     include Inspection
 
@@ -156,7 +160,7 @@ module TT::Plugins::ExtensionSources
 
     # @return [ExtensionSourcesManager]
     def create_extension_sources_manager
-      ExtensionSourcesManager.new(logger: @logger).tap { |manager|
+      ExtensionSourcesManager.new(logger: @logger, storage_path: sources_json_path).tap { |manager|
         manager.add_observer(self, :on_sources_changed)
       }
     end
@@ -225,6 +229,18 @@ module TT::Plugins::ExtensionSources
       sources = extension_sources_manager.sources
       dialog.update(sources)
       nil
+    end
+
+    # @return [String]
+    def storage_dir
+      File.join(OS.app_data_path, 'CookieWare', 'Extension Source Manager')
+    end
+
+    # The absolute path where the manager will serialize to/from.
+    #
+    # @return [String]
+    def sources_json_path
+      File.join(storage_dir, EXTENSION_SOURCES_JSON)
     end
 
   end # class

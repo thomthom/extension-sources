@@ -5,7 +5,6 @@ require 'observer'
 
 require 'tt_extension_sources/extension_source'
 require 'tt_extension_sources/inspection'
-require 'tt_extension_sources/os'
 
 module TT::Plugins::ExtensionSources
   # Manages the list of additional extension load-paths.
@@ -14,14 +13,14 @@ module TT::Plugins::ExtensionSources
     include Inspection
     include Observable
 
-    # Filename, excluding path, of the JSON file to serialize to/from.
-    EXTENSION_SOURCES_JSON = 'extension_sources.json'.freeze
-
+    # @param [String] storage_path Full path to JSON file to serialize data to.
     # @param [Array] load_path
     # @param [Logger] logger
-    def initialize(load_path: $LOAD_PATH, logger: Logger.new(nil))
+    def initialize(storage_path:, load_path: $LOAD_PATH, logger: Logger.new(nil), warnings: true)
+      @warnings = warnings
       @logger = logger
       @load_path = load_path
+      @storage_path = storage_path
       # TODO: Parse startup args:
       # "Config=${input:buildType};Path=${workspaceRoot}/ruby"
       #
@@ -35,7 +34,7 @@ module TT::Plugins::ExtensionSources
     # @param [String] source_path
     # @return [ExtensionSource, nil]
     def add(source_path, enabled: true)
-      warn "Path doesn't exist: #{source_path}" unless File.exist?(source_path)
+      warn "Path doesn't exist: #{source_path}" if @warnings && !File.exist?(source_path)
 
       return nil if include_path?(source_path)
 
@@ -81,11 +80,13 @@ module TT::Plugins::ExtensionSources
       source = find_by_source_id(source_id)
       raise IndexError, "source id #{source_id} not found" unless source
 
-      # TODO: Short circuit if no properties are updates.
-      # TODO: Don't update if no properties actually changes values.
+      # Don't update if no properties changes value.
+      return source if path.nil? && enabled.nil?
 
-      # TODO: Use custom errors.
-      raise "path '#{path}' already exists" if path && include_path?(path)
+      if (path && path != source.path)
+        # TODO: Use custom errors.
+        raise "path '#{path}' already exists" if path && include_path?(path)
+      end
 
       remove_load_path(source.path) if path
 
@@ -117,10 +118,10 @@ module TT::Plugins::ExtensionSources
       # extensions that depend on other extensions. These will assume the
       # dependent extension is present in the load path.
       data.each { |item|
-        source = add_load_path(item[:path])
+        add_load_path(item[:path])
       }
       data.each { |item|
-        source = add(item[:path], enabled: item[:enabled])
+        add(item[:path], enabled: item[:enabled])
       }
       nil
     end
@@ -149,14 +150,9 @@ module TT::Plugins::ExtensionSources
     end
 
     # @return [Hash]
-    def to_hash
-      @data.dup
-    end
-
-    # @return [Hash]
     def as_json(options={})
       # https://stackoverflow.com/a/40642530/486990
-      to_hash.map(&:to_hash)
+      @data.map(&:to_hash)
     end
 
     # @return [String]
@@ -212,42 +208,31 @@ module TT::Plugins::ExtensionSources
       !@load_path.delete(source_path).nil?
     end
 
-    # @param [Array<Hash>] data
-    # @return [Array<ExtensionSource>]
-    def from_hash(data)
-      # TODO: Unused?
-      data.map { |hash| ExtensionSource.new(**hash) }
-    end
-
-    # @return [String]
-    def storage_path
-      File.join(OS.app_data_path, 'CookieWare', 'Extension Source Manager')
-    end
-
     # The absolute path where the manager will serialize to/from.
     #
     # @return [String]
-    def sources_json_path
-      File.join(storage_path, EXTENSION_SOURCES_JSON)
+    def storage_path
+      @storage_path
     end
 
-    # Serializes the state of the manager to {sources_json_path}.
+    # Serializes the state of the manager to {storage_path}.
     def serialize
-      @logger.info { "#{self.class.object_name} serializing to '#{sources_json_path}'..." }
-      unless File.directory?(storage_path)
-        FileUtils.mkdir_p(storage_path)
+      @logger.info { "#{self.class.object_name} serializing to '#{storage_path}'..." }
+      directory = File.dirname(storage_path)
+      unless File.directory?(directory)
+        FileUtils.mkdir_p(directory)
       end
-      warn "Storage path missing: #{storage_path}" unless File.directory?(storage_path)
+      warn "Storage directory missing: #{directory}" if @warnings && File.directory?(directory)
 
-      export(sources_json_path)
-      @logger.info { "#{self.class.object_name} serializing done: #{sources_json_path}" }
+      export(storage_path)
+      @logger.info { "#{self.class.object_name} serializing done: #{storage_path}" }
     end
 
-    # Deserializes the state of the manager from {sources_json_path}.
+    # Deserializes the state of the manager from {storage_path}.
     def deserialize
-      @logger.info { "#{self.class.object_name} deserializing from '#{sources_json_path}'..." }
-      import(sources_json_path) if File.exist?(sources_json_path)
-      @logger.info { "#{self.class.object_name} deserializing done: #{sources_json_path}" }
+      @logger.info { "#{self.class.object_name} deserializing from '#{storage_path}'..." }
+      import(storage_path) if File.exist?(storage_path)
+      @logger.info { "#{self.class.object_name} deserializing done: #{storage_path}" }
     end
 
   end # class

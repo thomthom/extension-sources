@@ -99,7 +99,7 @@ module TT::Plugins::ExtensionSources
       assert_kind_of(TrueClass, source.enabled?)
     end
 
-    def test_path_Set_trigger_observer
+    def test_enabled_Set_trigger_observer
       path = Faker::File.dir
       source = ExtensionSource.new(path: path, enabled: false)
       assert_observer_event(source, :changed, [:enabled, source]) do

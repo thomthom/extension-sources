@@ -1,3 +1,10 @@
 {
   "solargraph.diagnostics": true,
+  // https://github.com/connorshea/vscode-ruby-test-adapter/issues/86#issue-1064452536
+  "rubyTestExplorer.debugCommand": "bundle exec rdebug-ide -I src -I tests/standalone/helpers",
+  "rubyTestExplorer.minitestCommand": "bundle exec rake -I src -I tests/standalone/helpers",
+  "rubyTestExplorer.minitestDirectory": "./tests/standalone",
+  "rubyTestExplorer.logpanel": true,
+  // As of VSCode 1.59 there is now a native Test Explorer UI.
+  "testExplorer.useNativeTesting": true
 }

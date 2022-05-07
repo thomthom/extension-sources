@@ -20,9 +20,9 @@ AllCops:
     SourcePath: src
     TargetSketchUpVersion: 2017 # UI::HtmlDialog.
     Exclude: # Exclude common folders.
-    - profiling/
-    - skippy/
-    - tests/
+    - profiling/**/*
+    - skippy/**/*
+    - tests/**/*
   TargetRubyVersion: 2.5 # Should have been 2.2 but RuboCop dropped support.
 
 

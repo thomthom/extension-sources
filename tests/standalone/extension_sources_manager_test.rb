@@ -541,8 +541,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      source1 = manager.add(Faker::File.unique.dir, enabled: true)
-      source2 = manager.add(Faker::File.unique.dir, enabled: true)
+      manager.add(Faker::File.unique.dir, enabled: true)
+      manager.add(Faker::File.unique.dir, enabled: true)
 
       result = manager.to_json
       assert_kind_of(String, result)
@@ -559,8 +559,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      source1 = manager.add(Faker::File.unique.dir, enabled: true)
-      source2 = manager.add(Faker::File.unique.dir, enabled: true)
+      manager.add(Faker::File.unique.dir, enabled: true)
+      manager.add(Faker::File.unique.dir, enabled: true)
       assert_equal(2, @storage_path.size)
 
       manager.save

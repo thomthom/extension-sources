@@ -12,7 +12,7 @@ module TT::Plugins::ExtensionSources
 
     # noop
     def close
-    end
+    end unless method_defined?(:close)
 
   end # class
 end # module

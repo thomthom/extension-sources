@@ -44,9 +44,10 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: source_path, enabled: enabled)
       @data << source
 
-      # TODO: Account for enabled state.
-      add_load_path(source.path)
-      require_sources(source.path)
+      if source.enabled?
+        add_load_path(source.path)
+        require_sources(source.path)
+      end
 
       source.add_observer(self, :on_source_changed)
 
@@ -86,21 +87,30 @@ module TT::Plugins::ExtensionSources
       source = find_by_source_id(source_id)
       raise IndexError, "source id #{source_id} not found" unless source
 
-      # Don't update if no properties changes value.
-      return source if path.nil? && enabled.nil?
-
-      if (path && path != source.path)
+      if path && path != source.path
         raise PathNotUnique, "path '#{path}' already exists" if path && include_path?(path)
       end
 
-      remove_load_path(source.path) if path
+      # Don't update if no properties changes value.
+      return source if path.nil? && enabled.nil?
 
-      source.path = path unless path.nil?
-      source.enabled = enabled unless enabled.nil?
+      if !enabled.nil? && enabled != source.enabled?
+        source.enabled = enabled
+        if source.enabled?
+          add_load_path(source.path)
+        else
+          remove_load_path(source.path)
+        end
+      end
 
-      # TODO: Account for enabled state.
-      add_load_path(source.path) if path
-      require_sources(source.path) if path && source.enabled?
+      if path && path != source.path
+        remove_load_path(source.path)
+        source.path = path
+        if source.enabled?
+          add_load_path(source.path)
+          require_sources(source.path)
+        end
+      end
 
       source
     end

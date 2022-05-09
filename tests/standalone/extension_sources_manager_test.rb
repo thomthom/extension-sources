@@ -150,7 +150,8 @@ module TT::Plugins::ExtensionSources
       end
       assert_kind_of(FalseClass, source.enabled?)
       assert(manager.include_path?(path))
-      assert(@load_path.include?(path)) # TODO: Should not be in load path when disabled
+      # Should not be in load path when source path is disabled.
+      refute(@load_path.include?(path))
     end
 
     def test_add_default_enabled
@@ -255,8 +256,8 @@ module TT::Plugins::ExtensionSources
       assert_equal(source, result)
       assert_kind_of(FalseClass, source.enabled?)
       assert(manager.include_path?(path))
-      # refute(@load_path.include?(path))
-      assert(@load_path.include?(path)) # TODO: This is wrong
+      # Should not be in load path when source path is disabled.
+      refute(@load_path.include?(path))
     end
 
     def test_update_nothing

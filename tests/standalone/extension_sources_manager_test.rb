@@ -325,7 +325,7 @@ module TT::Plugins::ExtensionSources
       path2 = Faker::File.unique.dir
       source2 = manager.add(path2, enabled: true)
 
-      assert_raises(RuntimeError) do
+      assert_raises(PathNotUnique) do
         manager.update(source_id: source2.source_id, path: path1)
       end
       assert_equal(path1, source1.path)

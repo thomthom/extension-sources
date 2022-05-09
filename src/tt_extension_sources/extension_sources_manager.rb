@@ -7,6 +7,9 @@ require 'tt_extension_sources/extension_source'
 require 'tt_extension_sources/inspection'
 
 module TT::Plugins::ExtensionSources
+  # Raised when the given path already exists in the {ExtensionSourcesManager}.
+  class PathNotUnique < StandardError; end
+
   # Manages the list of additional extension load-paths.
   class ExtensionSourcesManager
 
@@ -76,6 +79,9 @@ module TT::Plugins::ExtensionSources
     # @param [String] path
     # @param [Boolean] enabled
     # @return [ExtensionSource]
+    #
+    # @raise [PathNotUnique] when the given path already exists in another
+    #   {ExtensionSource} already added to the manager.
     def update(source_id:, path: nil, enabled: nil)
       source = find_by_source_id(source_id)
       raise IndexError, "source id #{source_id} not found" unless source
@@ -84,8 +90,7 @@ module TT::Plugins::ExtensionSources
       return source if path.nil? && enabled.nil?
 
       if (path && path != source.path)
-        # TODO: Use custom errors.
-        raise "path '#{path}' already exists" if path && include_path?(path)
+        raise PathNotUnique, "path '#{path}' already exists" if path && include_path?(path)
       end
 
       remove_load_path(source.path) if path

@@ -2,7 +2,7 @@
   "name": "Extension Sources",
   "description": "Manage additional sources to load extensions from.",
   "creator": "Thomas Thomassen",
-  "copyright": "Copyright (c) 2021",
+  "copyright": "Copyright (c) 2021-2022",
   "license": "MIT License",
   "product_id": "TT_ExtensionSources",
   "version": "1.0.0",

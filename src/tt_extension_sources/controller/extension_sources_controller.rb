@@ -1,11 +1,11 @@
 require 'logger'
 
-require 'tt_extension_sources/execution'
-require 'tt_extension_sources/extension_source'
-require 'tt_extension_sources/extension_sources_dialog'
-require 'tt_extension_sources/extension_sources_manager'
-require 'tt_extension_sources/inspection'
-require 'tt_extension_sources/os'
+require 'tt_extension_sources/app/os'
+require 'tt_extension_sources/model/extension_source'
+require 'tt_extension_sources/model/extension_sources_manager'
+require 'tt_extension_sources/utils/inspection'
+require 'tt_extension_sources/utils/execution'
+require 'tt_extension_sources/view/extension_sources_dialog'
 
 module TT::Plugins::ExtensionSources
   # Application logic binding the extension sources manager with the UI.

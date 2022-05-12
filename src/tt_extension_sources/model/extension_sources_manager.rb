@@ -3,8 +3,8 @@ require 'json'
 require 'logger'
 require 'observer'
 
-require 'tt_extension_sources/extension_source'
-require 'tt_extension_sources/inspection'
+require 'tt_extension_sources/model/extension_source'
+require 'tt_extension_sources/utils/inspection'
 
 module TT::Plugins::ExtensionSources
   # Raised when the given path already exists in the {ExtensionSourcesManager}.

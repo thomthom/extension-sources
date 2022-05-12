@@ -2,10 +2,10 @@ require 'sketchup'
 
 require 'logger'
 
-require 'tt_extension_sources/console'
-require 'tt_extension_sources/debug'
-require 'tt_extension_sources/extension_sources_controller'
-require 'tt_extension_sources/os'
+require 'tt_extension_sources/app/console'
+require 'tt_extension_sources/app/debug'
+require 'tt_extension_sources/app/os'
+require 'tt_extension_sources/controller/extension_sources_controller'
 
 module TT::Plugins::ExtensionSources
 

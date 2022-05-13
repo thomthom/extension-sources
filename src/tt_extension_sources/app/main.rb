@@ -2,6 +2,7 @@ require 'sketchup'
 
 require 'logger'
 
+require 'tt_extension_sources/app/app_settings'
 require 'tt_extension_sources/app/console'
 require 'tt_extension_sources/app/debug'
 require 'tt_extension_sources/app/os'
@@ -15,17 +16,25 @@ module TT::Plugins::ExtensionSources
   # File extension for toolbar images on the current OS.
   TOOLBAR_IMAGE_EXTENSION = OS.mac? ? 'pdf' : 'svg'
 
+  # @return [AppSettings]
+  def self.app_settings
+    @settings ||= AppSettings.new(EXTENSION[:product_id])
+    @settings
+  end
+
   # @return [ExtensionSourcesController]
   def self.extension_sources_controller
-    console = SketchUpConsole.new(SKETCHUP_CONSOLE)
+    if @extension_sources_controller.nil?
+      console = SketchUpConsole.new(SKETCHUP_CONSOLE)
 
-    @logger = Logger.new(console)
-    @logger.level = Logger::DEBUG # TODO: From settings.
-    @logger.formatter = proc do |severity, datetime, progname, msg|
-      "#{severity}: #{msg}\n"
+      @logger = Logger.new(console)
+      @logger.level = app_settings.log_level
+      @logger.formatter = proc do |severity, datetime, progname, msg|
+        "#{severity}: #{msg}\n"
+      end
+
+      @extension_sources_controller = ExtensionSourcesController.new(logger: @logger)
     end
-
-    @extension_sources_controller ||= ExtensionSourcesController.new(logger: @logger)
     @extension_sources_controller
   end
 

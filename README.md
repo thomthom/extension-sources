@@ -1,5 +1,7 @@
 # Extension Sources
 
+[![Build status](https://ci.appveyor.com/api/projects/status/j5gcwy6ky3hgmww5/branch/main?svg=true)](https://ci.appveyor.com/project/thomthom/extension-sources/branch/main)
+
 Manage additional sources to load extensions from.
 
 ## Documentation

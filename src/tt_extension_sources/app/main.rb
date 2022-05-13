@@ -2,8 +2,8 @@ require 'sketchup'
 
 require 'logger'
 
-require 'tt_extension_sources/app/app_settings'
 require 'tt_extension_sources/app/debug'
+require 'tt_extension_sources/app/settings'
 require 'tt_extension_sources/controller/extension_sources_controller'
 require 'tt_extension_sources/system/console'
 require 'tt_extension_sources/system/os'
@@ -17,7 +17,7 @@ module TT::Plugins::ExtensionSources
   TOOLBAR_IMAGE_EXTENSION = OS.mac? ? 'pdf' : 'svg'
 
   # @return [AppSettings]
-  def self.app_settings
+  def self.settings
     @settings ||= AppSettings.new(EXTENSION[:product_id])
     @settings
   end
@@ -28,7 +28,7 @@ module TT::Plugins::ExtensionSources
       console = SketchUpConsole.new(SKETCHUP_CONSOLE)
 
       @logger = Logger.new(console)
-      @logger.level = app_settings.log_level
+      @logger.level = self.settings.log_level
       @logger.formatter = proc do |severity, datetime, progname, msg|
         "#{severity}: #{msg}\n"
       end

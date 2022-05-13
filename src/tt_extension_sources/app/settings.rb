@@ -15,7 +15,7 @@ module TT::Plugins::ExtensionSources
     # It will take effect upon next start.
     #
     # @example
-    #   TT::Plugins::ExtensionSources.app_settings.debug = true
+    #   TT::Plugins::ExtensionSources.settings.debug = true
     #
     # @return [Boolean]
     define :debug, false
@@ -24,7 +24,7 @@ module TT::Plugins::ExtensionSources
     # It will take effect upon next start.
     #
     # @example
-    #   TT::Plugins::ExtensionSources.app_settings.log_level = Logger::DEBUG
+    #   TT::Plugins::ExtensionSources.settings.log_level = Logger::DEBUG
     #
     # @return [Integer]
     define :log_level, Logger::WARN

@@ -1,8 +1,8 @@
 require 'logger'
 
-require 'tt_extension_sources/app/os'
 require 'tt_extension_sources/model/extension_source'
 require 'tt_extension_sources/model/extension_sources_manager'
+require 'tt_extension_sources/system/os'
 require 'tt_extension_sources/utils/inspection'
 require 'tt_extension_sources/utils/execution'
 require 'tt_extension_sources/view/extension_sources_dialog'

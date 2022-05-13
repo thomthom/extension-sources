@@ -1,6 +1,6 @@
 require 'logger'
 
-require 'tt_extension_sources/app/settings'
+require 'tt_extension_sources/system/settings'
 
 module TT::Plugins::ExtensionSources
   # The application settings interface for Extension Sources.

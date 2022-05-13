@@ -103,11 +103,11 @@ module TT::Plugins::ExtensionSources
       data = write_storage_path_data do
         [
           {
-            path: Faker::File.dir,
+            path: Faker::File.unique.dir,
             enabled: true,
           },
           {
-            path: Faker::File.dir,
+            path: Faker::File.unique.dir,
             enabled: false,
           },
         ]
@@ -118,7 +118,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      assert_load_path(@load_path, data.map { |item| item[:path]} )
+      enabled_data = data.select { |item| item[:enabled] }
+      assert_load_path(@load_path, enabled_data.map { |item| item[:path]} )
       assert_equal(data, manager.sources.map(&:serialize_as_hash))
     end
 
@@ -129,7 +130,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       source = assert_observer_event(manager, :changed, [manager, :added, ExtensionSource]) do
         manager.add(path, enabled: true)
       end
@@ -144,7 +145,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       source = assert_observer_event(manager, :changed, [manager, :added, ExtensionSource]) do
         manager.add(path, enabled: false)
       end
@@ -160,7 +161,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       source = assert_observer_event(manager, :changed, [manager, :added, ExtensionSource]) do
         manager.add(path)
       end
@@ -176,7 +177,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       source = manager.add(path, enabled: true)
 
       result = assert_observer_event(manager, :changed, [manager, :removed, ExtensionSource]) do
@@ -193,7 +194,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       manager.add(path, enabled: true)
 
       assert_raises(IndexError) do
@@ -208,10 +209,10 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path1 = Faker::File.dir
+      path1 = Faker::File.unique.dir
       source = manager.add(path1, enabled: true)
 
-      path2 = Faker::File.dir
+      path2 = Faker::File.unique.dir
       result = assert_observer_event(manager, :changed, [manager, :changed, ExtensionSource]) do
         manager.update(source_id: source.source_id, path: path2)
       end
@@ -229,7 +230,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       source = manager.add(path, enabled: false)
 
       result = assert_observer_event(manager, :changed, [manager, :changed, ExtensionSource]) do
@@ -247,7 +248,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       source = manager.add(path, enabled: true)
 
       result = assert_observer_event(manager, :changed, [manager, :changed, ExtensionSource]) do
@@ -266,7 +267,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       source = manager.add(path, enabled: true)
 
       result = assert_no_observer_event(manager) do
@@ -284,7 +285,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       source = manager.add(path, enabled: true)
 
       result = assert_no_observer_event(manager) do
@@ -302,7 +303,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.dir
+      path = Faker::File.unique.dir
       source = manager.add(path, enabled: true)
 
       result = assert_no_observer_event(manager) do
@@ -403,12 +404,15 @@ module TT::Plugins::ExtensionSources
       assert_nil(manager.import(import_path.path))
       assert_equal(original_data.size + data.size - 1, manager.sources.size)
       original_data.each { |item|
-        assert(manager.include_path?(item[:path]))
-        assert(@load_path.include?(item[:path]))
+        assert(manager.include_path?(item[:path]), item)
+        assert_equal(item[:enabled], @load_path.include?(item[:path]), item)
       }
       data.each { |item|
-        assert(manager.include_path?(item[:path]))
-        assert(@load_path.include?(item[:path]))
+        assert(manager.include_path?(item[:path]), item)
+        # This line is to account for the overlapping item. The original value
+        # should be preserved over the imported value.
+        expected = (item[:path] == original[:path]) ? !item[:enabled] : item[:enabled]
+        assert_equal(expected, @load_path.include?(item[:path]), item)
       }
       assert_mock(mock)
     ensure

@@ -129,13 +129,14 @@ module TT::Plugins::ExtensionSources
     def import(import_path)
       json = File.open(import_path, "r:UTF-8", &:read)
       data = JSON.parse(json, symbolize_names: true)
+      new_data = data.select { |item| !include_path?(item[:path]) }
       # First add all load paths, then require. This is to account for
       # extensions that depend on other extensions. These will assume the
       # dependent extension is present in the load path.
-      data.each { |item|
-        add_load_path(item[:path])
+      new_data.each { |item|
+        add_load_path(item[:path]) if item[:enabled]
       }
-      data.each { |item|
+      new_data.each { |item|
         add(item[:path], enabled: item[:enabled])
       }
       nil

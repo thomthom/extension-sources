@@ -7,10 +7,11 @@ module TT::Plugins::ExtensionSources
   #
   # @return [Integer] Number of files reloaded.
   def self.reset
-    reopen = self.extension_sources_controller.close_extension_sources_dialog
-    @extension_sources_controller = nil
+    reopen = self.app.close_extension_sources_dialog
+    @app = nil
     result = self.reload
-    self.extension_sources_controller.open_extension_sources_dialog if reopen
+    self.app.boot
+    self.app.open_extension_sources_dialog if reopen
     result
   end
 

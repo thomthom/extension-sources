@@ -1,48 +1,21 @@
 require 'sketchup'
 
-require 'logger'
-
+require 'tt_extension_sources/app/app'
 require 'tt_extension_sources/app/debug'
-require 'tt_extension_sources/app/settings'
-require 'tt_extension_sources/controller/extension_sources_controller'
-require 'tt_extension_sources/system/console'
-require 'tt_extension_sources/system/os'
 
 module TT::Plugins::ExtensionSources
+
+  # @return [App]
+  def self.app
+    @app ||= App.new
+    @app
+  end
 
   # Absolute path to location of image resources.
   IMAGES_PATH = File.join(PATH, 'images').freeze
 
   # File extension for toolbar images on the current OS.
   TOOLBAR_IMAGE_EXTENSION = OS.mac? ? 'pdf' : 'svg'
-
-  # @return [AppSettings]
-  def self.settings
-    @settings ||= AppSettings.new(EXTENSION[:product_id])
-    @settings
-  end
-
-  # @return [ExtensionSourcesController]
-  def self.extension_sources_controller
-    if @extension_sources_controller.nil?
-      console = SketchUpConsole.new(SKETCHUP_CONSOLE)
-
-      @logger = Logger.new(console)
-      @logger.level = self.settings.log_level
-      @logger.formatter = proc do |severity, datetime, progname, msg|
-        "#{severity}: #{msg}\n"
-      end
-
-      @extension_sources_controller = ExtensionSourcesController.new(logger: @logger)
-    end
-    @extension_sources_controller
-  end
-
-  # @return [ExtensionSourcesDialog]
-  def self.open_extension_sources_dialog
-    app = self.extension_sources_controller
-    app.open_extension_sources_dialog
-  end
 
   # @param [String] basename Base name for toolbar icon resource.
   # @return [String] Absolute path to toolbar icon resource.
@@ -53,7 +26,7 @@ module TT::Plugins::ExtensionSources
 
   unless file_loaded?(__FILE__)
     cmd = UI::Command.new('Extension Sources…') {
-      self.open_extension_sources_dialog
+      self.app.open_extension_sources_dialog
     }
     cmd.tooltip = 'Extension Sources'
     cmd.status_bar_text = 'Open the Extension Sources Dialog.'
@@ -71,7 +44,7 @@ module TT::Plugins::ExtensionSources
 
     file_loaded(__FILE__)
 
-    self.extension_sources_controller.boot
+    self.app.boot
   end
 
 end # module

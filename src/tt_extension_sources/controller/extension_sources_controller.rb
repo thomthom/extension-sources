@@ -107,7 +107,6 @@ module TT::Plugins::ExtensionSources
 
       @logger.info { "#{self.class.object_name} > Path: #{source.path}" }
 
-      # TODO: Should this be done by the manager?
       pattern = "#{source.path}/**/*.rb"
       num_files = begin
         original_verbose = $VERBOSE

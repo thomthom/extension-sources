@@ -5,8 +5,8 @@ require 'faker'
 require 'json'
 require 'tempfile'
 
-require 'tt_extension_sources/extension_sources_manager'
-require 'tt_extension_sources/extension_source'
+require 'tt_extension_sources/model/extension_sources_manager'
+require 'tt_extension_sources/model/extension_source'
 
 module TT::Plugins::ExtensionSources
   class ExtensionSourcesManagerTest < Minitest::Test

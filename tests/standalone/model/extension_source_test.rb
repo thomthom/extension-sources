@@ -4,7 +4,7 @@ require 'test_helper'
 require 'faker'
 require 'tempfile'
 
-require 'tt_extension_sources/extension_source'
+require 'tt_extension_sources/model/extension_source'
 
 module TT::Plugins::ExtensionSources
   class ExtensionSourceTest < Minitest::Test

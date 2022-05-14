@@ -14,6 +14,21 @@
     html {
       cursor: default;
     }
+
+    /* Vertically align the "Clear Filter" list item */
+    .es-filter-footer {
+      display: block !important;
+      text-align: center !important;
+    }
+
+    .es-filter-footer .modus-icons {
+      vertical-align: bottom;
+    }
+
+    .es-filter-footer span {
+      line-height: 24px;
+      vertical-align: bottom;
+    }
   </style>
 </head>
 
@@ -36,7 +51,7 @@
           <form class="form-inline flex-grow-1">
             <div class="form-group w-100">
               <div class="input-with-icon-left w-100">
-                <input class="form-control w-100" placeholder="Type to filter source paths…">
+                <input class="form-control w-100" placeholder="Type to filter source paths…" v-model="filter">
                 <div class="input-icon">
                   <i class="modus-icons">search</i>
                 </div>
@@ -66,7 +81,7 @@
         <div class="modus-content-columns">
           <div class="modus-content">
             <ul class="list-group">
-              <li v-for="source in sources" v-bind:key="source.source_id"
+              <li v-for="source in filtered_sources" v-bind:key="source.source_id"
                 class="list-group-item list-item-left-control">
                 <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading">
                   <input type="checkbox" v-model="source.enabled" class="custom-control-input"
@@ -101,6 +116,15 @@
                       <i class="modus-icons">expand_more</i>
                     </button>
                   </div>
+                </div>
+              </li>
+              <li v-if="is_filtered" class="list-group-item list-item-left-control es-filter-footer">
+                <!-- pt-1 is a hack to nudge the text to be vertically center-ish. Better way? -->
+                <div class="pt-1">
+                  <a href="#" v-on:click.prevent="clear_filter">
+                    <i class="modus-icons">filter</i>
+                    <span>Clear Filter</span>
+                  </a>
                 </div>
               </li>
             </ul>

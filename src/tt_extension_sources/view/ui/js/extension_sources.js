@@ -1,11 +1,30 @@
 let app = new Vue({
   el: '#app',
   data: {
+    filter: "",
     sources: [],
+  },
+  computed: {
+    is_filtered() {
+      return this.filter.length != 0;
+    },
+    filtered_sources() {
+      if (!this.is_filtered) {
+        return this.sources;
+      }
+      const upper_case_filter = this.filter.toUpperCase();
+      return this.sources.filter((source) => {
+        const upper_case_path = source.path.toUpperCase();
+        return upper_case_path.includes(upper_case_filter);
+      });
+    }
   },
   methods: {
     source_enabled_id(source_id) {
       return `sourceEnabled${source_id}`;
+    },
+    clear_filter() {
+      this.filter = "";
     },
     update(sources) {
       this.sources = sources;

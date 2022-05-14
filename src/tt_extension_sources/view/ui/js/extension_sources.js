@@ -39,6 +39,10 @@ let app = new Vue({
     },
     reload_path(source_id) {
       sketchup.reload_path(source_id);
+    },
+    on_source_changed(source_id, changes) {
+      console.log('on_source_changed', source_id, changes)
+      sketchup.source_changed(source_id, changes);
     }
   },
   mounted() {

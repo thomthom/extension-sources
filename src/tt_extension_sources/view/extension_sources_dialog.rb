@@ -15,6 +15,7 @@ module TT::Plugins::ExtensionSources
         :edit_path,
         :remove_path,
         :reload_path,
+        :source_changed,
       ]
       @events = setup_events(event_names)
       @dialog = create_dialog
@@ -156,6 +157,9 @@ module TT::Plugins::ExtensionSources
       end
       dialog.add_action_callback('reload_path') do |context, source_id|
         trigger(:reload_path, self, source_id.to_i) # JS returns Float.
+      end
+      dialog.add_action_callback('source_changed') do |context, source_id, changes|
+        trigger(:source_changed, self, source_id.to_i, changes) # JS returns Float.
       end
     end
 

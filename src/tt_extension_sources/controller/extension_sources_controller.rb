@@ -99,6 +99,19 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     # @param [Integer] source_id
+    # @param [Hash{String, Object}] changes
+    def source_changed(dialog, source_id, changes)
+      source = extension_sources_manager.find_by_source_id(source_id)
+      raise "found no source path for: #{source_id}" if source.nil?
+
+      changes.each { |property, value|
+        setter = "#{property}=".to_sym
+        source.public_send(setter, value)
+      }
+    end
+
+    # @param [ExtensionSourcesDialog] dialog
+    # @param [Integer] source_id
     def reload_path(dialog, source_id)
       @logger.info { "#{self.class.object_name} reload_path(#{source_id})" }
 
@@ -183,16 +196,20 @@ module TT::Plugins::ExtensionSources
         add_path(dialog)
       end
 
-      dialog.on(:edit_path) do |dialog, path|
-        edit_path(dialog, path)
+      dialog.on(:edit_path) do |dialog, source_id|
+        edit_path(dialog, source_id)
       end
 
-      dialog.on(:remove_path) do |dialog, path|
-        remove_path(dialog, path)
+      dialog.on(:remove_path) do |dialog, source_id|
+        remove_path(dialog, source_id)
       end
 
-      dialog.on(:reload_path) do |dialog, path|
-        reload_path(dialog, path)
+      dialog.on(:reload_path) do |dialog, source_id|
+        reload_path(dialog, source_id)
+      end
+
+      dialog.on(:source_changed) do |dialog, source_id, changes|
+        source_changed(dialog, source_id, changes)
       end
 
       dialog.on(:import_paths) do |dialog|

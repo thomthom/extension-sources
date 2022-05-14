@@ -2,12 +2,19 @@ require 'logger'
 
 require 'tt_extension_sources/app/settings'
 require 'tt_extension_sources/controller/extension_sources_controller'
+require 'tt_extension_sources/utils/inspection'
 require 'tt_extension_sources/system/console'
 require 'tt_extension_sources/system/os'
 
 module TT::Plugins::ExtensionSources
   # The application logic for Extension Sources.
   class App
+
+    include Inspection
+
+    def initialize
+      logger.debug { "#{self.class.object_name} initialize" }
+    end
 
     # This will boot the extension sources manager and load files from the
     # list of additional load-paths.

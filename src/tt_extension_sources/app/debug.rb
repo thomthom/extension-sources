@@ -25,7 +25,8 @@ module TT::Plugins::ExtensionSources
     original_verbose = $VERBOSE
     $VERBOSE = nil
     load __FILE__ # rubocop:disable SketchupSuggestions/FileEncoding
-    pattern = File.join(__dir__, '**/*.rb') # rubocop:disable SketchupSuggestions/FileEncoding
+    path = File.expand_path('..', __dir__) # rubocop:disable SketchupSuggestions/FileEncoding
+    pattern = File.join(path, '**/*.rb')
     Dir.glob(pattern).each { |file| load file }.size
   ensure
     $VERBOSE = original_verbose

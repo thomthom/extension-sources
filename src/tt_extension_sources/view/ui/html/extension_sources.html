@@ -15,6 +15,10 @@
       cursor: default;
     }
 
+    [v-cloak] {
+      display: none;
+    }
+
     /* Vertically align the "Clear Filter" list item */
     .es-filter-footer {
       display: block !important;
@@ -33,7 +37,7 @@
 </head>
 
 <body>
-  <div id="app" class="modus-layout">
+  <div id="app" class="modus-layout" v-cloak>
     <div class="modus-body">
       <div class="modus-content-rows">
         <div class="modus-toolbar d-flex">
@@ -73,8 +77,10 @@
               <a class="dropdown-item" href="#" v-on:click.prevent="export_paths">Export Paths…</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="#" v-on:click.prevent="scan_paths">Scan for Paths…</a>
+              <!--
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="#" v-on:click.prevent="options">Options…</a>
+              -->
             </div>
           </div>
         </div>

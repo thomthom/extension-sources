@@ -20,6 +20,7 @@ AllCops:
     SourcePath: src
     TargetSketchUpVersion: 2017 # UI::HtmlDialog.
     Exclude: # Exclude common folders.
+    - fixtures/**/*
     - profiling/**/*
     - skippy/**/*
     - tests/**/*

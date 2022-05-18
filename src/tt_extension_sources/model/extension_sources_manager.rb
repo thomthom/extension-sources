@@ -238,7 +238,7 @@ module TT::Plugins::ExtensionSources
       unless File.directory?(directory)
         FileUtils.mkdir_p(directory)
       end
-      warn "Storage directory missing: #{directory}" if @warnings && File.directory?(directory)
+      warn "Storage directory missing: #{directory}" if @warnings && !File.directory?(directory)
 
       export(storage_path)
       @logger.info { "#{self.class.object_name} serializing done: #{storage_path}" }

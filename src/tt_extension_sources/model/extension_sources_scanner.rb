@@ -12,7 +12,14 @@ module TT::Plugins::ExtensionSources
     def scan(path)
       paths = []
       pattern = File.join(path, '**/*.rb')
-      Dir.glob(pattern) do |file_path|
+      # To ensure that parent directories are processed first before deeper
+      # nested directories they are first sorted by path length.
+      file_paths = Dir.glob(pattern).to_a.sort { |a, b|
+        # Sort by size then by string value.
+        comparison = a.size <=> a.size
+        comparison == 0 ? a <=> b : comparison
+      }
+      file_paths.each { |file_path|
         dir_path = File.dirname(file_path)
 
         # Don't scan deeper in paths that already have found to be an
@@ -21,7 +28,7 @@ module TT::Plugins::ExtensionSources
         next if !register_extension?(file_path)
 
         paths << dir_path
-      end
+      }
       paths
     end
 

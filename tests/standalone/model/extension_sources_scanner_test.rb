@@ -17,6 +17,8 @@ module TT::Plugins::ExtensionSources
       result.each { |item| assert_kind_of(String, item) }
       expected = %w[
         nested/with_register_extension
+        nested_with_multiple_register_extension
+        with_multiple_register_extension
         with_register_extension
       ].map { |item| File.join(fixtures_path, item) }
       assert_equal(expected.sort, result.sort)

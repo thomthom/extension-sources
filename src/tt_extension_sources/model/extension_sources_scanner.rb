@@ -46,6 +46,10 @@ module TT::Plugins::ExtensionSources
     # SketchUp method for registering extensions.
     REGISTER_EXTENSION = 'Sketchup.register_extension'.freeze
 
+    # Append a file separator at the end of the given path.
+    #
+    # @param [String] path
+    # @return [String]
     def path_with_end_separator(path)
       "#{path}#{File::SEPARATOR}"
     end

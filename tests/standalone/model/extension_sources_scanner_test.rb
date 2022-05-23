@@ -21,7 +21,24 @@ module TT::Plugins::ExtensionSources
         with_multiple_register_extension
         with_register_extension
       ].map { |item| File.join(fixtures_path, item) }
-      assert_equal(expected.sort, result.sort)
+      assert_equal(expected.sort, result.sort, "#{expected.size} vs #{result.size}")
+    end
+
+    def test_scan_with_exclude_filter
+      excluded = %w[
+        nested
+        with_multiple_register_extension
+      ].map { |item| File.join(fixtures_path, item) }
+      scanner = ExtensionSourcesScanner.new
+      result = scanner.scan(fixtures_path, exclude: excluded)
+      assert_kind_of(Array, result)
+      refute_empty(result)
+      result.each { |item| assert_kind_of(String, item) }
+      expected = %w[
+        nested_with_multiple_register_extension
+        with_register_extension
+      ].map { |item| File.join(fixtures_path, item) }
+      assert_equal(expected.sort, result.sort, "#{expected.size} vs #{result.size}")
     end
 
   end # class

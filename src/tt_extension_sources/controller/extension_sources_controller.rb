@@ -20,7 +20,11 @@ module TT::Plugins::ExtensionSources
     def initialize(logger: Logger.new(nil))
       @logger = logger
       @logger.debug { "#{self.class.object_name} initialize" }
+      # Deferring initialization of the manager because it will cause the
+      # extensions to load. Instead the `boot` method takes care of this.
       @extension_sources_manager = nil
+      # Dialogs are also lazy-constructed as there is no need to allocate their
+      # resources until they are used.
       @extension_sources_dialog = nil
 
       @sync = Execution::Debounce.new(0.0, &method(:sync))

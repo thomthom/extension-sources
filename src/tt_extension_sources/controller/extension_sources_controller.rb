@@ -2,9 +2,11 @@ require 'logger'
 
 require 'tt_extension_sources/model/extension_source'
 require 'tt_extension_sources/model/extension_sources_manager'
+require 'tt_extension_sources/model/extension_sources_scanner'
 require 'tt_extension_sources/system/os'
 require 'tt_extension_sources/utils/inspection'
 require 'tt_extension_sources/utils/execution'
+require 'tt_extension_sources/utils/timing'
 require 'tt_extension_sources/view/extension_sources_dialog'
 
 module TT::Plugins::ExtensionSources
@@ -168,6 +170,26 @@ module TT::Plugins::ExtensionSources
       extension_sources_manager.import(path)
     end
 
+    # @param [ExtensionSourcesDialog] dialog
+    def scan_paths(dialog)
+      directory = UI.select_directory(title: "Select Directory to Scan")
+      return if directory.nil?
+
+      existing_paths = extension_sources_manager.sources.map(&:path)
+
+      @logger.info { "#{self.class.object_name} Scanning: #{directory}" }
+      scanner = ExtensionSourcesScanner.new
+      timing = Timing.new
+      paths = timing.measure do
+        scanner.scan(directory, exclude: existing_paths)
+      end
+      @logger.info { "#{self.class.object_name} Scan for extension sources took: #{timing}" }
+      @logger.info { "#{self.class.object_name} Found #{paths.size} paths." }
+      @logger.debug { "Paths:\n* #{paths.join("\n* ")}" } unless paths.empty?
+
+      # TODO: Display results...
+    end
+
     # @return [ExtensionSourcesManager]
     def extension_sources_manager
       raise '`boot` has not been called yet' if @extension_sources_manager.nil?
@@ -222,6 +244,10 @@ module TT::Plugins::ExtensionSources
 
       dialog.on(:export_paths) do |dialog|
         export_paths(dialog)
+      end
+
+      dialog.on(:scan_paths) do |dialog|
+        scan_paths(dialog)
       end
 
       dialog

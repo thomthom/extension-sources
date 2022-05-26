@@ -59,8 +59,9 @@
         <div class="modus-content-columns">
           <div class="modus-content">
             <ul class="list-group">
-              <li v-for="source in filtered_sources" v-bind:key="source.source_id"
-                class="list-group-item list-item-left-control">
+              <li v-for="(source, index) in filtered_sources" v-bind:key="source.source_id"
+                v-on:mousedown.prevent="select($event, source, index)" class="list-group-item list-item-left-control"
+                v-bind:class="{ 'bg-selected': source.selected }">
                 <!-- Enabled switch -->
                 <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading">
                   <input type="checkbox" v-model="source.enabled" class="custom-control-input"

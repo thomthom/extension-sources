@@ -1,6 +1,8 @@
+require 'tt_extension_sources/view/dialog'
+
 module TT::Plugins::ExtensionSources
   # A dialog the user interacts with to manage additional load-paths.
-  class ExtensionSourcesDialog
+  class ExtensionSourcesDialog < Dialog
 
     def initialize
       event_names = [
@@ -17,15 +19,7 @@ module TT::Plugins::ExtensionSources
         :reload_path,
         :source_changed,
       ]
-      @events = setup_events(event_names)
-      @dialog = create_dialog
-    end
-
-    # @param [Symbol] event
-    def on(event, &block)
-      raise "unknown event: #{event}" unless @events.key?(event)
-
-      @events[event] << block
+      super(event_names)
     end
 
     # @param [Array<ExtensionSource>] sources
@@ -33,74 +27,7 @@ module TT::Plugins::ExtensionSources
       call_js('app.update', sources)
     end
 
-    # @return [nil]
-    def bring_to_front
-      @dialog.bring_to_front
-    end
-
-    # @return [nil]
-    def show
-      visible? ? bring_to_front : init_and_show
-      nil
-    end
-
-    # @return [Boolean]
-    def close
-      if @dialog.visible?
-        @dialog.close
-        return true
-      end
-      false
-    end
-
-    def visible?
-      @dialog.visible?
-    end
-
-    # @return [Boolean] The resulting visibility state.
-    def toggle
-      visible? ? close : show
-      visible?
-    end
-
     private
-
-    # @param [Array<Symbol>] event_names
-    # @return [Hash]
-    def setup_events(event_names)
-      Hash[event_names.map { |key| [key, []] }]
-    end
-
-    # Ensures that the action callbacks are initialized before showing the
-    # dialog.
-    #
-    # @return [nil]
-    def init_and_show
-      raise "don't initialize if dialog is shown" if @dialog.visible?
-
-      init_action_callbacks(@dialog)
-      @dialog.show
-      nil
-    end
-
-    # @param [String] function
-    # @param [Array<#to_json>] args
-    # @return [nil]
-    def call_js(function, *args)
-      params = args.map(&:to_json).join(',')
-      @dialog.execute_script("app.update(#{params})")
-      nil
-    end
-
-    # @param [Symbol] event
-    # @return [nil]
-    def trigger(event, *args)
-      raise "unknown event: #{event}" unless @events.key?(event)
-      warn "event without listeners: #{event}" if @events[event].empty?
-
-      @events[event].each { |callback| callback.call(*args) }
-      nil
-    end
 
     # @return [UI::HtmlDialog]
     def create_dialog
@@ -161,13 +88,6 @@ module TT::Plugins::ExtensionSources
       dialog.add_action_callback('source_changed') do |context, source_id, changes|
         trigger(:source_changed, self, source_id.to_i, changes) # JS returns Float.
       end
-    end
-
-    # @return [String]
-    def ui_path
-      path = __dir__
-      path.force_encoding('utf-8')
-      File.join(path, 'ui')
     end
 
   end

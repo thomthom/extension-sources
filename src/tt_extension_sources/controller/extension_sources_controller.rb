@@ -146,8 +146,7 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     def export_paths(dialog)
-      default_file = ExtensionSourcesManager::EXTENSION_SOURCES_JSON
-      path = UI.savepanel("Export Source Paths", nil, default_file)
+      path = UI.savepanel("Export Source Paths", nil, EXTENSION_SOURCES_JSON)
       return if path.nil?
 
       if File.exist?(path)
@@ -161,8 +160,7 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     def import_paths(dialog)
-      default_file = ExtensionSourcesManager::EXTENSION_SOURCES_JSON
-      path = UI.openpanel("Import Source Paths", nil, default_file)
+      path = UI.openpanel("Import Source Paths", nil, EXTENSION_SOURCES_JSON)
       return if path.nil?
 
       raise "path not found: #{path}" unless File.exist?(path)

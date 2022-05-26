@@ -285,7 +285,26 @@ module TT::Plugins::ExtensionSources
         dialog.update(dialog.sources)
       end
 
+      dialog.on(:accept) do |dialog, selected|
+        dialog.close
+        add_extension_sources(selected)
+      end
+
+      dialog.on(:cancel) do |dialog|
+        dialog.close
+      end
+
       dialog
+    end
+
+    # @param [Hash] selected
+    def add_extension_sources(selected)
+      @logger.debug { "#{self.class.object_name} add_extension_sources (#{selected.size})" }
+      # TODO:
+      selected.each { |item|
+        p item
+      }
+      nil
     end
 
     # Call whenever extension sources has changed. This will update the UI and

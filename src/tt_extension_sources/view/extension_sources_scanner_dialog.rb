@@ -9,17 +9,8 @@ module TT::Plugins::ExtensionSources
     def initialize
       event_names = [
         :boot,
-        # :options,
-        # :undo,
-        # :redo,
-        # :scan_paths,
-        # :import_paths,
-        # :export_paths,
-        # :add_path,
-        # :edit_path,
-        # :remove_path,
-        # :reload_path,
-        # :source_changed,
+        :accept,
+        :cancel,
       ]
       super(event_names)
       @sources = []
@@ -71,39 +62,12 @@ module TT::Plugins::ExtensionSources
       dialog.add_action_callback('ready') do
         trigger(:boot, self)
       end
-      # dialog.add_action_callback('options') do
-      #   trigger(:options, self)
-      # end
-      # dialog.add_action_callback('undo') do
-      #   trigger(:undo, self)
-      # end
-      # dialog.add_action_callback('redo') do
-      #   trigger(:redo, self)
-      # end
-      # dialog.add_action_callback('scan_paths') do
-      #   trigger(:scan_paths, self)
-      # end
-      # dialog.add_action_callback('import_paths') do
-      #   trigger(:import_paths, self)
-      # end
-      # dialog.add_action_callback('export_paths') do
-      #   trigger(:export_paths, self)
-      # end
-      # dialog.add_action_callback('add_path') do
-      #   trigger(:add_path, self)
-      # end
-      # dialog.add_action_callback('edit_path') do |context, source_id|
-      #   trigger(:edit_path, self, source_id.to_i) # JS returns Float.
-      # end
-      # dialog.add_action_callback('remove_path') do |context, source_id|
-      #   trigger(:remove_path, self, source_id.to_i) # JS returns Float.
-      # end
-      # dialog.add_action_callback('reload_path') do |context, source_id|
-      #   trigger(:reload_path, self, source_id.to_i) # JS returns Float.
-      # end
-      # dialog.add_action_callback('source_changed') do |context, source_id, changes|
-      #   trigger(:source_changed, self, source_id.to_i, changes) # JS returns Float.
-      # end
+      dialog.add_action_callback('accept') do |context, selected|
+        trigger(:accept, self, symbolize_keys(selected))
+      end
+      dialog.add_action_callback('cancel') do
+        trigger(:cancel, self)
+      end
     end
 
   end

@@ -17,6 +17,11 @@ let app = new Vue({
         const upper_case_path = source.path.toUpperCase();
         return upper_case_path.includes(upper_case_filter);
       });
+    },
+    selected() {
+      return this.sources.filter((source) => {
+        return source.enabled; // TODO: source.selected
+      });
     }
   },
   methods: {
@@ -29,35 +34,11 @@ let app = new Vue({
     update(sources) {
       this.sources = sources;
     },
-    options() {
-      sketchup.options();
+    accept() {
+      sketchup.accept(this.selected);
     },
-    undo() {
-      sketchup.undo();
-    },
-    redo() {
-      sketchup.redo();
-    },
-    scan_paths() {
-      sketchup.scan_paths();
-    },
-    import_paths() {
-      sketchup.import_paths();
-    },
-    export_paths() {
-      sketchup.export_paths();
-    },
-    add_path() {
-      sketchup.add_path();
-    },
-    edit_path(source_id) {
-      sketchup.edit_path(source_id);
-    },
-    remove_path(source_id) {
-      sketchup.remove_path(source_id);
-    },
-    reload_path(source_id) {
-      sketchup.reload_path(source_id);
+    cancel() {
+      sketchup.cancel();
     },
     on_source_changed(source_id, changes) {
       console.log('on_source_changed', source_id, changes)

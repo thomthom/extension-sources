@@ -98,6 +98,21 @@ module TT::Plugins::ExtensionSources
       raise NotImplementedError
     end
 
+    # Objects passed from JavaScript will have their keys represented as
+    # strings. This utility converts the keys to Symbols.
+    #
+    # @param [Hash{String, Object}, Enumerable, Object] object
+    # @return [Hash{Symbol, Object}, Enumerable, Object]
+    def symbolize_keys(object)
+      if object.is_a?(Hash)
+        Hash[object.map { |k, v| [k.to_sym, symbolize_keys(v)] }]
+      elsif object.is_a?(Enumerable)
+        return object.map { |item| symbolize_keys(item) }
+      else
+        object
+      end
+    end
+
     # @return [String]
     def ui_path
       path = __dir__

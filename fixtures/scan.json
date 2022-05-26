@@ -1,0 +1,182 @@
+[
+  {
+    "path": "C:/Users/Thomas/SourceTree/SUbD/Ruby/build",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/SUbD/Ruby/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/SpeedUp/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/TestUp2/build",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/TextEditor",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/extension-sources/fixtures/nested/with_register_extension",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/extension-sources/fixtures/nested_with_multiple_register_extension",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/extension-sources/fixtures/with_multiple_register_extension",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/extension-sources/fixtures/with_register_extension",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/extension-sources/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/quad-edge/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/rubocop-sketchup/examples/extensions/invalid/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/rubocop-sketchup/examples/extensions/invalid_case_mismatch/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/rubocop-sketchup/examples/extensions/macos_folder/src/__MACOSX",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/rubocop-sketchup/examples/extensions/macos_folder/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/rubocop-sketchup/examples/extensions/valid/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/rubocop-sketchup/examples/extensions/valid_custom_src_path/source",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/rubocop-sketchup/examples/snippets/requirements",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/rubocop-sketchup/spec/rubocop/cop/sketchup_requirements",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-annotations/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-extension-vscode-project/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-live-c-api/ruby",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-ruby-api-tutorials/examples/01_hello_cube",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-ruby-api-tutorials/examples/02_custom_tool",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-ruby-api-tutorials/examples/99_hello_donut",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-ruby-api-tutorials/examples/99_hello_sphere",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-ruby-api-tutorials/examples/99_sphere_tool",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-ruby-api-tutorials/tutorials/01_hello_cube",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-ruby-api-tutorials/tutorials/02_custom_tool",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/sketchup-safe-frames/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/fixtures/my_project/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/fixtures/project_with_lib/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/vendor/bundle/ruby/2.2.0/gems/skippy-0.2.0.a/fixtures/my_project/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/vendor/bundle/ruby/2.2.0/gems/skippy-0.2.1.a/fixtures/my_project/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/vendor/bundle/ruby/2.2.0/gems/skippy-0.2.1.a/fixtures/project_with_lib/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/vendor/bundle/ruby/2.2.0/gems/skippy-0.3.0.a/fixtures/my_project/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/vendor/bundle/ruby/2.2.0/gems/skippy-0.3.0.a/fixtures/project_with_lib/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/vendor/bundle/ruby/2.2.0/gems/skippy-0.4.0.a/fixtures/my_project/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/vendor/bundle/ruby/2.2.0/gems/skippy-0.4.0.a/fixtures/project_with_lib/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/vendor/bundle/ruby/2.2.0/gems/skippy-0.4.1.a/fixtures/my_project/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/skippy/vendor/bundle/ruby/2.2.0/gems/skippy-0.4.1.a/fixtures/project_with_lib/src",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/vertex-tools-v1/Build",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/vertex-tools-v1",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/vertex-tools/Build",
+    "enabled": true
+  },
+  {
+    "path": "C:/Users/Thomas/SourceTree/wave-function-collapse/src",
+    "enabled": true
+  }
+]

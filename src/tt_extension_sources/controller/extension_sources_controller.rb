@@ -8,6 +8,7 @@ require 'tt_extension_sources/utils/inspection'
 require 'tt_extension_sources/utils/execution'
 require 'tt_extension_sources/utils/timing'
 require 'tt_extension_sources/view/extension_sources_dialog'
+require 'tt_extension_sources/view/extension_sources_scanner_dialog'
 
 module TT::Plugins::ExtensionSources
   # Application logic binding the extension sources manager with the UI.
@@ -177,17 +178,36 @@ module TT::Plugins::ExtensionSources
 
       existing_paths = extension_sources_manager.sources.map(&:path)
 
-      @logger.info { "#{self.class.object_name} Scanning: #{directory}" }
-      scanner = ExtensionSourcesScanner.new
-      timing = Timing.new
-      paths = timing.measure do
-        scanner.scan(directory, exclude: existing_paths)
-      end
-      @logger.info { "#{self.class.object_name} Scan for extension sources took: #{timing}" }
-      @logger.info { "#{self.class.object_name} Found #{paths.size} paths." }
-      @logger.debug { "Paths:\n* #{paths.join("\n* ")}" } unless paths.empty?
+      debug_path = File.expand_path('../../../fixtures/scan.json', __dir__) # TODO: Debug
 
-      # TODO: Display results...
+      if true # TODO: Debug
+        json = File.open(debug_path, "r:UTF-8", &:read)
+        data = JSON.parse(json, symbolize_names: true)
+        results = data.map { |item|
+          ExtensionSource.new(path: item[:path], enabled: item[:enabled]).to_hash
+        }
+      else
+
+        @logger.info { "#{self.class.object_name} Scanning: #{directory}" }
+        scanner = ExtensionSourcesScanner.new
+        timing = Timing.new
+        paths = timing.measure do
+          scanner.scan(directory, exclude: existing_paths)
+        end
+        @logger.info { "#{self.class.object_name} Scan for extension sources took: #{timing}" }
+        @logger.info { "#{self.class.object_name} Found #{paths.size} paths." }
+        @logger.debug { "Paths:\n* #{paths.join("\n* ")}" } unless paths.empty?
+
+        results = paths.map { |path|
+          ExtensionSource.new(path: path, enabled: true)
+        }
+
+        # json = JSON.pretty_generate(results.map(&:to_hash)) # TODO: Debug
+        # File.open(debug_path, "w:UTF-8") { |file| file.write(json) } # TODO: Debug
+
+      end
+
+      extension_sources_scanner_dialog.show(results)
     end
 
     # @return [ExtensionSourcesManager]
@@ -248,6 +268,23 @@ module TT::Plugins::ExtensionSources
 
       dialog.on(:scan_paths) do |dialog|
         scan_paths(dialog)
+      end
+
+      dialog
+    end
+
+    # @return [ExtensionSourcesScannerDialog]
+    def extension_sources_scanner_dialog
+      @extension_sources_scanner_dialog ||= create_extension_sources_scanner_dialog
+      @extension_sources_scanner_dialog
+    end
+
+    # @return [ExtensionSourcesScannerDialog]
+    def create_extension_sources_scanner_dialog
+      dialog = ExtensionSourcesScannerDialog.new
+
+      dialog.on(:boot) do |dialog|
+        dialog.update(dialog.sources)
       end
 
       dialog

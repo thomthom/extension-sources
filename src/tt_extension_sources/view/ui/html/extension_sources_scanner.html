@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+
+  <title>Scan for Extension Sources</title>
+
+  <link rel="stylesheet" href="../css/modus.min-1.3.1.css">
+  <link rel="stylesheet" href="../css/modus-layout.min-1.3.1.css"><!-- Optional Layout -->
+  <link rel="stylesheet" href="../fonts/modus-icons.css"> <!-- 0.5.1 -->
+  <script src="../js/vue.js"></script>
+  <style>
+    html {
+      cursor: default;
+    }
+
+    [v-cloak] {
+      display: none;
+    }
+
+    /* Vertically align the "Clear Filter" list item */
+    .es-filter-footer {
+      display: block !important;
+      text-align: center !important;
+    }
+
+    .es-filter-footer .modus-icons {
+      vertical-align: bottom;
+    }
+
+    .es-filter-footer span {
+      line-height: 24px;
+      vertical-align: bottom;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" class="modus-layout" v-cloak>
+    <div class="modus-body">
+      <div class="modus-content-rows">
+        <div class="modus-toolbar d-flex">
+          <h4>Extension Sources</h4>
+          <!-- Undo/Redo -->
+          <button class="btn btn-text-dark btn-lg btn-icon-only ml-4" v-on:click="undo" title="Undo" disabled>
+            <!-- TODO: Undo icon -->
+            <i class="modus-icons">arrow_left_bold</i>
+          </button>
+          <button class="btn btn-text-dark btn-lg btn-icon-only mr-auto" v-on:click="redo" title="Redo" disabled>
+            <!-- TODO: Redo icon -->
+            <i class="modus-icons">arrow_right_bold</i>
+          </button>
+          <!-- Filter search -->
+          <form class="form-inline flex-grow-1">
+            <div class="form-group w-100">
+              <div class="input-with-icon-left w-100">
+                <input class="form-control w-100" placeholder="Type to filter source paths…" v-model="filter">
+                <div class="input-icon">
+                  <i class="modus-icons">search</i>
+                </div>
+              </div>
+            </div>
+          </form>
+          <!-- Add Path -->
+          <button class="btn btn-text-dark btn-lg btn-icon-only" v-on:click="add_path" title="Add Path">
+            <i class="modus-icons">circle_add_outline</i>
+          </button>
+          <!-- More... -->
+          <div class="dropdown">
+            <button class="btn btn-text-dark btn-lg btn-icon-only" id="dropdownMenuButton" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false" title="More…">
+              <i class="modus-icons">more_vertical</i>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#" v-on:click.prevent="import_paths">Import Paths…</a>
+              <a class="dropdown-item" href="#" v-on:click.prevent="export_paths">Export Paths…</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#" v-on:click.prevent="scan_paths">Scan for Paths…</a>
+              <!--
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#" v-on:click.prevent="options">Options…</a>
+              -->
+            </div>
+          </div>
+        </div>
+        <div class="modus-content-columns">
+          <div class="modus-content">
+            <ul class="list-group">
+              <li v-for="source in filtered_sources" v-bind:key="source.source_id"
+                class="list-group-item list-item-left-control">
+                <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading">
+                  <input type="checkbox" v-model="source.enabled" class="custom-control-input"
+                    v-bind:id="source_enabled_id(source.source_id)"
+                    v-on:change="on_source_changed(source.source_id, { enabled: source.enabled })">
+                  <label class="custom-control-label" v-bind:for="source_enabled_id(source.source_id)"></label>
+                </div>
+                <div class="d-flex">
+                  <!-- pt-1 is a hack to nudge the text to be vertically center-ish. Better way? -->
+                  <div class="flex-grow-1 pt-1">
+                    <span style="line-height: 24px;" v-bind:class="{ 'text-warning': !source.path_exist }">
+                      {{ source.path }}
+                    </span>
+                    <i v-if="!source.path_exist" class="modus-icons text-warning align-bottom"
+                      title="Path doesn't exist.">warning</i>
+                  </div>
+                  <!-- ml-auto vs flex-grow-1? -->
+                  <div>
+                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload"
+                      v-on:click="reload_path(source.source_id)">
+                      <i class="modus-icons">refresh</i>
+                    </button>
+                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Edit"
+                      v-on:click="edit_path(source.source_id)">
+                      <i class="modus-icons">edit</i>
+                    </button>
+                    <button class="btn btn-text-danger btn-msr btn-icon-only" title="Remove load path"
+                      v-on:click="remove_path(source.source_id)">
+                      <i class="modus-icons">trash</i>
+                    </button>
+                    <button class="btn btn-text-dark btn-ms btn-icon-only" title="Expand">
+                      <i class="modus-icons">expand_more</i>
+                    </button>
+                  </div>
+                </div>
+              </li>
+              <li v-if="is_filtered" class="list-group-item list-item-left-control es-filter-footer">
+                <!-- pt-1 is a hack to nudge the text to be vertically center-ish. Better way? -->
+                <div class="pt-1">
+                  <a href="#" v-on:click.prevent="clear_filter">
+                    <i class="modus-icons">filter</i>
+                    <span>Clear Filter</span>
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/jquery.slim.min.js"></script>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/modus-layout.min-1.3.1.js"></script><!-- Optional Layout -->
+  <script src="../js/extension_sources_scanner.js"></script>
+</body>
+
+</html>

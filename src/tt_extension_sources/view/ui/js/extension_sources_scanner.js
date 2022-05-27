@@ -1,3 +1,13 @@
+// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
+const MouseKeys = {
+  none: 0,      // No button or un- initialized
+  primary: 1,   // Primary button(usually the left button)
+  secondary: 2, // Secondary button(usually the right button)
+  auxiliary: 4, // Auxiliary button(usually the mouse wheel button or middle button)
+  fourth: 8,    // 4th button(typically the "Browser Back" button)
+  fifth: 16,    // 5th button(typically the "Browser Forward" button)
+};
+
 const OS = {
   isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 };
@@ -6,6 +16,7 @@ let app = new Vue({
   el: '#app',
   data: {
     filter: "",
+    mousedown_index: null,
     last_selected_index: null,
     sources: [],
   },
@@ -46,26 +57,40 @@ let app = new Vue({
       this.sources = sources;
     },
     select(event, source, index) {
-      console.log('select', source, source.source_id, 'selected:', source.selected, event);
-      // TODO: Mouse+drag to multi-select.
+      // console.log('select', source, source.source_id, 'selected:', source.selected, event);
+      this.mousedown_index = index;
       // Clear existing selection unless Ctrl is pressed.
       const addKey = OS.isMac ? event.metaKey : event.ctrlKey;
       if (!addKey) {
-        console.log('> clear-select');
+        // console.log('> clear-select');
         for (const item of this.sources) {
           item.selected = false;
         }
       }
       if (event.shiftKey && this.last_selected_index !== null) {
-        console.log('> multi-select');
+        // TODO: Handle filtered view.
+        // console.log('> multi-select');
         const min = Math.min(this.last_selected_index, index);
         const max = Math.max(this.last_selected_index, index);
         for (let i = min; i <= max; ++i) {
           this.sources[i].selected = true;
         }
       } else {
-        console.log('> single-select');
+        // console.log('> single-select');
         source.selected = !source.selected;
+      }
+      this.last_selected_index = index;
+    },
+    drag_select(event, source, index) {
+      // console.log('drag_select', source, source.source_id, 'selected:', source.selected, event);
+      if (event.buttons != MouseKeys.primary) {
+        return;
+      }
+      // TODO: Handle filtered view.
+      const min = Math.min(this.mousedown_index, index);
+      const max = Math.max(this.mousedown_index, index);
+      for (let i = min; i <= max; ++i) {
+        this.sources[i].selected = true;
       }
       this.last_selected_index = index;
     },

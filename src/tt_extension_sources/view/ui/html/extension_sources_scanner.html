@@ -60,7 +60,8 @@
           <div class="modus-content">
             <ul class="list-group">
               <li v-for="(source, index) in filtered_sources" v-bind:key="source.source_id"
-                v-on:mousedown.prevent="select($event, source, index)" class="list-group-item list-item-left-control"
+                v-on:mousedown.prevent="select($event, source, index)"
+                v-on:mousemove="drag_select($event, source, index)" class="list-group-item list-item-left-control"
                 v-bind:class="{ 'bg-selected': source.selected }">
                 <!-- Enabled switch -->
                 <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading">

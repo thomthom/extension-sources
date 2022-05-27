@@ -34,6 +34,9 @@ let app = new Vue({
         return upper_case_path.includes(upper_case_filter);
       });
     },
+    filtered_source_ids() {
+      return this.filtered_sources.map(source => source.source_id);
+    },
     selected() {
       return this.sources.filter((source) => {
         return source.selected;
@@ -56,6 +59,10 @@ let app = new Vue({
       }
       this.sources = sources;
     },
+    can_select(source_id) {
+      if (!this.is_filtered) return true;
+      return this.filtered_source_ids.includes(source_id);
+    },
     select(event, source, index) {
       // console.log('select', source, source.source_id, 'selected:', source.selected, event);
       this.mousedown_index = index;
@@ -68,12 +75,11 @@ let app = new Vue({
         }
       }
       if (event.shiftKey && this.last_selected_index !== null) {
-        // TODO: Handle filtered view.
-        // console.log('> multi-select');
+        // console.log('> multi-select', app.filtered_source_ids);
         const min = Math.min(this.last_selected_index, index);
         const max = Math.max(this.last_selected_index, index);
         for (let i = min; i <= max; ++i) {
-          this.sources[i].selected = true;
+          this.filtered_sources[i].selected = true;
         }
       } else {
         // console.log('> single-select');
@@ -89,17 +95,19 @@ let app = new Vue({
         return;
       }
       // console.log('drag_select', source, source.source_id, 'selected:', source.selected, event);
-      // TODO: Handle filtered view.
       const toggleKey = OS.isMac ? event.metaKey : event.ctrlKey;
       if (toggleKey) {
-        // console.log('> toggle')
+        // console.log('> toggle');
         source.selected = !source.selected;
       } else {
-        // console.log('> range')
+        // console.log('> range');
+        // console.log(this.filtered_source_ids);
         const min = Math.min(this.mousedown_index, index);
         const max = Math.max(this.mousedown_index, index);
-        for (let [i, item] of this.sources.entries()) {
-          if (i >= min && i <= max) {
+        const selectable_ids = this.filtered_source_ids.slice(min, max + 1);
+        // console.log(index, min, max, selectable_ids);
+        for (let item of this.sources) {
+          if (selectable_ids.includes(item.source_id)) {
             item.selected = true;
           } else {
             item.selected = false;

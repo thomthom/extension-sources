@@ -1,3 +1,7 @@
+const OS = {
+  isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
+};
+
 let app = new Vue({
   el: '#app',
   data: {
@@ -45,13 +49,14 @@ let app = new Vue({
       console.log('select', source, source.source_id, 'selected:', source.selected, event);
       // TODO: Mouse+drag to multi-select.
       // Clear existing selection unless Ctrl is pressed.
-      if (!event.ctrlKey) { // TODO: macOS key handling.
+      const addKey = OS.isMac ? event.metaKey : event.ctrlKey;
+      if (!addKey) {
         console.log('> clear-select');
         for (const item of this.sources) {
           item.selected = false;
         }
       }
-      if (event.shiftKey && this.last_selected_index !== null) { // TODO: macOS key handling.
+      if (event.shiftKey && this.last_selected_index !== null) {
         console.log('> multi-select');
         const min = Math.min(this.last_selected_index, index);
         const max = Math.max(this.last_selected_index, index);

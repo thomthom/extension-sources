@@ -178,7 +178,7 @@ module TT::Plugins::ExtensionSources
 
       debug_path = File.expand_path('../../../fixtures/scan.json', __dir__) # TODO: Debug
 
-      if true # TODO: Debug
+      if false # TODO: Debug
         json = File.open(debug_path, "r:UTF-8", &:read)
         data = JSON.parse(json, symbolize_names: true)
         results = data.map { |item|
@@ -300,9 +300,8 @@ module TT::Plugins::ExtensionSources
     # @param [Hash] selected
     def add_extension_sources(selected)
       @logger.debug { "#{self.class.object_name} add_extension_sources (#{selected.size})" }
-      # TODO:
       selected.each { |item|
-        p item
+        extension_sources_manager.add(item[:path], enabled: item[:enabled])
       }
       nil
     end

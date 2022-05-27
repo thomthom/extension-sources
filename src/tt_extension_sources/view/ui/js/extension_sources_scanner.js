@@ -82,15 +82,29 @@ let app = new Vue({
       this.last_selected_index = index;
     },
     drag_select(event, source, index) {
-      // console.log('drag_select', source, source.source_id, 'selected:', source.selected, event);
       if (event.buttons != MouseKeys.primary) {
         return;
       }
+      if (this.last_selected_index == index) {
+        return;
+      }
+      // console.log('drag_select', source, source.source_id, 'selected:', source.selected, event);
       // TODO: Handle filtered view.
-      const min = Math.min(this.mousedown_index, index);
-      const max = Math.max(this.mousedown_index, index);
-      for (let i = min; i <= max; ++i) {
-        this.sources[i].selected = true;
+      const toggleKey = OS.isMac ? event.metaKey : event.ctrlKey;
+      if (toggleKey) {
+        // console.log('> toggle')
+        source.selected = !source.selected;
+      } else {
+        // console.log('> range')
+        const min = Math.min(this.mousedown_index, index);
+        const max = Math.max(this.mousedown_index, index);
+        for (let [i, item] of this.sources.entries()) {
+          if (i >= min && i <= max) {
+            item.selected = true;
+          } else {
+            item.selected = false;
+          }
+        }
       }
       this.last_selected_index = index;
     },

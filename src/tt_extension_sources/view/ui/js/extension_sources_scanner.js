@@ -59,6 +59,13 @@ let app = new Vue({
       }
       this.sources = sources;
     },
+    enable_toggle(source) {
+      // console.log('enable_toggle', source.enabled);
+      const enabled = source.enabled;
+      for (let item of this.selected) {
+        item.enabled = enabled;
+      }
+    },
     can_select(source_id) {
       if (!this.is_filtered) return true;
       return this.filtered_source_ids.includes(source_id);

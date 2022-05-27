@@ -64,10 +64,10 @@
                 v-on:mousemove="drag_select($event, source, index)" class="list-group-item list-item-left-control"
                 v-bind:class="{ 'bg-selected': source.selected }">
                 <!-- Enabled switch -->
-                <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading">
+                <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading"
+                  v-on:mousedown.prevent.stop="">
                   <input type="checkbox" v-model="source.enabled" class="custom-control-input"
-                    v-bind:id="source_enabled_id(source.source_id)"
-                    v-on:change="on_source_changed(source.source_id, { enabled: source.enabled })">
+                    v-bind:id="source_enabled_id(source.source_id)" v-on:change="enable_toggle(source)">
                   <label class="custom-control-label" v-bind:for="source_enabled_id(source.source_id)"></label>
                 </div>
                 <div class="d-flex">

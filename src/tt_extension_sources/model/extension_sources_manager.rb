@@ -5,6 +5,7 @@ require 'observer'
 
 require 'tt_extension_sources/model/extension_source'
 require 'tt_extension_sources/utils/inspection'
+require 'tt_extension_sources/utils/timing'
 
 module TT::Plugins::ExtensionSources
   # Raised when the given path already exists in the {ExtensionSourcesManager}.
@@ -133,12 +134,22 @@ module TT::Plugins::ExtensionSources
       # First add all load paths, then require. This is to account for
       # extensions that depend on other extensions. These will assume the
       # dependent extension is present in the load path.
-      new_data.each { |item|
-        add_load_path(item[:path]) if item[:enabled]
-      }
-      new_data.each { |item|
-        add(item[:path], enabled: item[:enabled])
-      }
+      timing = Timing.new
+      timing.measure(label: 'Add load paths') do
+
+        new_data.each { |item|
+          add_load_path(item[:path]) if item[:enabled]
+        }
+
+      end
+      timing.measure(label: 'Load extensions') do
+
+        new_data.each { |item|
+          add(item[:path], enabled: item[:enabled])
+        }
+
+      end
+      @logger.info { "#{self.class.object_name} Loading extensions took:\n#{timing.format(prefix: '* ')}" }
       nil
     end
 

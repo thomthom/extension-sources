@@ -42,7 +42,7 @@ module TT::Plugins::ExtensionSources
 
       # @return [String]
       def format_time_duration(duration)
-        sprintf("%.4f", duration)
+        sprintf("%.4fs", duration)
       end
 
     end # class Measurement
@@ -61,14 +61,20 @@ module TT::Plugins::ExtensionSources
       result
     end
 
+    # @param [String] prefix Line prefix for each measurement.
     # @return [String]
-    def to_s
+    def format(prefix: '')
       output = StringIO.new
       output.puts(@title) if @title
       @measurements.each { |measurement|
-        output.puts(measurement)
+        output.puts("#{prefix}#{measurement}")
       }
       output.string.rstrip
+    end
+
+    # @return [String]
+    def to_s
+      format
     end
 
   end # class

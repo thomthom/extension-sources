@@ -19,10 +19,12 @@ module TT::Plugins::ExtensionSources
 
     include Inspection
 
+    # @param [AppSettings] settings
     # @param [Logger] logger
-    def initialize(logger: Logger.new(nil))
+    def initialize(settings:, logger: Logger.new(nil))
       @logger = logger
       @logger.debug { "#{self.class.object_name} initialize" }
+      @settings = settings
       # Deferring initialization of the manager because it will cause the
       # extensions to load. Instead the `boot` method takes care of this.
       @extension_sources_manager = nil
@@ -176,14 +178,11 @@ module TT::Plugins::ExtensionSources
 
       existing_paths = extension_sources_manager.sources.map(&:path)
 
-      debug_path = File.expand_path('../../../fixtures/scan.json', __dir__) # TODO: Debug
-
-      if false # TODO: Debug
-        json = File.open(debug_path, "r:UTF-8", &:read)
-        data = JSON.parse(json, symbolize_names: true)
-        results = data.map { |item|
-          ExtensionSource.new(path: item[:path], enabled: item[:enabled]).to_hash
-        }
+      # The scanner might take time. In order to speed up development on
+      # processing the scanner results, UI etc, these debug methods can be used
+      # to read/write the scanner results to a cache.
+      if @settings.debug_use_cached_scan_results?
+        results = debug_read_scan_dump(debug_scan_dump_path)
       else
 
         @logger.info { "#{self.class.object_name} Scanning: #{directory}" }
@@ -200,9 +199,9 @@ module TT::Plugins::ExtensionSources
           ExtensionSource.new(path: path, enabled: true)
         }
 
-        # json = JSON.pretty_generate(results.map(&:to_hash)) # TODO: Debug
-        # File.open(debug_path, "w:UTF-8") { |file| file.write(json) } # TODO: Debug
-
+        if settings.debug_dump_cached_scan_results?
+          debug_write_scan_dump(debug_scan_dump_path, results)
+        end
       end
 
       extension_sources_scanner_dialog.show(results)
@@ -340,6 +339,36 @@ module TT::Plugins::ExtensionSources
     # @return [String]
     def sources_json_path
       File.join(storage_dir, EXTENSION_SOURCES_JSON)
+    end
+
+    # ExtensionSourcesScanner debug methods:
+    # The scanner can take some time to complete. In order to speed up
+    # development iteration, some debug methods can be used to read/write a
+    # cache of scanned results.
+
+    # @return [String]
+    def debug_scan_dump_path
+      debug_path = File.expand_path('../../../fixtures/scan.json', __dir__) # rubocop:disable SketchupSuggestions/FileEncoding
+    end
+
+    # @param [String] json_path
+    # @return [Array<Hash>]
+    def debug_read_scan_dump(json_path)
+      @logger.debug { "#{self.class.object_name} debug_read_scan_dump" }
+      json = File.open(json_path, "r:UTF-8", &:read)
+      data = JSON.parse(json, symbolize_names: true)
+      results = data.map { |item|
+        ExtensionSource.new(path: item[:path], enabled: item[:enabled]).to_hash
+      }
+    end
+
+    # @param [String] json_path
+    # @param [Array<Hash>] results
+    def debug_write_scan_dump(json_path, results)
+      @logger.debug { "#{self.class.object_name} debug_write_scan_dump" }
+      json = JSON.pretty_generate(results.map(&:to_hash))
+      File.open(json_path, "w:UTF-8") { |file| file.write(json) }
+      nil
     end
 
   end # class

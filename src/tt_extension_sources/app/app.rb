@@ -44,7 +44,8 @@ module TT::Plugins::ExtensionSources
     # @return [ExtensionSourcesController]
     def extension_sources_controller
       @extension_sources_controller ||= ExtensionSourcesController.new(
-        logger: logger
+        settings: settings,
+        logger: logger,
       )
       @extension_sources_controller
     end

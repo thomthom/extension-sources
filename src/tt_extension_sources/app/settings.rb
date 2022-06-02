@@ -4,6 +4,9 @@ require 'tt_extension_sources/system/settings'
 
 module TT::Plugins::ExtensionSources
   # The application settings interface for Extension Sources.
+  #
+  # @example
+  #   TT::Plugins::ExtensionSources.app.settings.to_h
   class AppSettings < Settings
 
     # @param [Symbol] product_id the key for the settings to be stored under.
@@ -28,6 +31,24 @@ module TT::Plugins::ExtensionSources
     #
     # @return [Integer]
     define :log_level, Logger::WARN
+
+    # @private
+    #
+    # @example
+    #   app = TT::Plugins::ExtensionSources.app
+    #   app.settings.debug_use_cached_scan_results = true
+    #
+    # @return [Boolean]
+    define :debug_use_cached_scan_results, false
+
+    # @private
+    #
+    # @example
+    #   app = TT::Plugins::ExtensionSources.app
+    #   app.settings.debug_use_cached_scan_results = true
+    #
+    # @return [Boolean]
+    define :debug_dump_cached_scan_results, false
 
   end # class
 end # module

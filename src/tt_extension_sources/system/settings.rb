@@ -66,6 +66,14 @@ module TT::Plugins::ExtensionSources
       to_s
     end
 
+    # @return [Hash{Symbol, Object}]
+    def to_h
+      # Note: This currently doesn't return any key/value pair unless that
+      #   key has already been read/written. There's currently no list of
+      #   valid keys to iterate over.
+      Hash[@cache.map { |k, v| [k.to_sym, v] }]
+    end
+
     private
 
     # @param [Symbol] key

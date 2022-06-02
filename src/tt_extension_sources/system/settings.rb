@@ -34,23 +34,30 @@ module TT::Plugins::ExtensionSources
     #   **Default:** `$2`
     #   @!attribute [rw] $1
     def self.define(key, default = nil)
+      (@keys_and_defaults ||= {})[key] = default
       read_method = boolean?(default) ? "#{key}?".to_sym : key.to_sym
       write_method = "#{key}=".to_sym
       self.class_eval {
         define_method(read_method) { |default_value = default|
-          read(key.to_s, default_value)
+          read(key, default_value)
         }
         define_method(write_method) { |value|
-          write(key.to_s, value)
+          write(key, value)
         }
       }
       nil
     end
 
-    # @private
+    # @api private
     # @param [Object] value
     def self.boolean?(value)
       value.is_a?(TrueClass) || value.is_a?(FalseClass)
+    end
+
+    # @api private
+    # @return [Hash{Symbol, Object}>]
+    def self.keys_and_defaults
+      @keys_and_defaults
     end
 
     # @param [String] preference_id
@@ -68,10 +75,9 @@ module TT::Plugins::ExtensionSources
 
     # @return [Hash{Symbol, Object}]
     def to_h
-      # Note: This currently doesn't return any key/value pair unless that
-      #   key has already been read/written. There's currently no list of
-      #   valid keys to iterate over.
-      Hash[@cache.map { |k, v| [k.to_sym, v] }]
+      Hash[self.class.keys_and_defaults.map { |key, default|
+        [key, read(key, default)]
+      }]
     end
 
     private
@@ -83,7 +89,7 @@ module TT::Plugins::ExtensionSources
       if @cache.key?(key)
         @cache[key]
       else
-        value = Sketchup.read_default(@preference_id, key, default)
+        value = Sketchup.read_default(@preference_id, key.to_s, default)
         @cache[key] = value
         value
       end
@@ -95,7 +101,7 @@ module TT::Plugins::ExtensionSources
     def write(key, value)
       @cache[key] = value
       escaped_value = escape_quotes(value)
-      Sketchup.write_default(@preference_id, key, escaped_value)
+      Sketchup.write_default(@preference_id, key.to_s, escaped_value)
       value
     end
 

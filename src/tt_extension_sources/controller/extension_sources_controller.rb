@@ -14,8 +14,10 @@ module TT::Plugins::ExtensionSources
   # Application logic binding the extension sources manager with the UI.
   class ExtensionSourcesController
 
+    # @private
     # Filename, excluding path, of the JSON file to serialize to/from.
     EXTENSION_SOURCES_JSON = 'extension_sources.json'.freeze
+    private_constant :EXTENSION_SOURCES_JSON
 
     include Inspection
 

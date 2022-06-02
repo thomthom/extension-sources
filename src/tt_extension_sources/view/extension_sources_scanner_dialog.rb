@@ -27,7 +27,7 @@ module TT::Plugins::ExtensionSources
       super()
     end
 
-    # @private
+    # @api private
     def toggle
       # Cannot do `private :toggle` because that makes the method on the
       # superclass private, affecting all subclasses.

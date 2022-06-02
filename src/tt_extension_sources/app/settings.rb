@@ -32,7 +32,7 @@ module TT::Plugins::ExtensionSources
     # @return [Integer]
     define :log_level, Logger::WARN
 
-    # @private
+    # @api private
     #
     # @example
     #   app = TT::Plugins::ExtensionSources.app
@@ -41,7 +41,7 @@ module TT::Plugins::ExtensionSources
     # @return [Boolean]
     define :debug_use_cached_scan_results, false
 
-    # @private
+    # @api private
     #
     # @example
     #   app = TT::Plugins::ExtensionSources.app

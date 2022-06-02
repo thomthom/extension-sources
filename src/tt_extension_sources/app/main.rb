@@ -11,11 +11,15 @@ module TT::Plugins::ExtensionSources
     @app
   end
 
+  # @private
   # Absolute path to location of image resources.
   IMAGES_PATH = File.join(PATH, 'images').freeze
+  private_constant :IMAGES_PATH
 
+  # @private
   # File extension for toolbar images on the current OS.
   TOOLBAR_IMAGE_EXTENSION = OS.mac? ? 'pdf' : 'svg'
+  private_constant :TOOLBAR_IMAGE_EXTENSION
 
   # @param [String] basename Base name for toolbar icon resource.
   # @return [String] Absolute path to toolbar icon resource.

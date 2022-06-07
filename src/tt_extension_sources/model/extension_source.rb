@@ -94,5 +94,11 @@ module TT::Plugins::ExtensionSources
       to_hash.to_json(*args)
     end
 
+    # @return [String]
+    def inspect(*args)
+      hex_id = "0x%x" % (object_id << 1)
+      %{#<ExtensionSource:#{hex_id} id=#{source_id.inspect} path=#{path.inspect} enabled=#{enabled?.inspect}>}
+    end
+
   end # class
 end # module

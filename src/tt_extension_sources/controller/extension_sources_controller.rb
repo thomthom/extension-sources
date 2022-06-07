@@ -154,8 +154,16 @@ module TT::Plugins::ExtensionSources
       return if path.nil?
 
       if File.exist?(path)
-        # TODO: Prompt to overwrite.
-        warn "Overwriting existing file: #{path}"
+        # On Windows the dialog itself takes care of prompting to overwrite
+        # existing files. (Might not be true for older SketchUp versions, but
+        # they might not be compatible with Extension Sources anyway.)
+        if OS.mac?
+          message = 'Do you want to overwrite existing file?'
+          result = UI.messagebox(message, MB_YESNO)
+          return if result == IDNO
+        end
+
+        @logger.info { "#{self.class.object_name} Overwriting existing file: #{path}" }
       end
 
       @logger.info { "#{self.class.object_name} Exporting to: #{path}" }

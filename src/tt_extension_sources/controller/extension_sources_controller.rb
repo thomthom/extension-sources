@@ -157,11 +157,14 @@ module TT::Plugins::ExtensionSources
         # On Windows the dialog itself takes care of prompting to overwrite
         # existing files. (Might not be true for older SketchUp versions, but
         # they might not be compatible with Extension Sources anyway.)
-        if OS.mac?
-          message = 'Do you want to overwrite existing file?'
-          result = UI.messagebox(message, MB_YESNO)
-          return if result == IDNO
-        end
+        # TODO: This appear to also be the case with macOS, at least Big Sur.
+        #   Further testing is needed to check what OS and SketchUp combinations
+        #   might need a prompt via Ruby code. (GitHub issue #41)
+        # if OS.mac?
+        #   message = 'Do you want to overwrite existing file?'
+        #   result = UI.messagebox(message, MB_YESNO)
+        #   return if result == IDNO
+        # end
 
         @logger.info { "#{self.class.object_name} Overwriting existing file: #{path}" }
       end

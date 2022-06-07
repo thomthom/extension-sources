@@ -4,6 +4,20 @@
 
 Manage additional sources to load extensions from.
 
+## Tests
+
+```sh
+bundle exec rake test
+```
+
+```sh
+bundle exec rake test TEST=tests/standalone/model/extension_source_test.rb
+```
+
+```sh
+bundle exec rake test TEST=tests/standalone/model/extension_source_test.rb TESTOPTS="--name=/test_enabled.*/ -v"
+```
+
 ## Documentation
 
 ### List undocumented code

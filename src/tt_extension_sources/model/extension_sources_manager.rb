@@ -204,6 +204,26 @@ module TT::Plugins::ExtensionSources
       notify_observers(self, :changed, source)
     end
 
+    # Moves the given +sources+ in position before the target item.
+    #
+    # Either +before+ or +after+ must be provided as target item.
+    #
+    # @param [Array<ExtensionSource>] sources
+    # @param [ExtensionSource, nil] before
+    # @param [ExtensionSource, nil] after
+    def move(sources:, before: nil, after: nil)
+      raise ArgumentError, "Must use before: or after:" if before.nil? && after.nil?
+      raise ArgumentError, "Must use either before: or after:, not both" if !before.nil? && !after.nil?
+
+      target = before || after
+      target_index = @data.find_index(target)
+      raise "target not found: #{target.inspect}" if target_index.nil?
+
+      # TODO: Sort @data
+
+      nil
+    end
+
     private
 
     # @return [Hash]

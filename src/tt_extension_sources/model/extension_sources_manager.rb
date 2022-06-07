@@ -219,7 +219,53 @@ module TT::Plugins::ExtensionSources
       target_index = @data.find_index(target)
       raise "target not found: #{target.inspect}" if target_index.nil?
 
-      # TODO: Sort @data
+      target_index += 1 if after
+
+      # Kludge, avoid temporary data?
+      items = @data.map { |source|
+        {
+          source: source,
+          selected: sources.include?(source),
+        }
+      }
+
+      first_selected_index = items.find_index { |item| item[:selected] } || 0
+      lower_bound_index = [first_selected_index, target_index].min
+      # TODO: Find a way to use .sort! while still have access to indices.
+      sorted = items.each.with_index.sort { |current, previous|
+        item_current, index_current = current
+        item_previous, index_previous = previous
+
+        # Keep the items above the lower bound index.
+        # This effectively splits the list in half;
+        # * Everything above the insertion point
+        # * Everything else
+        is_movable_current = index_current >= lower_bound_index
+        is_movable_previous = index_previous >= lower_bound_index
+        next -1 if !is_movable_current && is_movable_previous
+        next 1 if is_movable_current && !is_movable_previous
+
+        # Everything that is below the insertion point is then grouped and sorted
+        # first by selected, then by index.
+        # Selected items are moved to the top of this sub-list, while un-selected
+        # ends up at the bottom.
+        if is_movable_current
+          selected_current = item_current[:selected]
+          selected_previous = item_previous[:selected]
+          next -1 if selected_current && !selected_previous
+          next 1 if !selected_current && selected_previous
+        end
+
+        # This resolves any ambiguity, defaulting to the unique
+        # indices of each item. This should never return 0, ensuring
+        # that the sort is stable.
+        index_current <=> index_previous
+      }&.map(&:first)
+
+      # This is a kludge to reuse the same array. Workaround for not being able
+      # to use .sort! with index.
+      @data.clear
+      @data.concat(sorted.map { |item| item[:source] })
 
       nil
     end

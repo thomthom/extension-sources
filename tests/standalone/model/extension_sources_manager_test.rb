@@ -683,11 +683,11 @@ module TT::Plugins::ExtensionSources
       assert_nil(result)
 
       expected = [
-        source3,
-        source5,
         source1,
         source2,
         source4,
+        source3,
+        source5,
       ]
       assert_sources_equal(expected, manager.sources)
     end

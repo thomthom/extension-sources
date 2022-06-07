@@ -1,7 +1,6 @@
 require 'minitest/autorun'
 require 'test_helper'
 
-require 'faker'
 require 'tempfile'
 
 require 'tt_extension_sources/model/extension_source'
@@ -25,7 +24,7 @@ module TT::Plugins::ExtensionSources
 
 
     def test_initialize_with_defaults
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path)
       assert_equal(path, source.path)
       assert_kind_of(TrueClass, source.enabled?)
@@ -33,7 +32,7 @@ module TT::Plugins::ExtensionSources
     end
 
     def test_initialize_disabled
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path, enabled: false)
       assert_equal(path, source.path)
       assert_kind_of(FalseClass, source.enabled?)
@@ -41,7 +40,7 @@ module TT::Plugins::ExtensionSources
     end
 
     def test_initialize_unique_ids
-      path = Faker::File.dir
+      path = '/fake/path'
       sources = 10.times.map {
         ExtensionSource.new(path: path)
       }
@@ -51,7 +50,7 @@ module TT::Plugins::ExtensionSources
 
 
     def test_path_exist_Query_with_fake_path
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path)
       assert_kind_of(FalseClass, source.path_exist?)
     end
@@ -65,32 +64,32 @@ module TT::Plugins::ExtensionSources
 
 
     def test_path
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path)
       assert_kind_of(String, source.path)
       assert_equal(path, source.path)
     end
 
     def test_path_Set
-      path1 = Faker::File.unique.dir
+      path1 = '/fake/path/hello'
       source = ExtensionSource.new(path: path1)
-      path2 = Faker::File.unique.dir
+      path2 = '/fake/path/world'
       refute_equal(path1, path2)
       source.path = path2
       assert_equal(path2, source.path)
     end
 
     def test_path_Set_trigger_observer
-      path = Faker::File.unique.dir
+      path = '/fake/path/hello'
       source = ExtensionSource.new(path: path)
       assert_observer_event(source, :changed, [:path, source]) do
-        source.path = Faker::File.unique.dir
+        source.path = '/fake/path/world'
       end
     end
 
 
     def test_enabled
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path, enabled: true)
       assert_kind_of(TrueClass, source.enabled?)
       source.enabled = false
@@ -100,7 +99,7 @@ module TT::Plugins::ExtensionSources
     end
 
     def test_enabled_Set_trigger_observer
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path, enabled: false)
       assert_observer_event(source, :changed, [:enabled, source]) do
         source.enabled = true
@@ -109,7 +108,7 @@ module TT::Plugins::ExtensionSources
 
 
     def test_to_hash
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path, enabled: false)
       result = source.to_hash
       assert_kind_of(Hash, result)
@@ -124,7 +123,7 @@ module TT::Plugins::ExtensionSources
 
 
     def test_serialize_as_hash
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path, enabled: false)
       result = source.serialize_as_hash
       assert_kind_of(Hash, result)
@@ -137,7 +136,7 @@ module TT::Plugins::ExtensionSources
 
 
     def test_as_json
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path, enabled: false)
       result = source.as_json
       assert_kind_of(Hash, result)
@@ -152,7 +151,7 @@ module TT::Plugins::ExtensionSources
 
 
     def test_to_json
-      path = Faker::File.dir
+      path = '/fake/path'
       source = ExtensionSource.new(path: path, enabled: false)
       result = source.to_json
       assert_kind_of(String, result)

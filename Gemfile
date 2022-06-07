@@ -7,7 +7,6 @@ group :development do
 end
 
 group :test do
-  gem 'faker', '~> 2.20'
   gem 'minitest', '~> 5.14'
   gem 'rake', '~> 13.0'
 end

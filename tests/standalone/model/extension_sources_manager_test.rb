@@ -1,7 +1,6 @@
 require 'minitest/autorun'
 require 'test_helper'
 
-require 'faker'
 require 'json'
 require 'tempfile'
 
@@ -79,7 +78,7 @@ module TT::Plugins::ExtensionSources
 
 
     def test_initialize_no_storage_path_file
-      storage_path = Faker::File.file_name
+      storage_path = '/fake/filename.json'
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: storage_path,
@@ -103,11 +102,11 @@ module TT::Plugins::ExtensionSources
       data = write_storage_path_data do
         [
           {
-            path: Faker::File.unique.dir,
+            path: '/fake/path/hello',
             enabled: true,
           },
           {
-            path: Faker::File.unique.dir,
+            path: '/fake/path/world',
             enabled: false,
           },
         ]
@@ -130,7 +129,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       source = assert_observer_event(manager, :changed, [manager, :added, ExtensionSource]) do
         manager.add(path, enabled: true)
       end
@@ -145,7 +144,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       source = assert_observer_event(manager, :changed, [manager, :added, ExtensionSource]) do
         manager.add(path, enabled: false)
       end
@@ -161,7 +160,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       source = assert_observer_event(manager, :changed, [manager, :added, ExtensionSource]) do
         manager.add(path)
       end
@@ -177,7 +176,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       source = manager.add(path, enabled: true)
 
       result = assert_observer_event(manager, :changed, [manager, :removed, ExtensionSource]) do
@@ -194,7 +193,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       manager.add(path, enabled: true)
 
       assert_raises(IndexError) do
@@ -209,10 +208,10 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path1 = Faker::File.unique.dir
+      path1 = '/fake/path/hello'
       source = manager.add(path1, enabled: true)
 
-      path2 = Faker::File.unique.dir
+      path2 = '/fake/path/world'
       result = assert_observer_event(manager, :changed, [manager, :changed, ExtensionSource]) do
         manager.update(source_id: source.source_id, path: path2)
       end
@@ -230,7 +229,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       source = manager.add(path, enabled: false)
 
       result = assert_observer_event(manager, :changed, [manager, :changed, ExtensionSource]) do
@@ -248,7 +247,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       source = manager.add(path, enabled: true)
 
       result = assert_observer_event(manager, :changed, [manager, :changed, ExtensionSource]) do
@@ -267,7 +266,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       source = manager.add(path, enabled: true)
 
       result = assert_no_observer_event(manager) do
@@ -285,7 +284,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       source = manager.add(path, enabled: true)
 
       result = assert_no_observer_event(manager) do
@@ -303,7 +302,7 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path = Faker::File.unique.dir
+      path = '/fake/path'
       source = manager.add(path, enabled: true)
 
       result = assert_no_observer_event(manager) do
@@ -322,9 +321,9 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      path1 = Faker::File.unique.dir
+      path1 = '/fake/path/hello'
       source1 = manager.add(path1, enabled: true)
-      path2 = Faker::File.unique.dir
+      path2 = '/fake/path/world'
       source2 = manager.add(path2, enabled: true)
 
       assert_raises(PathNotUnique) do
@@ -347,11 +346,10 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      3.times {
-        path = Faker::File.unique.dir
-        enabled = Faker::Boolean.boolean(true_ratio: 0.75)
-        manager.add(path, enabled: enabled)
-      }
+      manager.add('/fake/path/hello', enabled: true)
+      manager.add('/fake/path/world', enabled: false)
+      manager.add('/fake/path/universe', enabled: true)
+
       expected = manager.sources.map(&:serialize_as_hash)
       assert_nil(manager.export(export_path))
 
@@ -373,19 +371,24 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      original_sources = 2.times.map {
-        path = Faker::File.unique.dir(root: 'original')
-        enabled = Faker::Boolean.boolean(true_ratio: 0.75)
-        manager.add(path, enabled: enabled)
-      }
-      original_data = original_sources.map(&:serialize_as_hash)
+      manager.add('/fake/path/hello', enabled: true)
+      manager.add('/fake/path/world', enabled: false)
+      original_data = manager.sources.map(&:serialize_as_hash)
 
-      data = 3.times.map {
+      data = [
         {
-          path: Faker::File.unique.dir(root: 'import'),
-          enabled: Faker::Boolean.boolean(true_ratio: 0.75)
-        }
-      }
+          path: '/fake/path/mars',
+          enabled: true,
+        },
+        {
+          path: '/fake/path/venus',
+          enabled: false,
+        },
+        {
+          path: '/fake/path/jupiter',
+          enabled: true,
+        },
+      ]
       # Add data for one original path. Ensure the state if different.
       original = original_data.last.dup
       original[:enabled] = !original[:enabled]
@@ -426,8 +429,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      source1 = manager.add(Faker::File.unique.dir, enabled: true)
-      source2 = manager.add(Faker::File.unique.dir, enabled: true)
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
 
       result = manager.find_by_source_id(source2.source_id)
       refute_equal(source1, result)
@@ -440,8 +443,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      manager.add(Faker::File.unique.dir, enabled: true)
-      manager.add(Faker::File.unique.dir, enabled: true)
+      manager.add('/fake/path/hello', enabled: true)
+      manager.add('/fake/path/world', enabled: true)
 
       result = manager.find_by_source_id(123456)
       assert_nil(result)
@@ -454,8 +457,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      source1 = manager.add(Faker::File.unique.dir, enabled: true)
-      source2 = manager.add(Faker::File.unique.dir, enabled: true)
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
 
       result = manager.find_by_path(source2.path)
       refute_equal(source1, result)
@@ -468,10 +471,10 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      manager.add(Faker::File.unique.dir, enabled: true)
-      manager.add(Faker::File.unique.dir, enabled: true)
+      manager.add('/fake/path/hello', enabled: true)
+      manager.add('/fake/path/world', enabled: true)
 
-      result = manager.find_by_path(Faker::File.unique.dir)
+      result = manager.find_by_path('/fake/path/universe')
       assert_nil(result)
     end
 
@@ -482,8 +485,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      source1 = manager.add(Faker::File.unique.dir, enabled: true)
-      source2 = manager.add(Faker::File.unique.dir, enabled: true)
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
 
       assert_kind_of(TrueClass, manager.include_path?(source1.path))
       assert_kind_of(TrueClass, manager.include_path?(source2.path))
@@ -495,10 +498,10 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      manager.add(Faker::File.unique.dir, enabled: true)
-      manager.add(Faker::File.unique.dir, enabled: true)
+      manager.add('/fake/path/hello', enabled: true)
+      manager.add('/fake/path/world', enabled: true)
 
-      assert_kind_of(FalseClass, manager.include_path?(Faker::File.unique.dir))
+      assert_kind_of(FalseClass, manager.include_path?('/fake/path/universe'))
     end
 
 
@@ -508,8 +511,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      source1 = manager.add(Faker::File.unique.dir, enabled: true)
-      source2 = manager.add(Faker::File.unique.dir, enabled: true)
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
 
       result = manager.sources
       assert_kind_of(Array, result)
@@ -527,8 +530,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      source1 = manager.add(Faker::File.unique.dir, enabled: true)
-      source2 = manager.add(Faker::File.unique.dir, enabled: true)
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
 
       result = manager.as_json
       assert_kind_of(Array, result)
@@ -546,8 +549,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      manager.add(Faker::File.unique.dir, enabled: true)
-      manager.add(Faker::File.unique.dir, enabled: true)
+      manager.add('/fake/path/hello', enabled: true)
+      manager.add('/fake/path/world', enabled: true)
 
       result = manager.to_json
       assert_kind_of(String, result)
@@ -564,8 +567,8 @@ module TT::Plugins::ExtensionSources
         storage_path: @storage_path.path,
         warnings: false,
       )
-      manager.add(Faker::File.unique.dir, enabled: true)
-      manager.add(Faker::File.unique.dir, enabled: true)
+      manager.add('/fake/path/hello', enabled: true)
+      manager.add('/fake/path/world', enabled: true)
       assert_equal(2, @storage_path.size)
 
       manager.save

@@ -189,7 +189,10 @@ module TT::Plugins::ExtensionSources
     # @param [Integer] target_id
     def move_paths_to(dialog, selected_ids, target_id)
       @logger.debug { "#{self.class.object_name} Move Selected Paths: #{selected_ids.inspect} to #{target_id.inspect}" }
+      selected = selected_ids.map { |id| manager.find_by_source_id(id) }
+      target = manager.find_by_source_id(target_id)
       # TODO:
+      # manager.move(paths: selected, to: target)
     end
 
     # @param [ExtensionSourcesDialog] dialog

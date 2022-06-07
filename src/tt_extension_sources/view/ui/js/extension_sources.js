@@ -18,6 +18,7 @@ let app = new Vue({
     filter: "",
     mousedown_index: null,
     last_selected_index: null,
+    drag_over_source_id: null,
     sources: [],
   },
   computed: {
@@ -66,12 +67,16 @@ let app = new Vue({
         item.enabled = enabled;
       }
     },
+    // --- Selection Logic ---
     can_select(source_id) {
       if (!this.is_filtered) return true;
       return this.filtered_source_ids.includes(source_id);
     },
     select(event, source, index) {
       // console.log('select', source, source.source_id, 'selected:', source.selected, event);
+      if (source.selected) return; // Allow drag of selected items.
+
+      event.preventDefault(); // Prevent drag when doing drag-select.
       this.mousedown_index = index;
       // Clear existing selection unless Ctrl is pressed.
       const addKey = OS.isMac ? event.metaKey : event.ctrlKey;
@@ -123,6 +128,43 @@ let app = new Vue({
       }
       this.last_selected_index = index;
     },
+    // --- Drag & Drop Logic ---
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
+    drag_start(event, source) {
+      console.log('drag_start', source.source_id, source.path, event);
+      // Add the target element's id to the data transfer object
+      // event.dataTransfer.setData("text/plain", event.target.id);
+      // event.dataTransfer.dropEffect = "copy";
+
+      // event.dataTransfer.setData("application/my-app", event.target.id);
+      event.dataTransfer.effectAllowed = "move";
+    },
+    drag_over(event, source) {
+      // console.log('drag_over', event);
+      console.log('drag_over');
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+
+      this.drag_over_source_id = source.source_id
+    },
+    drag_drop(event, source) {
+      console.log('drag_drop', source.source_id, source.path, event);
+      event.preventDefault();
+      // Get the id of the target and add the moved element to the target's DOM
+      // const data = ev.dataTransfer.getData("text/plain");
+      // ev.target.appendChild(document.getElementById(data));
+
+      // Get the id of the target and add the moved element to the target's DOM
+      // const data = event.dataTransfer.getData("application/my-app");
+      // event.target.appendChild(document.getElementById(data));
+      // console.log('> element', data);
+
+      this.drag_over_source_id = null;
+
+      const selected_ids = this.selected.map(source => source.source_id);
+      sketchup.move_paths_to(selected_ids, source.source_id);
+    },
+    // --- Callbacks ---
     options() {
       sketchup.options();
     },

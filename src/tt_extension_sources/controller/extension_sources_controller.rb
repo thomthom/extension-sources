@@ -185,6 +185,14 @@ module TT::Plugins::ExtensionSources
     end
 
     # @param [ExtensionSourcesDialog] dialog
+    # @param [Array<Integer>] selected_ids
+    # @param [Integer] target_id
+    def move_paths_to(dialog, selected_ids, target_id)
+      @logger.debug { "#{self.class.object_name} Move Selected Paths: #{selected_ids.inspect} to #{target_id.inspect}" }
+      # TODO:
+    end
+
+    # @param [ExtensionSourcesDialog] dialog
     def scan_paths(dialog)
       directory = UI.select_directory(title: "Select Directory to Scan")
       return if directory.nil?
@@ -278,6 +286,10 @@ module TT::Plugins::ExtensionSources
 
       dialog.on(:scan_paths) do |dialog|
         scan_paths(dialog)
+      end
+
+      dialog.on(:move_paths_to) do |dialog, selected_ids, target_id|
+        move_paths_to(dialog, selected_ids, target_id)
       end
 
       dialog

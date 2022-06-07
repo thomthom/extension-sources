@@ -33,6 +33,16 @@
       line-height: 24px;
       vertical-align: bottom;
     }
+
+    .es-drag-over:before {
+      content: '';
+      overflow: hidden;
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      top: -1px;
+      background: #333;
+    }
   </style>
 </head>
 
@@ -91,9 +101,11 @@
           <div class="modus-content">
             <ul class="list-group">
               <li v-for="(source, index) in filtered_sources" v-bind:key="source.source_id"
-                v-on:mousedown.prevent="select($event, source, index)"
-                v-on:mousemove="drag_select($event, source, index)" class="list-group-item list-item-left-control"
-                v-bind:class="{ 'bg-selected': source.selected }">
+                v-on:mousedown="select($event, source, index)" v-on:mousemove="drag_select($event, source, index)"
+                class="list-group-item list-item-left-control"
+                v-bind:class="{ 'bg-selected': source.selected, 'es-drag-over': drag_over_source_id == source.source_id }"
+                draggable="true" v-on:dragstart="drag_start($event, source)" v-on:dragover="drag_over($event, source)"
+                v-on:drop="drag_drop($event, source)">
                 <!-- Enabled switch -->
                 <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading"
                   v-on:mousedown.prevent.stop="">

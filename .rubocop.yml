@@ -21,6 +21,7 @@ AllCops:
     TargetSketchUpVersion: 2017 # UI::HtmlDialog.
     Exclude: # Exclude common folders.
     - fixtures/**/*
+    - research/**/*
     - profiling/**/*
     - skippy/**/*
     - tests/**/*

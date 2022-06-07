@@ -72,21 +72,39 @@ let app = new Vue({
       if (!this.is_filtered) return true;
       return this.filtered_source_ids.includes(source_id);
     },
+    // Returns an object describing the selection behaviour.
+    select_behavior(event) {
+      const toggle_select = OS.isMac ? event.metaKey : event.ctrlKey;
+      const multi_select = event.shiftKey;
+      const single_select = !toggle_select && !multi_select;
+      return {
+        toggle_select: toggle_select,
+        multi_select: multi_select,
+        single_select: single_select,
+      };
+    },
     select(event, source, index) {
       // console.log('select', source, source.source_id, 'selected:', source.selected, event);
-      if (source.selected) return; // Allow drag of selected items.
+      console.log('select', source, source.source_id);
+      const behavior = this.select_behavior(event);
+
+      // Allow drag of selected items. If a drag wasn't performed then the click
+      // is processed during mouse up.
+      if (source.selected && behavior.single_select) {
+        console.log('> deferring single-select of pre-selected item');
+        return;
+      }
 
       event.preventDefault(); // Prevent drag when doing drag-select.
       this.mousedown_index = index;
       // Clear existing selection unless Ctrl is pressed.
-      const addKey = OS.isMac ? event.metaKey : event.ctrlKey;
-      if (!addKey) {
+      if (!behavior.toggle_select) {
         // console.log('> clear-select');
         for (const item of this.sources) {
           item.selected = false;
         }
       }
-      if (event.shiftKey && this.last_selected_index !== null) {
+      if (behavior.multi_select && this.last_selected_index !== null) {
         // console.log('> multi-select', app.filtered_source_ids);
         const min = Math.min(this.last_selected_index, index);
         const max = Math.max(this.last_selected_index, index);
@@ -99,6 +117,27 @@ let app = new Vue({
       }
       this.last_selected_index = index;
     },
+    select_mouseup(event, source, index) {
+      // console.log('select_mouseup', source, source.source_id, 'selected:', source.selected, event);
+      console.log('select_mouseup', source, source.source_id);
+      const behavior = this.select_behavior(event);
+
+      // In case the user clicked on a selected item, that might be part of a
+      // large selection, the down-click was not processed because it might
+      // result in a drag. This handling must then be processed on mouse up.
+      if (behavior.single_select) {
+        // Don't do anything if the selection doesn't change.
+        // console.log('> selection size', this.selected.length)
+        if (!(this.selected.length == 1 && this.selected[0].source_id != source.source_id)) {
+          console.log('> deferred single-select');
+          for (const item of this.sources) {
+            item.selected = false;
+          }
+          source.selected = !source.selected;
+          this.last_selected_index = index;
+        }
+      }
+    },
     drag_select(event, source, index) {
       if (event.buttons != MouseKeys.primary) {
         return;
@@ -106,9 +145,16 @@ let app = new Vue({
       if (this.last_selected_index == index) {
         return;
       }
+      // If starting a drag on a selected item, that should initiate drag and
+      // drop, not drag-select.
+      if (source.selected) {
+        return;
+      }
+      console.log('drag_select');
+      event.preventDefault(); // Prevent drag and drop while a drag-select is active.
       // console.log('drag_select', source, source.source_id, 'selected:', source.selected, event);
-      const toggleKey = OS.isMac ? event.metaKey : event.ctrlKey;
-      if (toggleKey) {
+      const behavior = this.select_behavior(event);
+      if (behavior.toggle_select) {
         // console.log('> toggle');
         source.selected = !source.selected;
       } else {
@@ -141,7 +187,7 @@ let app = new Vue({
     },
     drag_over(event, source) {
       // console.log('drag_over', event);
-      console.log('drag_over');
+      // console.log('drag_over');
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
 

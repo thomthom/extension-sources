@@ -60,8 +60,8 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesManager] sources_manager
     # @param [Symbol] event
-    # @param [ExtensionSource] source
-    def on_sources_changed(sources_manager, event, source)
+    # @param [ExtensionSource, nil] source
+    def on_sources_changed(sources_manager, event, source = nil)
       @logger.debug { "#{self.class.object_name} on_sources_changed: #{event} - ##{source&.source_id}: #{source&.path}" }
       @sync.call
     end
@@ -185,6 +185,22 @@ module TT::Plugins::ExtensionSources
     end
 
     # @param [ExtensionSourcesDialog] dialog
+    # @param [Array<Integer>] selected_ids
+    # @param [Integer] target_id
+    def reorder(dialog, selected_ids, target_id, before)
+      @logger.debug { "#{self.class.object_name} Move Selected Paths: #{selected_ids.inspect} to #{target_id.inspect} (Before: #{before.inspect})" }
+      manager = extension_sources_manager
+      selected = selected_ids.map { |id| manager.find_by_source_id(id) }
+      target = manager.find_by_source_id(target_id)
+      position = before ? :before : :after
+      params = {
+        :sources => selected,
+        position => target,
+      }
+      manager.move(**params)
+    end
+
+    # @param [ExtensionSourcesDialog] dialog
     def scan_paths(dialog)
       directory = UI.select_directory(title: "Select Directory to Scan")
       return if directory.nil?
@@ -212,7 +228,7 @@ module TT::Plugins::ExtensionSources
           ExtensionSource.new(path: path, enabled: true)
         }
 
-        if settings.debug_dump_cached_scan_results?
+        if @settings.debug_dump_cached_scan_results?
           debug_write_scan_dump(debug_scan_dump_path, results)
         end
       end
@@ -278,6 +294,10 @@ module TT::Plugins::ExtensionSources
 
       dialog.on(:scan_paths) do |dialog|
         scan_paths(dialog)
+      end
+
+      dialog.on(:reorder) do |dialog, selected_ids, target_id, before|
+        reorder(dialog, selected_ids, target_id, before)
       end
 
       dialog

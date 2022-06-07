@@ -204,6 +204,83 @@ module TT::Plugins::ExtensionSources
       notify_observers(self, :changed, source)
     end
 
+    # @private
+    # Data structure helper to aid in algorithmic processing of extension
+    # sources.
+    ItemState = Struct.new(:source, :index, :selected)
+    private_constant :ItemState
+
+    # Moves the given +sources+ in position at the target item.
+    #
+    # Either +before+ or +after+ must be provided as target item.
+    #
+    # @param [Array<ExtensionSource>] sources
+    # @param [ExtensionSource, nil] before
+    # @param [ExtensionSource, nil] after
+    def move(sources:, before: nil, after: nil)
+      raise ArgumentError, "Must use before: or after:" if before.nil? && after.nil?
+      raise ArgumentError, "Must use either before: or after:, not both" if !before.nil? && !after.nil?
+
+      target = before || after
+      target_index = @data.find_index(target)
+      raise "target not found: #{target.inspect}" if target_index.nil?
+
+      target_index += 1 if after
+
+      state = Hash[@data.map.with_index { |item, i|
+        [item, ItemState.new(item, i, sources.include?(item))]
+      }]
+      # This is effectively performing a stable partition sort on the elements
+      # above and below the target index.
+      #
+      # In C++ this would be done as:
+      #   stable_partition(begin(xs), target, std::not_fn(pred));
+      #   stable_partition(target, end(xs), pred);
+      #
+      # (See Sean Parent's talk: https://youtu.be/W2tWOdzgXHA?t=533)
+      #
+      # Ruby's Enumerable#partition doesn't do partial range, nor does it modify
+      # the collection, instead it returns two new arrays. It's also not stable.
+      #
+      # When an array is returned to #sort_by it will sort by Array comparison.
+      # This comparison is done by comparing each element in the array in
+      # sequence.
+      #
+      # For this algorithm we first sort by the upper and lower set in the
+      # collection, split by the insertion index. (primary)
+      #
+      # stable_partition [first, insert)
+      # stable_partition [insert, last)
+      #
+      # Ruby Ranges:
+      # (0..6) == [0..6]  <- inclusive last
+      # (0...6) == [0..6) <- exclusive last
+      #
+      # Then, in the upper set the "selected" items should appear at the bottom
+      # and in the lower set they should appear at the top. (secondary)
+      #
+      # In order to make this a stable sort, any equal comparison of the primary
+      # and secondary values are resolved by the original index. (tertiary)
+      upper = (0...target_index)
+      @data.sort_by! { |source|
+        item = state[source]
+        in_upper = upper.include?(item.index)
+        to_top_of_partition = if in_upper
+          item.selected ? 1 : 0
+        else
+          item.selected ? 0 : 1
+        end
+        primary = in_upper ? 0 : 1
+        secondary = to_top_of_partition
+        tertiary = item.index
+        [primary, secondary, tertiary]
+      }
+
+      changed
+      notify_observers(self, :reordered)
+      nil
+    end
+
     private
 
     # @return [Hash]

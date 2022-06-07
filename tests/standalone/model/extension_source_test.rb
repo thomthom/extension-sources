@@ -164,5 +164,16 @@ module TT::Plugins::ExtensionSources
       assert_equal(expected.to_json, result)
     end
 
+
+    def test_inspect
+      path = '/fake/path'
+      source = ExtensionSource.new(path: path, enabled: false)
+      result = source.inspect
+      assert_kind_of(String, result)
+      hex_id = "0x%x" % (source.object_id << 1)
+      expected = %{#<ExtensionSource:#{hex_id} id=#{source.source_id} path="/fake/path" enabled=false>}
+      assert_equal(expected, result)
+    end
+
   end # class
 end # module

@@ -1,5 +1,5 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
-const MouseKeys = {
+const MouseButtons = {
   none: 0,      // No button or un- initialized
   primary: 1,   // Primary button(usually the left button)
   secondary: 2, // Secondary button(usually the right button)
@@ -8,17 +8,60 @@ const MouseKeys = {
   fifth: 16,    // 5th button(typically the "Browser Forward" button)
 };
 
+// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+const MouseButton = {
+  primary: 0,   // Primary button(usually the left button)
+  auxiliary: 1, // Auxiliary button(usually the mouse wheel button or middle button)
+  secondary: 2, // Secondary button(usually the right button)
+  fourth: 3,    // 4th button(typically the "Browser Back" button)
+  fifth: 4,     // 5th button(typically the "Browser Forward" button)
+};
+
 const OS = {
   isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 };
+
+// Stub out the callbacks on the `sketchup` object for testing in a browser.
+console.log('sketchup', typeof sketchup);
+if (typeof sketchup === 'undefined') {
+  console.log('Shimming `sketchup` object for in-browser testing...');
+  window.sketchup = {
+    move_paths_to() { },
+    options() { },
+    undo() { },
+    redo() { },
+    scan_paths() { },
+    import_paths() { },
+    export_paths() { },
+    add_path() { },
+    edit_path() { },
+    remove_path() { },
+    reload_path() { },
+    reorder() { },
+    source_changed() { },
+    ready() {
+      console.log('shim: ready()')
+      let items = [
+        { source_id: 1, path: '/fake/path1', enabled: true, path_exist: true },
+        { source_id: 2, path: '/fake/path2', enabled: true, path_exist: true },
+        { source_id: 3, path: '/fake/path3', enabled: true, path_exist: true },
+        { source_id: 4, path: '/fake/path4', enabled: true, path_exist: true },
+        { source_id: 5, path: '/fake/path5', enabled: true, path_exist: true },
+      ];
+      setTimeout(() => app.update(items)); // Simulate async action.
+    },
+  };
+}
 
 let app = new Vue({
   el: '#app',
   data: {
     filter: "",
-    mousedown_index: null,
-    last_selected_index: null,
     sources: [],
+    // List UI state:
+    last_selected_index: null,
+    drag_over_source_id: null,
+    drag_before: false,
   },
   computed: {
     is_filtered() {
@@ -41,7 +84,7 @@ let app = new Vue({
       return this.sources.filter((source) => {
         return source.selected;
       });
-    }
+    },
   },
   methods: {
     source_enabled_id(source_id) {
@@ -54,8 +97,17 @@ let app = new Vue({
       // Inject additional properties that only the Vue app cares about.
       // For Vue's reactor to pick up the changes they must be added to
       // the `sources` data before assigning to the Vue app's data.
+      let ui_state = {};
+      for (const item of this.sources) {
+        ui_state[item.source_id] = {
+          selected: item.selected,
+          draggable: item.draggable,
+        };
+      }
       for (const item of sources) {
-        item.selected = false;
+        item.selected = ui_state[item.source_id]?.selected || false;
+        item.draggable = ui_state[item.source_id]?.draggable || false;
+        // item.selected = (item.source_id in ui_state) ? ui_state[item.source_id].selected : false;
       }
       this.sources = sources;
     },
@@ -66,22 +118,45 @@ let app = new Vue({
         item.enabled = enabled;
       }
     },
-    can_select(source_id) {
-      if (!this.is_filtered) return true;
-      return this.filtered_source_ids.includes(source_id);
+    // --- Selection Logic ---
+    // Returns an object describing the selection behaviour.
+    select_behavior(event) {
+      const toggle_select = OS.isMac ? event.metaKey : event.ctrlKey;
+      const multi_select = event.shiftKey;
+      const single_select = !toggle_select && !multi_select;
+      return {
+        toggle_select: toggle_select,
+        multi_select: multi_select,
+        single_select: single_select,
+      };
     },
     select(event, source, index) {
+      if (event.buttons != MouseButtons.primary) {
+        console.log('select', 'not primary buttons', event.buttons)
+        return;
+      }
+
       // console.log('select', source, source.source_id, 'selected:', source.selected, event);
-      this.mousedown_index = index;
+      // console.log('select', source, source.source_id);
+      console.log('select', source, source.source_id, 'buttons', event.buttons);
+      const behavior = this.select_behavior(event);
+
+      let is_drag_handle = event.target.closest('.es-drag-handle') !== null;
+      // Don't change the selection when clicking the drag handle of a selected
+      // item. But allow selection to change when clicking the drag handle of
+      // and unselected item. (Doesn't make sense to drag an unselected item.)
+      if (is_drag_handle && source.selected) {
+        return;
+      }
+
       // Clear existing selection unless Ctrl is pressed.
-      const addKey = OS.isMac ? event.metaKey : event.ctrlKey;
-      if (!addKey) {
+      if (!behavior.toggle_select) {
         // console.log('> clear-select');
         for (const item of this.sources) {
           item.selected = false;
         }
       }
-      if (event.shiftKey && this.last_selected_index !== null) {
+      if (behavior.multi_select && this.last_selected_index !== null) {
         // console.log('> multi-select', app.filtered_source_ids);
         const min = Math.min(this.last_selected_index, index);
         const max = Math.max(this.last_selected_index, index);
@@ -94,35 +169,98 @@ let app = new Vue({
       }
       this.last_selected_index = index;
     },
-    drag_select(event, source, index) {
-      if (event.buttons != MouseKeys.primary) {
-        return;
-      }
-      if (this.last_selected_index == index) {
-        return;
-      }
-      // console.log('drag_select', source, source.source_id, 'selected:', source.selected, event);
-      const toggleKey = OS.isMac ? event.metaKey : event.ctrlKey;
-      if (toggleKey) {
-        // console.log('> toggle');
-        source.selected = !source.selected;
-      } else {
-        // console.log('> range');
-        // console.log(this.filtered_source_ids);
-        const min = Math.min(this.mousedown_index, index);
-        const max = Math.max(this.mousedown_index, index);
-        const selectable_ids = this.filtered_source_ids.slice(min, max + 1);
-        // console.log(index, min, max, selectable_ids);
-        for (let item of this.sources) {
-          if (selectable_ids.includes(item.source_id)) {
-            item.selected = true;
-          } else {
-            item.selected = false;
-          }
-        }
-      }
-      this.last_selected_index = index;
+    // --- Drag & Drop Logic ---
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
+    drag_start(event, source) {
+      console.log('drag_start', source.source_id, source.path, event);
+      event.dataTransfer.effectAllowed = "move";
     },
+    drag_end(event, source) {
+      console.log('drag_end', source.source_id, source.path, event);
+      this.drag_over_source_id = null;
+      source.draggable = false; // Because .es-drag-handle onmouseup doesn't trigger after a drag.
+
+      // Workaround for SketchUp bug:
+      // On Windows the `drop` event fails to trigger on the very first drop.
+      // (Tested on SketchUp up til SU2022.0).
+      // To work around this the `dragend` event is used instead. This event
+      // is called on the element that started `dragstart`, so the target
+      // target element must be computed manually.
+
+      // Check if the drop was cancelled.
+      // Bug: This also fails. Need another approach. Maybe;
+      // * Check valid drop target.
+      // * Monitor ESC key in between drag's start and end.
+      // Bug: Nope, no key events fire during drag and drop.
+      // if (event.dataTransfer.dropEffect == "none") {
+      //   return;
+      // }
+
+      // Known Issue: Not able to detect Escape cancelling the drag. :(
+
+      // Find the target list item and the associated source item.
+      let target = this.drag_target_from_point(event.x, event.y);
+      if (target === null)
+        return;
+      let source_id = parseInt(target.dataset.sourceId);
+
+      // This is what the `drop` event would do, if it worked reliably:
+      console.log('drop (workaround)');
+      this.drag_selected_to_target(source_id);
+    },
+    drag_enter(event, source) {
+      // console.log('drag_enter');
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+
+      this.drag_over_source_id = source.source_id
+      this.drag_before = this.is_drop_target_before(event.target, event.x, event.y);
+    },
+    drag_over(event, source) {
+      // console.log('drag_over');
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+
+      this.drag_over_source_id = source.source_id
+      this.drag_before = this.is_drop_target_before(event.target, event.x, event.y);
+    },
+    drag_drop(event, source) {
+      console.log('drag_drop', source.source_id, source.path, event);
+      event.preventDefault();
+
+      // Bug: This doesn't work properly in SketchUp on Windows. See `drag_end`.
+      // this.drag_selected_to_target(source_id);
+    },
+    is_drop_target_before(target, x, y) {
+      // console.log('drag_before_or_after', x, y);
+
+      target = target.closest('.su-source');
+      // console.log(target, x, y);
+
+      let bounds = target.getBoundingClientRect();
+      let relative_y = y - bounds.y;
+      let before = relative_y < (bounds.height / 2);
+      // console.log(bounds, relative_y, bounds.height, before);
+      return before;
+    },
+    drag_target_from_point(x, y) {
+      let target = document.elementFromPoint(x, y);
+      // console.log('elementFromPoint', target);
+
+      let list_item = target.closest('.su-source');
+      // console.log('closest', list_item);
+
+      return list_item
+    },
+    drag_selected_to_target(source_id) {
+      const selected_ids = this.selected.map(item => item.source_id);
+      if (selected_ids.length == 1 && source_id == selected_ids[0]) {
+        return; // Nothing was moved.
+      }
+      console.log('reorder', selected_ids, source_id, this.drag_before);
+      sketchup.reorder(selected_ids, source_id, this.drag_before);
+    },
+    // --- Callbacks ---
     options() {
       sketchup.options();
     },
@@ -159,6 +297,7 @@ let app = new Vue({
     }
   },
   mounted() {
+    // Everything ready, notify the Ruby side.
     sketchup.ready();
   },
 });

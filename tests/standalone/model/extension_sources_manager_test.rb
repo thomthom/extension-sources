@@ -76,6 +76,15 @@ module TT::Plugins::ExtensionSources
       assert_equal(FAKE_LOAD_PATH + additional_paths, load_path)
     end
 
+    # An assert-helper that makes the expected/actual results more readable.
+    #
+    # @param [Array<ExtensionSource>] expected
+    # @param [Array<ExtensionSource>] actual
+    # @param [String] msg
+    def assert_sources_equal(expected, actual, msg = nil)
+      assert_equal(expected.map(&:source_id), actual.map(&:source_id), msg)
+    end
+
 
     def test_initialize_no_storage_path_file
       storage_path = '/fake/filename.json'
@@ -580,6 +589,273 @@ module TT::Plugins::ExtensionSources
       assert_equal(manager.sources.size, data.size)
       expected = manager.sources.map(&:serialize_as_hash)
       assert_equal(expected, data)
+    end
+
+
+    def test_move_before
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      result = manager.move(sources: [source3, source5], before: source1)
+      assert_nil(result)
+
+      expected = [
+        source3,
+        source5,
+        source1,
+        source2,
+        source4,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
+    def test_move_after
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      result = manager.move(sources: [source3, source5], after: source1)
+      assert_nil(result)
+
+      expected = [
+        source1,
+        source3,
+        source5,
+        source2,
+        source4,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
+    def test_move_before_including_self
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      result = manager.move(sources: [source1, source3, source5], before: source1)
+      assert_nil(result)
+
+      expected = [
+        source1,
+        source3,
+        source5,
+        source2,
+        source4,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
+    def test_move_after_including_self
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      result = manager.move(sources: [source1, source3, source5], after: source1)
+      assert_nil(result)
+
+      expected = [
+        source1,
+        source3,
+        source5,
+        source2,
+        source4,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
+    def test_move_to_end
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      result = manager.move(sources: [source1, source2, source4], after: source5)
+      assert_nil(result)
+      assert_equal(5, manager.sources.size, 'Unexpected number of items after move')
+
+      expected = [
+        source3,
+        source5,
+        source1,
+        source2,
+        source4,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
+    def test_move_down_below_last_selected
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      result = manager.move(sources: [source2], before: source5)
+      assert_nil(result)
+
+      expected = [
+        source1,
+        source3,
+        source4,
+        source2,
+        source5,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
+    def test_move_mixed
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+      source6 = manager.add('/fake/path/saturn', enabled: false)
+      source7 = manager.add('/fake/path/pluto', enabled: false)
+
+      result = manager.move(sources: [source1, source3, source4, source6], before: source3)
+      assert_nil(result)
+      assert_equal(7, manager.sources.size, 'Unexpected number of items after move')
+
+      expected = [
+        source2,
+        source1,
+        source3,
+        source4,
+        source6,
+        source5,
+        source7,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
+    def test_move_no_sources
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      result = manager.move(sources: [], after: source3)
+      assert_nil(result)
+
+      expected = [
+        source1,
+        source2,
+        source3,
+        source4,
+        source5,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
+    def test_move_all_to_middle
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      sources = [source1, source2, source3, source4, source5]
+      result = manager.move(sources: sources, before: source3)
+      assert_nil(result)
+
+      expected = [
+        source1,
+        source2,
+        source3,
+        source4,
+        source5,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
+    def test_move_missing_target
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      _source1 = manager.add('/fake/path/hello', enabled: true)
+      _source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      _source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      assert_raises(ArgumentError) do
+        manager.move(sources: [source3, source5])
+      end
+    end
+
+    def test_move_both_target_args
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      _source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      _source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      assert_raises(ArgumentError) do
+        manager.move(sources: [source3, source5], before: source1, after: source1)
+      end
     end
 
   end # class

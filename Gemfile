@@ -1,9 +1,11 @@
 source 'https://rubygems.org'
 
 group :development do
-  gem 'sketchup-api-stubs'
+  gem 'debase', '~> 0.2'         # VSCode debugging
+  gem 'ruby-debug-ide', '~> 0.7' # VSCode debugging
+  gem 'sketchup-api-stubs'       # VSCode SketchUp API insight
   gem 'skippy', '~> 0.4.1.a'
-  gem 'solargraph'
+  gem 'solargraph'               # VSCode IDE support
 end
 
 group :test do

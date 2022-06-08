@@ -692,6 +692,31 @@ module TT::Plugins::ExtensionSources
       assert_sources_equal(expected, manager.sources)
     end
 
+    def test_move_down
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/vanus', enabled: false)
+
+      result = manager.move(sources: [source2], before: source5)
+      assert_nil(result)
+
+      expected = [
+        source1,
+        source3,
+        source4,
+        source2,
+        source5,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
     def test_move_no_sources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,

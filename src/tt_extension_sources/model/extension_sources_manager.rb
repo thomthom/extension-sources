@@ -204,6 +204,12 @@ module TT::Plugins::ExtensionSources
       notify_observers(self, :changed, source)
     end
 
+    # @private
+    # Data structure helper to aid in algorithmic processing of extension
+    # sources.
+    ItemState = Struct.new(:source, :index, :selected)
+    private_constant :ItemState
+
     # Moves the given +sources+ in position before the target item.
     #
     # Either +before+ or +after+ must be provided as target item.
@@ -221,27 +227,22 @@ module TT::Plugins::ExtensionSources
 
       target_index += 1 if after
 
-      # Kludge, avoid temporary data?
-      items = @data.map { |source|
-        {
-          source: source,
-          selected: sources.include?(source),
-        }
-      }
+      items = Hash[@data.map.with_index { |source, index|
+        [source, ItemState.new(source, index, sources.include?(source))]
+      }]
 
-      first_selected_index = items.find_index { |item| item[:selected] } || 0
+      first_selected_index = items.find_index { |index, item| item.selected } || 0
       lower_bound_index = [first_selected_index, target_index].min
-      # TODO: Find a way to use .sort! while still have access to indices.
-      sorted = items.each.with_index.sort { |current, previous|
-        item_current, index_current = current
-        item_previous, index_previous = previous
+      @data.sort! { |current, previous|
+        state_current = items[current]
+        state_previous = items[previous]
 
         # Keep the items above the lower bound index.
         # This effectively splits the list in half;
         # * Everything above the insertion point
         # * Everything else
-        is_movable_current = index_current >= lower_bound_index
-        is_movable_previous = index_previous >= lower_bound_index
+        is_movable_current = state_current.index >= lower_bound_index
+        is_movable_previous = state_previous.index >= lower_bound_index
         next -1 if !is_movable_current && is_movable_previous
         next 1 if is_movable_current && !is_movable_previous
 
@@ -250,8 +251,8 @@ module TT::Plugins::ExtensionSources
         # Selected items are moved to the top of this sub-list, while un-selected
         # ends up at the bottom.
         if is_movable_current
-          selected_current = item_current[:selected]
-          selected_previous = item_previous[:selected]
+          selected_current = state_current.selected
+          selected_previous = state_previous.selected
           next -1 if selected_current && !selected_previous
           next 1 if !selected_current && selected_previous
         end
@@ -259,14 +260,11 @@ module TT::Plugins::ExtensionSources
         # This resolves any ambiguity, defaulting to the unique
         # indices of each item. This should never return 0, ensuring
         # that the sort is stable.
-        index_current <=> index_previous
-      }&.map(&:first)
+        state_current.index <=> state_previous.index
+      }
 
-      # This is a kludge to reuse the same array. Workaround for not being able
-      # to use .sort! with index.
-      @data.clear
-      @data.concat(sorted.map { |item| item[:source] })
-
+      changed
+      notify_observers(self, :reordered)
       nil
     end
 

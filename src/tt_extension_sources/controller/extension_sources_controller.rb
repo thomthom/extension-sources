@@ -60,8 +60,8 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesManager] sources_manager
     # @param [Symbol] event
-    # @param [ExtensionSource] source
-    def on_sources_changed(sources_manager, event, source)
+    # @param [ExtensionSource, nil] source
+    def on_sources_changed(sources_manager, event, source = nil)
       @logger.debug { "#{self.class.object_name} on_sources_changed: #{event} - ##{source&.source_id}: #{source&.path}" }
       @sync.call
     end

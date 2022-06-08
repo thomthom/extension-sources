@@ -692,7 +692,7 @@ module TT::Plugins::ExtensionSources
       assert_sources_equal(expected, manager.sources)
     end
 
-    def test_move_down
+    def test_move_down_below_last_selected
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,

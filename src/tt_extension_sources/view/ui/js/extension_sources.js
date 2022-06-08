@@ -1,11 +1,20 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
-const MouseKeys = {
+const MouseButtons = {
   none: 0,      // No button or un- initialized
   primary: 1,   // Primary button(usually the left button)
   secondary: 2, // Secondary button(usually the right button)
   auxiliary: 4, // Auxiliary button(usually the mouse wheel button or middle button)
   fourth: 8,    // 4th button(typically the "Browser Back" button)
   fifth: 16,    // 5th button(typically the "Browser Forward" button)
+};
+
+// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+const MouseButton = {
+  primary: 0,   // Primary button(usually the left button)
+  auxiliary: 1, // Auxiliary button(usually the mouse wheel button or middle button)
+  secondary: 2, // Secondary button(usually the right button)
+  fourth: 3,    // 4th button(typically the "Browser Back" button)
+  fifth: 4,     // 5th button(typically the "Browser Forward" button)
 };
 
 const OS = {
@@ -84,8 +93,13 @@ let app = new Vue({
       };
     },
     select(event, source, index) {
+      if (event.buttons != MouseButtons.primary) {
+        return;
+      }
+
       // console.log('select', source, source.source_id, 'selected:', source.selected, event);
-      console.log('select', source, source.source_id);
+      // console.log('select', source, source.source_id);
+      console.log('select', source, source.source_id, 'buttons', event.buttons);
       const behavior = this.select_behavior(event);
 
       // Allow drag of selected items. If a drag wasn't performed then the click
@@ -118,9 +132,20 @@ let app = new Vue({
       this.last_selected_index = index;
     },
     select_mouseup(event, source, index) {
+      // Note this is querying `button` instead of `buttons` because it's the
+      // only thing that indicate which button was released. `buttons` will
+      // claim no button is pressed.
+      if (event.button != MouseButton.primary) {
+        // console.log('select_mouseup', 'not primary button', event.button)
+        return;
+      }
+
       // console.log('select_mouseup', source, source.source_id, 'selected:', source.selected, event);
-      console.log('select_mouseup', source, source.source_id);
+      // console.log('select_mouseup', source, source.source_id);
+      console.log('select_mouseup', source, source.source_id, 'button', event.button);
+      // console.log(event);
       const behavior = this.select_behavior(event);
+      // console.log('behavior', behavior);
 
       // In case the user clicked on a selected item, that might be part of a
       // large selection, the down-click was not processed because it might
@@ -139,7 +164,7 @@ let app = new Vue({
       }
     },
     drag_select(event, source, index) {
-      if (event.buttons != MouseKeys.primary) {
+      if (event.buttons != MouseButtons.primary) {
         return;
       }
       if (this.last_selected_index == index) {

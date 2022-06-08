@@ -225,7 +225,8 @@ module TT::Plugins::ExtensionSources
       target_index = @data.find_index(target)
       raise "target not found: #{target.inspect}" if target_index.nil?
 
-      target_index += 1 if after
+      # target_index += 1 if after
+      target_index -= 1 if before
 
       # Need to access the index and "selected" state of the items to move.
       # Because Ruby's .sort! doesn't provide the index this lookup hash is
@@ -234,37 +235,44 @@ module TT::Plugins::ExtensionSources
         [source, ItemState.new(source, index, sources.include?(source))]
       }]
 
-      # All the "unselected" items above the insertion index remain unchanged.
-      # Need to determine which index that is, to be used within the sorting.
-      first_selected_index = state.find_index { |index, item| item.selected } || 0
+      first_selected_index = @data.index { |item| state[item].selected } || 0
+      last_selected_index = @data.rindex { |item| state[item].selected } || [state.size - 1, 0].max
       lower_bound_index = [first_selected_index, target_index].min
+      upper_bound_index = [last_selected_index, target_index].max
+      movable_range = (lower_bound_index..upper_bound_index)
+
+      current_index = 0
+      previous_index = -1
       @data.sort! { |current, previous|
         state_current = state[current]
         state_previous = state[previous]
 
-        # Keep the items above the lower bound index as-is.
-        # This effectively splits the list in half;
-        # * Everything above the insertion point
-        # * Everything else
-        is_movable_current = state_current.index >= lower_bound_index
-        is_movable_previous = state_previous.index >= lower_bound_index
-        next -1 if !is_movable_current && is_movable_previous
-        next 1 if is_movable_current && !is_movable_previous
+        current_index += 1  # .value_or(1)
+        previous_index += 1 # .value_or(0)
 
-        # Everything that is below the insertion point is then grouped and sorted
-        # first by selected, then by index.
-        # Selected items are moved to the top of this sub-list, while un-selected
-        # ends up at the bottom.
-        if is_movable_current
-          selected_current = state_current.selected
-          selected_previous = state_previous.selected
-          next -1 if selected_current && !selected_previous
-          next 1 if !selected_current && selected_previous
+        puts
+        p [current_index, previous_index]
+        p [state_current.index, state_previous.index]
+
+        if state_current.selected != state_previous.selected
+
+          move_current_down = state_current.selected && current_index < target_index
+          # next 1 if move_current_down
+          if move_current_down
+            p [:move_current_down, 1]
+            next 1
+          end
+
+          move_previous_down = state_previous.selected && previous_index < target_index
+          # next -1 if move_previous_down
+          if move_previous_down
+            p [:move_previous_down, -1]
+            next -1
+          end
+
         end
 
-        # This resolves any ambiguity, defaulting to the unique
-        # indices of each item. This should never return 0, ensuring
-        # that the sort is stable.
+        p [:index, state_current.index <=> state_previous.index]
         state_current.index <=> state_previous.index
       }
 

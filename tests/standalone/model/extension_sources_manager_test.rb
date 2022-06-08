@@ -602,7 +602,7 @@ module TT::Plugins::ExtensionSources
       source2 = manager.add('/fake/path/world', enabled: true)
       source3 = manager.add('/fake/path/universe', enabled: false)
       source4 = manager.add('/fake/path/mars', enabled: true)
-      source5 = manager.add('/fake/path/vanus', enabled: false)
+      source5 = manager.add('/fake/path/venus', enabled: false)
 
       result = manager.move(sources: [source3, source5], before: source1)
       assert_nil(result)
@@ -627,7 +627,7 @@ module TT::Plugins::ExtensionSources
       source2 = manager.add('/fake/path/world', enabled: true)
       source3 = manager.add('/fake/path/universe', enabled: false)
       source4 = manager.add('/fake/path/mars', enabled: true)
-      source5 = manager.add('/fake/path/vanus', enabled: false)
+      source5 = manager.add('/fake/path/venus', enabled: false)
 
       result = manager.move(sources: [source3, source5], after: source1)
       assert_nil(result)
@@ -652,7 +652,7 @@ module TT::Plugins::ExtensionSources
       source2 = manager.add('/fake/path/world', enabled: true)
       source3 = manager.add('/fake/path/universe', enabled: false)
       source4 = manager.add('/fake/path/mars', enabled: true)
-      source5 = manager.add('/fake/path/vanus', enabled: false)
+      source5 = manager.add('/fake/path/venus', enabled: false)
 
       result = manager.move(sources: [source1, source3, source5], before: source1)
       assert_nil(result)
@@ -677,7 +677,7 @@ module TT::Plugins::ExtensionSources
       source2 = manager.add('/fake/path/world', enabled: true)
       source3 = manager.add('/fake/path/universe', enabled: false)
       source4 = manager.add('/fake/path/mars', enabled: true)
-      source5 = manager.add('/fake/path/vanus', enabled: false)
+      source5 = manager.add('/fake/path/venus', enabled: false)
 
       result = manager.move(sources: [source1, source2, source4], after: source5)
       assert_nil(result)
@@ -702,7 +702,7 @@ module TT::Plugins::ExtensionSources
       source2 = manager.add('/fake/path/world', enabled: true)
       source3 = manager.add('/fake/path/universe', enabled: false)
       source4 = manager.add('/fake/path/mars', enabled: true)
-      source5 = manager.add('/fake/path/vanus', enabled: false)
+      source5 = manager.add('/fake/path/venus', enabled: false)
 
       result = manager.move(sources: [source2], before: source5)
       assert_nil(result)
@@ -727,7 +727,7 @@ module TT::Plugins::ExtensionSources
       source2 = manager.add('/fake/path/world', enabled: true)
       source3 = manager.add('/fake/path/universe', enabled: false)
       source4 = manager.add('/fake/path/mars', enabled: true)
-      source5 = manager.add('/fake/path/vanus', enabled: false)
+      source5 = manager.add('/fake/path/venus', enabled: false)
 
       result = manager.move(sources: [], after: source3)
       assert_nil(result)
@@ -752,7 +752,7 @@ module TT::Plugins::ExtensionSources
       source2 = manager.add('/fake/path/world', enabled: true)
       source3 = manager.add('/fake/path/universe', enabled: false)
       source4 = manager.add('/fake/path/mars', enabled: true)
-      source5 = manager.add('/fake/path/vanus', enabled: false)
+      source5 = manager.add('/fake/path/venus', enabled: false)
 
       sources = [source1, source2, source3, source4, source5]
       result = manager.move(sources: sources, before: source3)
@@ -778,7 +778,7 @@ module TT::Plugins::ExtensionSources
       _source2 = manager.add('/fake/path/world', enabled: true)
       source3 = manager.add('/fake/path/universe', enabled: false)
       _source4 = manager.add('/fake/path/mars', enabled: true)
-      source5 = manager.add('/fake/path/vanus', enabled: false)
+      source5 = manager.add('/fake/path/venus', enabled: false)
 
       assert_raises(ArgumentError) do
         manager.move(sources: [source3, source5])
@@ -795,7 +795,7 @@ module TT::Plugins::ExtensionSources
       _source2 = manager.add('/fake/path/world', enabled: true)
       source3 = manager.add('/fake/path/universe', enabled: false)
       _source4 = manager.add('/fake/path/mars', enabled: true)
-      source5 = manager.add('/fake/path/vanus', enabled: false)
+      source5 = manager.add('/fake/path/venus', enabled: false)
 
       assert_raises(ArgumentError) do
         manager.move(sources: [source3, source5], before: source1, after: source1)

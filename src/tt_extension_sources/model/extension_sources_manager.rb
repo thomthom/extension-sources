@@ -210,7 +210,7 @@ module TT::Plugins::ExtensionSources
     ItemState = Struct.new(:source, :index, :selected)
     private_constant :ItemState
 
-    # Moves the given +sources+ in position before the target item.
+    # Moves the given +sources+ in position at the target item.
     #
     # Either +before+ or +after+ must be provided as target item.
     #
@@ -227,17 +227,22 @@ module TT::Plugins::ExtensionSources
 
       target_index += 1 if after
 
-      items = Hash[@data.map.with_index { |source, index|
+      # Need to access the index and "selected" state of the items to move.
+      # Because Ruby's .sort! doesn't provide the index this lookup hash is
+      # used to provide the auxiliary information.
+      state = Hash[@data.map.with_index { |source, index|
         [source, ItemState.new(source, index, sources.include?(source))]
       }]
 
-      first_selected_index = items.find_index { |index, item| item.selected } || 0
+      # All the "unselected" items above the insertion index remain unchanged.
+      # Need to determine which index that is, to be used within the sorting.
+      first_selected_index = state.find_index { |index, item| item.selected } || 0
       lower_bound_index = [first_selected_index, target_index].min
       @data.sort! { |current, previous|
-        state_current = items[current]
-        state_previous = items[previous]
+        state_current = state[current]
+        state_previous = state[previous]
 
-        # Keep the items above the lower bound index.
+        # Keep the items above the lower bound index as-is.
         # This effectively splits the list in half;
         # * Everything above the insertion point
         # * Everything else

@@ -225,55 +225,64 @@ module TT::Plugins::ExtensionSources
       target_index = @data.find_index(target)
       raise "target not found: #{target.inspect}" if target_index.nil?
 
-      # target_index += 1 if after
-      target_index -= 1 if before
+      target_index += 1 if after
+      # target_index -= 1 if before
 
-      # Need to access the index and "selected" state of the items to move.
-      # Because Ruby's .sort! doesn't provide the index this lookup hash is
-      # used to provide the auxiliary information.
-      state = Hash[@data.map.with_index { |source, index|
-        [source, ItemState.new(source, index, sources.include?(source))]
-      }]
+      pos = before ? :before : :after
+      puts
+      p [pos, :target_index, target_index]
+      puts
+      p @data.map { |n| n&.source_id }
+      puts
 
-      first_selected_index = @data.index { |item| state[item].selected } || 0
-      last_selected_index = @data.rindex { |item| state[item].selected } || [state.size - 1, 0].max
-      lower_bound_index = [first_selected_index, target_index].min
-      upper_bound_index = [last_selected_index, target_index].max
-      movable_range = (lower_bound_index..upper_bound_index)
-
-      current_index = 0
-      previous_index = -1
-      @data.sort! { |current, previous|
-        state_current = state[current]
-        state_previous = state[previous]
-
-        current_index += 1  # .value_or(1)
-        previous_index += 1 # .value_or(0)
-
+      insert_index = target_index
+      temp = @data.dup
+      temp.each.with_index { |item, index|
         puts
-        p [current_index, previous_index]
-        p [state_current.index, state_previous.index]
+        p [:each, :target_index, target_index, :insert_index, insert_index, item]
+        # p @data.map { |n| n&.source_id }
+        if sources.include?(item) # item.selected
+          p [:selected]
 
-        if state_current.selected != state_previous.selected
+          i = index < insert_index ? insert_index - 1 : insert_index
+          # i = insert_index
 
-          move_current_down = state_current.selected && current_index < target_index
-          # next 1 if move_current_down
-          if move_current_down
-            p [:move_current_down, 1]
-            next 1
+          p [:item, item]
+          p [pos, :insert_index, insert_index]
+          p [:at, :i, i, :same, item == @data[i]]
+          p [item.source_id, @data[i].source_id]
+
+          if item == @data[i]
+            # insert_index = [insert_index + 1, @data.size].min
+            insert_index = [insert_index + 1, @data.size].min if before
+            next
           end
 
-          move_previous_down = state_previous.selected && previous_index < target_index
-          # next -1 if move_previous_down
-          if move_previous_down
-            p [:move_previous_down, -1]
-            next -1
-          end
+          r = @data.delete(item)
+
+          raise "failed to remove #{item}" if r.nil?
+          p @data.map { |n| n&.source_id }
+
+          @data.insert(i, item)
+          # @data.insert(insert_index, item)
+          p @data.map { |n| n&.source_id }
+
+          # insert_index += 1
+          # insert_index = [insert_index + 1, insert_index, @data.size].min
+          # insert_index = [insert_index + 1, insert_index].min
+          insert_index = [insert_index + 1, @data.size].min
+
+
+          # source_index = @data.find_index(item)
+          # p [:source_index, source_index, :insert_index, insert_index]
+          # source = @data[source_index]
+          # target = @data[insert_index]
+          # @data[source_index] = target
+          # @data[insert_index] = source
+
+          p @data.map { |n| n&.source_id }
 
         end
-
-        p [:index, state_current.index <=> state_previous.index]
-        state_current.index <=> state_previous.index
       }
 
       changed

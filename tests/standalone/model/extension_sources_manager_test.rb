@@ -667,6 +667,31 @@ module TT::Plugins::ExtensionSources
       assert_sources_equal(expected, manager.sources)
     end
 
+    def test_move_after_including_self
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+
+      result = manager.move(sources: [source1, source3, source5], after: source1)
+      assert_nil(result)
+
+      expected = [
+        source1,
+        source3,
+        source5,
+        source2,
+        source4,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
     def test_move_to_end
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
@@ -681,13 +706,14 @@ module TT::Plugins::ExtensionSources
 
       result = manager.move(sources: [source1, source2, source4], after: source5)
       assert_nil(result)
+      assert_equal(5, manager.sources.size, 'Unexpected number of items after move')
 
       expected = [
+        source3,
+        source5,
         source1,
         source2,
         source4,
-        source3,
-        source5,
       ]
       assert_sources_equal(expected, manager.sources)
     end

@@ -1,0 +1,31 @@
+0 0 item0
+1 1 item1
+2 2 item2 *
+3 3 item3
+4 4 item4 *
+5 5 item5 <- target (5)
+6 6 item6
+--------------------------------------------------------------------------------
+0 0 item0
+1 1 item1
+2 2 item2 * <- ------- RangeStart
+3 3 item3              |
+4 4 item4 *            |
+5 5 item5 <- target <- RangeEnd
+6 6 item6
+
+0 0 item0
+1 1 item1
+2 2 item2 * <- previous (move previous down: 2 < 5)
+3 3 item3 <- current: -1
+4 4 item4 *
+5 5 item5 <- target
+6 6 item6
+
+0 0 item0
+1 1 item1
+2 3 item3
+3 2 item2 * <- previous (move previous down: 2 < 5)
+4 4 item4 * <- current: -1 (move current down: 4 < 5)
+5 5 item5 <- target
+6 6 item6

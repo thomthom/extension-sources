@@ -64,8 +64,12 @@ let app = new Vue({
       // Inject additional properties that only the Vue app cares about.
       // For Vue's reactor to pick up the changes they must be added to
       // the `sources` data before assigning to the Vue app's data.
+      let ui_state = {};
+      for (const item of this.sources) {
+        ui_state[item.source_id] = { selected: item.selected };
+      }
       for (const item of sources) {
-        item.selected = false;
+        item.selected = ui_state[item.source_id]?.selected || false;
       }
       this.sources = sources;
     },

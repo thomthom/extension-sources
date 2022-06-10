@@ -743,6 +743,36 @@ module TT::Plugins::ExtensionSources
       assert_sources_equal(expected, manager.sources)
     end
 
+    def test_move_mixed
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        warnings: false,
+      )
+      source1 = manager.add('/fake/path/hello', enabled: true)
+      source2 = manager.add('/fake/path/world', enabled: true)
+      source3 = manager.add('/fake/path/universe', enabled: false)
+      source4 = manager.add('/fake/path/mars', enabled: true)
+      source5 = manager.add('/fake/path/venus', enabled: false)
+      source6 = manager.add('/fake/path/saturn', enabled: false)
+      source7 = manager.add('/fake/path/pluto', enabled: false)
+
+      result = manager.move(sources: [source1, source3, source4, source6], before: source3)
+      assert_nil(result)
+      assert_equal(7, manager.sources.size, 'Unexpected number of items after move')
+
+      expected = [
+        source2,
+        source1,
+        source3,
+        source4,
+        source6,
+        source5,
+        source7,
+      ]
+      assert_sources_equal(expected, manager.sources)
+    end
+
     def test_move_no_sources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,

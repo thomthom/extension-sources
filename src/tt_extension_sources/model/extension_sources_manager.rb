@@ -226,63 +226,54 @@ module TT::Plugins::ExtensionSources
       raise "target not found: #{target.inspect}" if target_index.nil?
 
       target_index += 1 if after
-      # target_index -= 1 if before
 
-      pos = before ? :before : :after
-      puts
-      p [pos, :target_index, target_index]
-      puts
-      p @data.map { |n| n&.source_id }
-      puts
-
-      insert_index = target_index
-      temp = @data.dup
-      temp.each.with_index { |item, index|
-        puts
-        p [:each, :target_index, target_index, :insert_index, insert_index, item]
-        # p @data.map { |n| n&.source_id }
-        if sources.include?(item) # item.selected
-          p [:selected]
-
-          i = index < insert_index ? insert_index - 1 : insert_index
-          # i = insert_index
-
-          p [:item, item]
-          p [pos, :insert_index, insert_index]
-          p [:at, :i, i, :same, item == @data[i]]
-          p [item.source_id, @data[i].source_id]
-
-          if item == @data[i]
-            # insert_index = [insert_index + 1, @data.size].min
-            insert_index = [insert_index + 1, @data.size].min if before
-            next
-          end
-
-          r = @data.delete(item)
-
-          raise "failed to remove #{item}" if r.nil?
-          p @data.map { |n| n&.source_id }
-
-          @data.insert(i, item)
-          # @data.insert(insert_index, item)
-          p @data.map { |n| n&.source_id }
-
-          # insert_index += 1
-          # insert_index = [insert_index + 1, insert_index, @data.size].min
-          # insert_index = [insert_index + 1, insert_index].min
-          insert_index = [insert_index + 1, @data.size].min
-
-
-          # source_index = @data.find_index(item)
-          # p [:source_index, source_index, :insert_index, insert_index]
-          # source = @data[source_index]
-          # target = @data[insert_index]
-          # @data[source_index] = target
-          # @data[insert_index] = source
-
-          p @data.map { |n| n&.source_id }
-
+      state = Hash[@data.map.with_index { |item, i|
+        [item, ItemState.new(item, i, sources.include?(item))]
+      }]
+      # This is effectively performing a stable partition sort on the elements
+      # above and below the target index.
+      #
+      # In C++ this would be done as:
+      #   stable_partition(begin(xs), target, std::not_fn(pred));
+      #   stable_partition(target, end(xs), pred);
+      #
+      # (See Sean Parent's talk: https://youtu.be/W2tWOdzgXHA?t=533)
+      #
+      # Ruby's Enumerable#partition doesn't do partial range, nor does it modify
+      # the collection, instead it returns two new arrays. It's also not stable.
+      #
+      # When an array is returned to #sort_by it will sort by Array comparison.
+      # This comparison is done by comparing each element in the array in
+      # sequence.
+      #
+      # For this algorithm we first sort by the upper and lower set in the
+      # collection, split by the insertion index. (primary)
+      #
+      # stable_partition [first, insert)
+      # stable_partition [insert, last)
+      #
+      # Ruby Ranges:
+      # (0..6) == [0..6]  <- inclusive last
+      # (0...6) == [0..6) <- exclusive last
+      #
+      # Then, in the upper set the "selected" items should appear at the bottom
+      # and in the lower set they should appear at the top. (secondary)
+      #
+      # In order to make this a stable sort, any equal comparison of the primary
+      # and secondary values are resolved by the original index. (tertiary)
+      upper = (0...target_index)
+      @data.sort_by! { |source|
+        item = state[source]
+        in_upper = upper.include?(item.index)
+        to_top_of_partition = if in_upper
+          item.selected ? 1 : 0
+        else
+          item.selected ? 0 : 1
         end
+        primary = in_upper ? 0 : 1
+        secondary = to_top_of_partition
+        tertiary = item.index
+        [primary, secondary, tertiary]
       }
 
       changed

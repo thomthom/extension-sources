@@ -21,6 +21,36 @@ const OS = {
   isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 };
 
+console.log('sketchup', typeof sketchup);
+if (typeof sketchup === 'undefined') {
+  console.log('Browser testing shims');
+  window.sketchup = {
+    move_paths_to() { },
+    options() { },
+    undo() { },
+    redo() { },
+    scan_paths() { },
+    import_paths() { },
+    export_paths() { },
+    add_path() { },
+    edit_path() { },
+    remove_path() { },
+    reload_path() { },
+    source_changed() { },
+    ready() {
+      console.log('shim: ready()')
+      items = [
+        { source_id: 1, path: '/fake/path1', enabled: true, path_exist: true },
+        { source_id: 2, path: '/fake/path2', enabled: true, path_exist: true },
+        { source_id: 3, path: '/fake/path3', enabled: true, path_exist: true },
+        { source_id: 4, path: '/fake/path4', enabled: true, path_exist: true },
+        { source_id: 5, path: '/fake/path5', enabled: true, path_exist: true },
+      ];
+      setTimeout(() => app.update(items));
+    },
+  };
+}
+
 let app = new Vue({
   el: '#app',
   data: {
@@ -69,7 +99,8 @@ let app = new Vue({
         ui_state[item.source_id] = { selected: item.selected };
       }
       for (const item of sources) {
-        item.selected = ui_state[item.source_id]?.selected || false;
+        // item.selected = ui_state[item.source_id]?.selected || false;
+        item.selected = (item.source_id in ui_state) ? ui_state[item.source_id].selected : false;
       }
       this.sources = sources;
     },
@@ -97,7 +128,9 @@ let app = new Vue({
       };
     },
     select(event, source, index) {
+      return;
       if (event.buttons != MouseButtons.primary) {
+        console.log('select', 'not primary buttons', event.buttons)
         return;
       }
 
@@ -136,11 +169,12 @@ let app = new Vue({
       this.last_selected_index = index;
     },
     select_mouseup(event, source, index) {
+      return;
       // Note this is querying `button` instead of `buttons` because it's the
       // only thing that indicate which button was released. `buttons` will
       // claim no button is pressed.
       if (event.button != MouseButton.primary) {
-        // console.log('select_mouseup', 'not primary button', event.button)
+        console.log('select_mouseup', 'not primary button', event.button)
         return;
       }
 
@@ -168,15 +202,19 @@ let app = new Vue({
       }
     },
     drag_select(event, source, index) {
+      return;
       if (event.buttons != MouseButtons.primary) {
+        // console.log('drag_select', 'not primary buttons', event.buttons)
         return;
       }
       if (this.last_selected_index == index) {
+        // console.log('drag_select', 'same element')
         return;
       }
       // If starting a drag on a selected item, that should initiate drag and
       // drop, not drag-select.
       if (source.selected) {
+        // console.log('drag_select', 'selected')
         return;
       }
       console.log('drag_select');
@@ -207,16 +245,17 @@ let app = new Vue({
     // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
     drag_start(event, source) {
       console.log('drag_start', source.source_id, source.path, event);
-      // Add the target element's id to the data transfer object
-      // event.dataTransfer.setData("text/plain", event.target.id);
-      // event.dataTransfer.dropEffect = "copy";
-
-      // event.dataTransfer.setData("application/my-app", event.target.id);
       event.dataTransfer.effectAllowed = "move";
     },
+    drag_enter(event, source) {
+      console.log('drag_enter');
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+
+      this.drag_over_source_id = source.source_id
+    },
     drag_over(event, source) {
-      // console.log('drag_over', event);
-      // console.log('drag_over');
+      console.log('drag_over');
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
 
@@ -225,14 +264,6 @@ let app = new Vue({
     drag_drop(event, source) {
       console.log('drag_drop', source.source_id, source.path, event);
       event.preventDefault();
-      // Get the id of the target and add the moved element to the target's DOM
-      // const data = ev.dataTransfer.getData("text/plain");
-      // ev.target.appendChild(document.getElementById(data));
-
-      // Get the id of the target and add the moved element to the target's DOM
-      // const data = event.dataTransfer.getData("application/my-app");
-      // event.target.appendChild(document.getElementById(data));
-      // console.log('> element', data);
 
       this.drag_over_source_id = null;
 
@@ -277,5 +308,6 @@ let app = new Vue({
   },
   mounted() {
     sketchup.ready();
+    // setTimeout(() => sketchup.ready());
   },
 });

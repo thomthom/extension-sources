@@ -223,7 +223,7 @@ module TT::Plugins::ExtensionSources
           ExtensionSource.new(path: path, enabled: true)
         }
 
-        if settings.debug_dump_cached_scan_results?
+        if @settings.debug_dump_cached_scan_results?
           debug_write_scan_dump(debug_scan_dump_path, results)
         end
       end

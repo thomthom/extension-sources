@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+
+  <title>Drag and Drop test</title>
+
+  <style>
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 0.5em 1em;
+      background: #eee;
+      border-bottom: 1px solid #aaa;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h4>Drag and Drop</h4>
+
+  <ul>
+    <li draggable="true">Item 1</li>
+    <li draggable="true">Item 2</li>
+    <li draggable="true">Item 3</li>
+    <li draggable="true">Item 4</li>
+    <li draggable="true">Item 5</li>
+  </ul>
+
+  <script>
+    let items = document.querySelectorAll("li");
+    for (let item of items) {
+      item.addEventListener('dragstart', (event) => {
+        console.log('dragstart');
+        event.dataTransfer.setData("application/my-app", event.target.innerText);
+        event.dataTransfer.effectAllowed = "move";
+      });
+      item.addEventListener('dragover', (event) => {
+        console.log('dragover');
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+      });
+      item.addEventListener('drop', (event) => {
+        console.log('drop');
+        event.preventDefault();
+      });
+    }
+    // document.body.addEventListener('dragover', (event) => {
+    //   console.log('body - dragover');
+    //   event.preventDefault();
+    //   event.dataTransfer.dropEffect = "move";
+    // });
+    // document.body.addEventListener('drop', (event) => {
+    //   console.log('body - drop');
+    //   event.preventDefault();
+    // });
+    // document.body.blur();
+    // document.body.focus();
+    // location.reload();
+  </script>
+</body>
+
+</html>

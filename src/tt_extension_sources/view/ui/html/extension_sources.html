@@ -34,6 +34,13 @@
       vertical-align: bottom;
     }
 
+    .es-drag-handle {
+      font-size: 24px;
+      margin-left: -8px;
+      padding-right: 8px;
+      cursor: grab;
+    }
+
     .es-drag-over:before {
       content: '';
       overflow: hidden;
@@ -105,18 +112,22 @@
                 v-bind:class="{ 'bg-selected': source.selected, 'es-drag-over': drag_over_source_id == source.source_id }"
                 draggable="true" v-on:dragstart="drag_start($event, source)" v-on:dragenter="drag_enter($event, source)"
                 v-on:dragover="drag_over($event, source)" v-on:drop="drag_drop($event, source)">
+                <!-- Drag Handle -->
                 <!-- Enabled switch -->
-                <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading"
-                  v-on:mousedown.prevent.stop="">
-                  <input type="checkbox" v-model="source.enabled" class="custom-control-input"
-                    v-bind:id="source_enabled_id(source.source_id)"
-                    v-on:change="on_source_changed(source.source_id, { enabled: source.enabled })">
-                  <label class="custom-control-label" v-bind:for="source_enabled_id(source.source_id)"></label>
+                <div class="d-flex align-items-center">
+                  <div class="es-drag-handle">⠿</div>
+                  <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading"
+                    v-on:mousedown.prevent.stop="">
+                    <input type="checkbox" v-model="source.enabled" class="custom-control-input"
+                      v-bind:id="source_enabled_id(source.source_id)"
+                      v-on:change="on_source_changed(source.source_id, { enabled: source.enabled })">
+                    <label class="custom-control-label" v-bind:for="source_enabled_id(source.source_id)"></label>
+                  </div>
                 </div>
-                <div class="d-flex">
+                <div class="d-flex align-items-center">
                   <!-- Path label -->
                   <!-- pt-1 is a hack to nudge the text to be vertically center-ish. Better way? -->
-                  <div class="flex-grow-1 pt-1">
+                  <div class="flex-grow-1">
                     <span style="line-height: 24px;" v-bind:class="{ 'text-warning': !source.path_exist }">
                       {{ source.path }}
                     </span>
@@ -124,7 +135,7 @@
                       title="Path doesn't exist.">warning</i>
                   </div>
                   <!-- ml-auto vs flex-grow-1? -->
-                  <div>
+                  <div class="text-nowrap">
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload"
                       v-on:click="reload_path(source.source_id)">
                       <i class="modus-icons">refresh</i>
@@ -137,9 +148,11 @@
                       v-on:click="remove_path(source.source_id)">
                       <i class="modus-icons">trash</i>
                     </button>
+                    <!--
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Expand">
                       <i class="modus-icons">expand_more</i>
                     </button>
+                    -->
                   </div>
                 </div>
               </li>

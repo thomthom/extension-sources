@@ -55,10 +55,10 @@ let app = new Vue({
   el: '#app',
   data: {
     filter: "",
-    mousedown_index: null,
+    sources: [],
+    // List UI state:
     last_selected_index: null,
     drag_over_source_id: null,
-    sources: [],
   },
   computed: {
     is_filtered() {
@@ -112,10 +112,6 @@ let app = new Vue({
       }
     },
     // --- Selection Logic ---
-    can_select(source_id) {
-      if (!this.is_filtered) return true;
-      return this.filtered_source_ids.includes(source_id);
-    },
     // Returns an object describing the selection behaviour.
     select_behavior(event) {
       const toggle_select = OS.isMac ? event.metaKey : event.ctrlKey;
@@ -128,7 +124,6 @@ let app = new Vue({
       };
     },
     select(event, source, index) {
-      return;
       if (event.buttons != MouseButtons.primary) {
         console.log('select', 'not primary buttons', event.buttons)
         return;
@@ -147,7 +142,6 @@ let app = new Vue({
       }
 
       event.preventDefault(); // Prevent drag when doing drag-select.
-      this.mousedown_index = index;
       // Clear existing selection unless Ctrl is pressed.
       if (!behavior.toggle_select) {
         // console.log('> clear-select');
@@ -169,7 +163,6 @@ let app = new Vue({
       this.last_selected_index = index;
     },
     select_mouseup(event, source, index) {
-      return;
       // Note this is querying `button` instead of `buttons` because it's the
       // only thing that indicate which button was released. `buttons` will
       // claim no button is pressed.
@@ -200,46 +193,6 @@ let app = new Vue({
           this.last_selected_index = index;
         }
       }
-    },
-    drag_select(event, source, index) {
-      return;
-      if (event.buttons != MouseButtons.primary) {
-        // console.log('drag_select', 'not primary buttons', event.buttons)
-        return;
-      }
-      if (this.last_selected_index == index) {
-        // console.log('drag_select', 'same element')
-        return;
-      }
-      // If starting a drag on a selected item, that should initiate drag and
-      // drop, not drag-select.
-      if (source.selected) {
-        // console.log('drag_select', 'selected')
-        return;
-      }
-      console.log('drag_select');
-      event.preventDefault(); // Prevent drag and drop while a drag-select is active.
-      // console.log('drag_select', source, source.source_id, 'selected:', source.selected, event);
-      const behavior = this.select_behavior(event);
-      if (behavior.toggle_select) {
-        // console.log('> toggle');
-        source.selected = !source.selected;
-      } else {
-        // console.log('> range');
-        // console.log(this.filtered_source_ids);
-        const min = Math.min(this.mousedown_index, index);
-        const max = Math.max(this.mousedown_index, index);
-        const selectable_ids = this.filtered_source_ids.slice(min, max + 1);
-        // console.log(index, min, max, selectable_ids);
-        for (let item of this.sources) {
-          if (selectable_ids.includes(item.source_id)) {
-            item.selected = true;
-          } else {
-            item.selected = false;
-          }
-        }
-      }
-      this.last_selected_index = index;
     },
     // --- Drag & Drop Logic ---
     // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API

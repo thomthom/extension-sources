@@ -200,6 +200,46 @@ let app = new Vue({
       console.log('drag_start', source.source_id, source.path, event);
       event.dataTransfer.effectAllowed = "move";
     },
+    drag_end(event, source) {
+      console.log('drag_end', source.source_id, source.path, event);
+      this.drag_over_source_id = null;
+
+      // Workaround for SketchUp bug:
+      // On Windows the `drop` event fails to trigger on the very first drop.
+      // (Tested on SketchUp up til SU2022.0).
+      // To work around this the `dragend` event is used instead. This event
+      // is called on the element that started `dragstart`, so the target
+      // target element must be computed manually.
+
+      // Check if the drop was cancelled.
+      if (event.dataTransfer.dropEffect == "none") {
+        return;
+      }
+
+      // Find the target list item and the associated source item.
+      let target = document.elementFromPoint(event.x, event.y);
+      console.log('elementFromPoint', target);
+
+      let list_item = target.closest('.su-source');
+      console.log('closest', list_item);
+      if (list_item === null) {
+        return;
+      }
+
+      let source_id = parseInt(list_item.dataset.sourceId);
+      console.log('source id:', source_id, typeof source_id);
+
+      // let target_source = this.sources.find(item => item.source_id == source_id);
+      // console.log(target_source);
+
+      // This is what the `drop` event would do, if it worked reliably:
+      // console.log('drop_shim', source.source_id, source.path);
+      const selected_ids = this.selected.map(item => item.source_id);
+      if (selected_ids.length == 1 && source_id == selected_ids[0]) {
+        return; // Nothing was moved.
+      }
+      sketchup.move_paths_to(selected_ids, source_id);
+    },
     drag_enter(event, source) {
       console.log('drag_enter');
       event.preventDefault();
@@ -218,10 +258,9 @@ let app = new Vue({
       console.log('drag_drop', source.source_id, source.path, event);
       event.preventDefault();
 
-      this.drag_over_source_id = null;
-
-      const selected_ids = this.selected.map(source => source.source_id);
-      sketchup.move_paths_to(selected_ids, source.source_id);
+      // Bug: This doesn't work properly in SketchUp on Windows. See `drag_end`.
+      // const selected_ids = this.selected.map(source => source.source_id);
+      // sketchup.move_paths_to(selected_ids, source.source_id);
     },
     // --- Callbacks ---
     options() {

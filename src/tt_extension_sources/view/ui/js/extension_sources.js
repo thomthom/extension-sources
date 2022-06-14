@@ -233,12 +233,7 @@ let app = new Vue({
       // console.log(target_source);
 
       // This is what the `drop` event would do, if it worked reliably:
-      // console.log('drop_shim', source.source_id, source.path);
-      const selected_ids = this.selected.map(item => item.source_id);
-      if (selected_ids.length == 1 && source_id == selected_ids[0]) {
-        return; // Nothing was moved.
-      }
-      sketchup.move_paths_to(selected_ids, source_id);
+      this.drag_selected_to_target(source_id);
     },
     drag_enter(event, source) {
       console.log('drag_enter');
@@ -259,8 +254,14 @@ let app = new Vue({
       event.preventDefault();
 
       // Bug: This doesn't work properly in SketchUp on Windows. See `drag_end`.
-      // const selected_ids = this.selected.map(source => source.source_id);
-      // sketchup.move_paths_to(selected_ids, source.source_id);
+      // this.drag_selected_to_target(source_id);
+    },
+    drag_selected_to_target(source_id) {
+      const selected_ids = this.selected.map(item => item.source_id);
+      if (selected_ids.length == 1 && source_id == selected_ids[0]) {
+        return; // Nothing was moved.
+      }
+      sketchup.move_paths_to(selected_ids, source_id);
     },
     // --- Callbacks ---
     options() {

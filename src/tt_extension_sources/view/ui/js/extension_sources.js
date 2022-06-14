@@ -59,6 +59,7 @@ let app = new Vue({
     // List UI state:
     last_selected_index: null,
     drag_over_source_id: null,
+    drag_before: false,
   },
   computed: {
     is_filtered() {
@@ -81,7 +82,7 @@ let app = new Vue({
       return this.sources.filter((source) => {
         return source.selected;
       });
-    }
+    },
   },
   methods: {
     source_enabled_id(source_id) {
@@ -217,16 +218,8 @@ let app = new Vue({
       }
 
       // Find the target list item and the associated source item.
-      let target = document.elementFromPoint(event.x, event.y);
-      console.log('elementFromPoint', target);
-
-      let list_item = target.closest('.su-source');
-      console.log('closest', list_item);
-      if (list_item === null) {
-        return;
-      }
-
-      let source_id = parseInt(list_item.dataset.sourceId);
+      let target = this.drag_target_from_point(event.x, event.y);
+      let source_id = parseInt(target.dataset.sourceId);
       console.log('source id:', source_id, typeof source_id);
 
       // let target_source = this.sources.find(item => item.source_id == source_id);
@@ -236,18 +229,20 @@ let app = new Vue({
       this.drag_selected_to_target(source_id);
     },
     drag_enter(event, source) {
-      console.log('drag_enter');
+      // console.log('drag_enter');
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
 
       this.drag_over_source_id = source.source_id
+      this.drag_before = this.is_drop_target_before(event.target, event.x, event.y);
     },
     drag_over(event, source) {
-      console.log('drag_over');
+      // console.log('drag_over');
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
 
       this.drag_over_source_id = source.source_id
+      this.drag_before = this.is_drop_target_before(event.target, event.x, event.y);
     },
     drag_drop(event, source) {
       console.log('drag_drop', source.source_id, source.path, event);
@@ -256,12 +251,33 @@ let app = new Vue({
       // Bug: This doesn't work properly in SketchUp on Windows. See `drag_end`.
       // this.drag_selected_to_target(source_id);
     },
+    is_drop_target_before(target, x, y) {
+      // console.log('drag_before_or_after', x, y);
+
+      target = target.closest('.su-source');
+      // console.log(target, x, y);
+
+      let bounds = target.getBoundingClientRect();
+      let relative_y = y - bounds.y;
+      let before = relative_y < (bounds.height / 2);
+      // console.log(bounds, relative_y, bounds.height, before);
+      return before;
+    },
+    drag_target_from_point(x, y) {
+      let target = document.elementFromPoint(x, y);
+      console.log('elementFromPoint', target);
+
+      let list_item = target.closest('.su-source');
+      console.log('closest', list_item);
+
+      return list_item
+    },
     drag_selected_to_target(source_id) {
       const selected_ids = this.selected.map(item => item.source_id);
       if (selected_ids.length == 1 && source_id == selected_ids[0]) {
         return; // Nothing was moved.
       }
-      sketchup.move_paths_to(selected_ids, source_id);
+      sketchup.reorder(selected_ids, source_id, this.drag_before);
     },
     // --- Callbacks ---
     options() {

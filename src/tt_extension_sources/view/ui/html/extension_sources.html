@@ -41,14 +41,22 @@
       cursor: grab;
     }
 
-    .es-drag-over:before {
+    .es-drag-over.es-drag-before:before,
+    .es-drag-over.es-drag-after:after {
       content: '';
       overflow: hidden;
       position: absolute;
       width: 100%;
       height: 2px;
-      top: -1px;
       background: #333;
+    }
+
+    .es-drag-over.es-drag-before:before {
+      top: -1px;
+    }
+
+    .es-drag-over.es-drag-after:after {
+      bottom: -1px;
     }
   </style>
 </head>
@@ -111,7 +119,7 @@
                 v-bind:data-source-id="source.source_id" v-on:mousedown="select($event, source, index)"
                 v-on:mouseup="select_mouseup($event, source, index)"
                 class="su-source list-group-item list-item-left-control"
-                v-bind:class="{ 'bg-selected': source.selected, 'es-drag-over': drag_over_source_id == source.source_id }"
+                v-bind:class="{ 'bg-selected': source.selected, 'es-drag-over': drag_over_source_id == source.source_id, 'es-drag-before': drag_before, 'es-drag-after': !drag_before }"
                 draggable="true" v-on:dragstart="drag_start($event, source)" v-on:dragend="drag_end($event, source)"
                 v-on:dragenter="drag_enter($event, source)" v-on:dragover="drag_over($event, source)"
                 v-on:drop="drag_drop($event, source)">

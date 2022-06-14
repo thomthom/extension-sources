@@ -187,12 +187,17 @@ module TT::Plugins::ExtensionSources
     # @param [ExtensionSourcesDialog] dialog
     # @param [Array<Integer>] selected_ids
     # @param [Integer] target_id
-    def move_paths_to(dialog, selected_ids, target_id)
+    def reorder(dialog, selected_ids, target_id, before)
       @logger.debug { "#{self.class.object_name} Move Selected Paths: #{selected_ids.inspect} to #{target_id.inspect}" }
       manager = extension_sources_manager
       selected = selected_ids.map { |id| manager.find_by_source_id(id) }
       target = manager.find_by_source_id(target_id)
-      manager.move(sources: selected, before: target)
+      position = before ? :before : :after
+      params = {
+        :sources => selected,
+        position => target,
+      }
+      manager.move(**params)
     end
 
     # @param [ExtensionSourcesDialog] dialog
@@ -291,8 +296,8 @@ module TT::Plugins::ExtensionSources
         scan_paths(dialog)
       end
 
-      dialog.on(:move_paths_to) do |dialog, selected_ids, target_id|
-        move_paths_to(dialog, selected_ids, target_id)
+      dialog.on(:reorder) do |dialog, selected_ids, target_id, before|
+        reorder(dialog, selected_ids, target_id, before)
       end
 
       dialog

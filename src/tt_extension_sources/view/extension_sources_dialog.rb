@@ -17,7 +17,7 @@ module TT::Plugins::ExtensionSources
         :edit_path,
         :remove_path,
         :reload_path,
-        :move_paths_to,
+        :reorder,
         :source_changed,
       ]
       super(event_names)
@@ -86,9 +86,9 @@ module TT::Plugins::ExtensionSources
       dialog.add_action_callback('reload_path') do |context, source_id|
         trigger(:reload_path, self, source_id.to_i) # JS returns Float.
       end
-      dialog.add_action_callback('move_paths_to') do |context, selected_ids, target_id|
+      dialog.add_action_callback('reorder') do |context, selected_ids, target_id|
         selected_ids.map!(&:to_i) # JS returns Float.
-        trigger(:move_paths_to, self, selected_ids, target_id.to_i) # JS returns Float.
+        trigger(:reorder, self, selected_ids, target_id.to_i) # JS returns Float.
       end
       dialog.add_action_callback('source_changed') do |context, source_id, changes|
         trigger(:source_changed, self, source_id.to_i, changes) # JS returns Float.

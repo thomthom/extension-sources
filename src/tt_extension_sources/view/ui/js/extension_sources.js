@@ -97,11 +97,15 @@ let app = new Vue({
       // the `sources` data before assigning to the Vue app's data.
       let ui_state = {};
       for (const item of this.sources) {
-        ui_state[item.source_id] = { selected: item.selected };
+        ui_state[item.source_id] = {
+          selected: item.selected,
+          draggable: item.draggable,
+        };
       }
       for (const item of sources) {
-        // item.selected = ui_state[item.source_id]?.selected || false;
-        item.selected = (item.source_id in ui_state) ? ui_state[item.source_id].selected : false;
+        item.selected = ui_state[item.source_id]?.selected || false;
+        item.draggable = ui_state[item.source_id]?.draggable || false;
+        // item.selected = (item.source_id in ui_state) ? ui_state[item.source_id].selected : false;
       }
       this.sources = sources;
     },
@@ -135,14 +139,17 @@ let app = new Vue({
       console.log('select', source, source.source_id, 'buttons', event.buttons);
       const behavior = this.select_behavior(event);
 
-      // Allow drag of selected items. If a drag wasn't performed then the click
-      // is processed during mouse up.
-      if (source.selected && behavior.single_select) {
-        console.log('> deferring single-select of pre-selected item');
+      let is_drag_handle = event.target.closest('.es-drag-handle') !== null;
+      // console.log('is_drag_handle', is_drag_handle, service.selected);
+      // Don't change the selection when clicking the drag handle of a selected
+      // item. But allow selection to change when clicking the drag handle of
+      // and unselected item. (Doesn't make sense to drag an unselected item.)
+      console.log('> is_drag_handle:', is_drag_handle, 'selected:', source.selected);
+      if (is_drag_handle && source.selected) {
+        console.log('> bail');
         return;
       }
 
-      event.preventDefault(); // Prevent drag when doing drag-select.
       // Clear existing selection unless Ctrl is pressed.
       if (!behavior.toggle_select) {
         // console.log('> clear-select');
@@ -163,38 +170,6 @@ let app = new Vue({
       }
       this.last_selected_index = index;
     },
-    select_mouseup(event, source, index) {
-      // Note this is querying `button` instead of `buttons` because it's the
-      // only thing that indicate which button was released. `buttons` will
-      // claim no button is pressed.
-      if (event.button != MouseButton.primary) {
-        console.log('select_mouseup', 'not primary button', event.button)
-        return;
-      }
-
-      // console.log('select_mouseup', source, source.source_id, 'selected:', source.selected, event);
-      // console.log('select_mouseup', source, source.source_id);
-      console.log('select_mouseup', source, source.source_id, 'button', event.button);
-      // console.log(event);
-      const behavior = this.select_behavior(event);
-      // console.log('behavior', behavior);
-
-      // In case the user clicked on a selected item, that might be part of a
-      // large selection, the down-click was not processed because it might
-      // result in a drag. This handling must then be processed on mouse up.
-      if (behavior.single_select) {
-        // Don't do anything if the selection doesn't change.
-        // console.log('> selection size', this.selected.length)
-        if (!(this.selected.length == 1 && this.selected[0].source_id != source.source_id)) {
-          console.log('> deferred single-select');
-          for (const item of this.sources) {
-            item.selected = false;
-          }
-          source.selected = !source.selected;
-          this.last_selected_index = index;
-        }
-      }
-    },
     // --- Drag & Drop Logic ---
     // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
     drag_start(event, source) {
@@ -204,6 +179,7 @@ let app = new Vue({
     drag_end(event, source) {
       console.log('drag_end', source.source_id, source.path, event);
       this.drag_over_source_id = null;
+      source.draggable = false; // Because .es-drag-handle onmouseup doesn't trigger after a drag.
 
       // Workaround for SketchUp bug:
       // On Windows the `drop` event fails to trigger on the very first drop.
@@ -229,7 +205,7 @@ let app = new Vue({
       this.drag_selected_to_target(source_id);
     },
     drag_enter(event, source) {
-      // console.log('drag_enter');
+      console.log('drag_enter');
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
 
@@ -237,7 +213,7 @@ let app = new Vue({
       this.drag_before = this.is_drop_target_before(event.target, event.x, event.y);
     },
     drag_over(event, source) {
-      // console.log('drag_over');
+      console.log('drag_over');
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
 
@@ -277,6 +253,7 @@ let app = new Vue({
       if (selected_ids.length == 1 && source_id == selected_ids[0]) {
         return; // Nothing was moved.
       }
+      console.log('reorder', selected_ids, source_id, this.drag_before);
       sketchup.reorder(selected_ids, source_id, this.drag_before);
     },
     // --- Callbacks ---

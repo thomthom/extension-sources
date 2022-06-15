@@ -188,7 +188,7 @@ module TT::Plugins::ExtensionSources
     # @param [Array<Integer>] selected_ids
     # @param [Integer] target_id
     def reorder(dialog, selected_ids, target_id, before)
-      @logger.debug { "#{self.class.object_name} Move Selected Paths: #{selected_ids.inspect} to #{target_id.inspect}" }
+      @logger.debug { "#{self.class.object_name} Move Selected Paths: #{selected_ids.inspect} to #{target_id.inspect} (Before: #{before.inspect})" }
       manager = extension_sources_manager
       selected = selected_ids.map { |id| manager.find_by_source_id(id) }
       target = manager.find_by_source_id(target_id)

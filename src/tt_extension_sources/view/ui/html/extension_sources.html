@@ -61,7 +61,7 @@
   </style>
 </head>
 
-<body>
+<body class="user-select-none">
   <div id="app" class="modus-layout" v-cloak>
     <div class="modus-body">
       <!-- Header -->
@@ -117,16 +117,16 @@
             <ul class="list-group">
               <li v-for="(source, index) in filtered_sources" v-bind:key="source.source_id"
                 v-bind:data-source-id="source.source_id" v-on:mousedown="select($event, source, index)"
-                v-on:mouseup="select_mouseup($event, source, index)"
                 class="su-source list-group-item list-item-left-control"
                 v-bind:class="{ 'bg-selected': source.selected, 'es-drag-over': drag_over_source_id == source.source_id, 'es-drag-before': drag_before, 'es-drag-after': !drag_before }"
-                draggable="true" v-on:dragstart="drag_start($event, source)" v-on:dragend="drag_end($event, source)"
-                v-on:dragenter="drag_enter($event, source)" v-on:dragover="drag_over($event, source)"
-                v-on:drop="drag_drop($event, source)">
+                v-bind:draggable="source.draggable" v-on:dragstart="drag_start($event, source)"
+                v-on:dragend="drag_end($event, source)" v-on:dragenter="drag_enter($event, source)"
+                v-on:dragover="drag_over($event, source)" v-on:drop="drag_drop($event, source)">
                 <!-- Drag Handle -->
                 <!-- Enabled switch -->
                 <div class="d-flex align-items-center">
-                  <div class="es-drag-handle">⠿</div>
+                  <div class="es-drag-handle" v-on:mousedown="source.draggable=true"
+                    v-on:mouseup="source.draggable=false">⠿</div>
                   <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading"
                     v-on:mousedown.prevent.stop="">
                     <input type="checkbox" v-model="source.enabled" class="custom-control-input"
@@ -139,7 +139,8 @@
                   <!-- Path label -->
                   <!-- pt-1 is a hack to nudge the text to be vertically center-ish. Better way? -->
                   <div class="flex-grow-1">
-                    <span style="line-height: 24px;" v-bind:class="{ 'text-warning': !source.path_exist }">
+                    <span class="user-select-auto" style="line-height: 24px;"
+                      v-bind:class="{ 'text-warning': !source.path_exist }">
                       {{ source.path }}
                     </span>
                     <i v-if="!source.path_exist" class="modus-icons text-warning align-bottom"

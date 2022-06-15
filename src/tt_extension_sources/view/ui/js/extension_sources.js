@@ -58,7 +58,6 @@ let app = new Vue({
     sources: [],
     // List UI state:
     last_selected_index: null,
-    drag_cancelled: false,
     drag_over_source_id: null,
     drag_before: false,
   },
@@ -176,7 +175,6 @@ let app = new Vue({
     drag_start(event, source) {
       console.log('drag_start', source.source_id, source.path, event);
       event.dataTransfer.effectAllowed = "move";
-      this.drag_cancelled = false;
     },
     drag_end(event, source) {
       console.log('drag_end', source.source_id, source.path, event);
@@ -198,11 +196,8 @@ let app = new Vue({
       // if (event.dataTransfer.dropEffect == "none") {
       //   return;
       // }
-      console.log('> drag_cancelled', this.drag_cancelled)
-      if (this.drag_cancelled) {
-        console.log('> drag cancelled, no drop')
-        return;
-      }
+
+      // Known Issue: Not able to detect Escape cancelling the drag. :(
 
       // Find the target list item and the associated source item.
       let target = this.drag_target_from_point(event.x, event.y);
@@ -267,13 +262,6 @@ let app = new Vue({
       console.log('reorder', selected_ids, source_id, this.drag_before);
       sketchup.reorder(selected_ids, source_id, this.drag_before);
     },
-    on_key_down(event) {
-      console.log('on_key_down', event);
-      if (event.key == "Escape") {
-        console.log('keydown: Escape');
-        this.drag_cancelled = true;
-      }
-    },
     // --- Callbacks ---
     options() {
       sketchup.options();
@@ -311,13 +299,6 @@ let app = new Vue({
     }
   },
   mounted() {
-    // Part of a workaround for SketchUp's drag and drop bugs.
-    let app = this;
-    document.addEventListener('keydown', (event) => {
-      // console.log('keydown', event);
-      app.on_key_down(event);
-    }, false);
-
     // Everything ready, notify the Ruby side.
     sketchup.ready();
   },

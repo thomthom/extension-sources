@@ -9,7 +9,7 @@ group :development do
 end
 
 group :test do
-  gem 'minitest', '~> 5.14'
+  gem 'minitest', '~> 5.15.0' # Regression in 5.16.0 causing failure on Ruby 2.7
   gem 'rake', '~> 13.0'
 end
 

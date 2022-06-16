@@ -21,9 +21,10 @@ const OS = {
   isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 };
 
+// Stub out the callbacks on the `sketchup` object for testing in a browser.
 console.log('sketchup', typeof sketchup);
 if (typeof sketchup === 'undefined') {
-  console.log('Browser testing shims');
+  console.log('Shimming `sketchup` object for in-browser testing...');
   window.sketchup = {
     move_paths_to() { },
     options() { },
@@ -36,17 +37,18 @@ if (typeof sketchup === 'undefined') {
     edit_path() { },
     remove_path() { },
     reload_path() { },
+    reorder() { },
     source_changed() { },
     ready() {
       console.log('shim: ready()')
-      items = [
+      let items = [
         { source_id: 1, path: '/fake/path1', enabled: true, path_exist: true },
         { source_id: 2, path: '/fake/path2', enabled: true, path_exist: true },
         { source_id: 3, path: '/fake/path3', enabled: true, path_exist: true },
         { source_id: 4, path: '/fake/path4', enabled: true, path_exist: true },
         { source_id: 5, path: '/fake/path5', enabled: true, path_exist: true },
       ];
-      setTimeout(() => app.update(items));
+      setTimeout(() => app.update(items)); // Simulate async action.
     },
   };
 }
@@ -140,13 +142,10 @@ let app = new Vue({
       const behavior = this.select_behavior(event);
 
       let is_drag_handle = event.target.closest('.es-drag-handle') !== null;
-      // console.log('is_drag_handle', is_drag_handle, service.selected);
       // Don't change the selection when clicking the drag handle of a selected
       // item. But allow selection to change when clicking the drag handle of
       // and unselected item. (Doesn't make sense to drag an unselected item.)
-      console.log('> is_drag_handle:', is_drag_handle, 'selected:', source.selected);
       if (is_drag_handle && source.selected) {
-        console.log('> bail');
         return;
       }
 
@@ -202,16 +201,12 @@ let app = new Vue({
       // Find the target list item and the associated source item.
       let target = this.drag_target_from_point(event.x, event.y);
       let source_id = parseInt(target.dataset.sourceId);
-      console.log('source id:', source_id, typeof source_id);
-
-      // let target_source = this.sources.find(item => item.source_id == source_id);
-      // console.log(target_source);
 
       // This is what the `drop` event would do, if it worked reliably:
       this.drag_selected_to_target(source_id);
     },
     drag_enter(event, source) {
-      console.log('drag_enter');
+      // console.log('drag_enter');
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
 
@@ -219,7 +214,7 @@ let app = new Vue({
       this.drag_before = this.is_drop_target_before(event.target, event.x, event.y);
     },
     drag_over(event, source) {
-      console.log('drag_over');
+      // console.log('drag_over');
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
 
@@ -247,10 +242,10 @@ let app = new Vue({
     },
     drag_target_from_point(x, y) {
       let target = document.elementFromPoint(x, y);
-      console.log('elementFromPoint', target);
+      // console.log('elementFromPoint', target);
 
       let list_item = target.closest('.su-source');
-      console.log('closest', list_item);
+      // console.log('closest', list_item);
 
       return list_item
     },

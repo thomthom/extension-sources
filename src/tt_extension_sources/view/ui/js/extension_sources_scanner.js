@@ -1,5 +1,5 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
-const MouseKeys = {
+const MouseButtons = {
   none: 0,      // No button or un- initialized
   primary: 1,   // Primary button(usually the left button)
   secondary: 2, // Secondary button(usually the right button)
@@ -61,16 +61,25 @@ let app = new Vue({
     },
     enable_toggle(source) {
       // console.log('enable_toggle', source.enabled);
+      // Check clicked toggle have already changed state. This handler will
+      // apply the same state to the whole selection.
       const enabled = source.enabled;
       for (let item of this.selected) {
         item.enabled = enabled;
       }
+    },
+    trace(message) {
+      console.log(message);
     },
     can_select(source_id) {
       if (!this.is_filtered) return true;
       return this.filtered_source_ids.includes(source_id);
     },
     select(event, source, index) {
+      if (event.buttons != MouseButtons.primary) {
+        // console.log('select', 'not primary buttons', event.buttons)
+        return;
+      }
       // console.log('select', source, source.source_id, 'selected:', source.selected, event);
       this.mousedown_index = index;
       // Clear existing selection unless Ctrl is pressed.
@@ -95,7 +104,7 @@ let app = new Vue({
       this.last_selected_index = index;
     },
     drag_select(event, source, index) {
-      if (event.buttons != MouseKeys.primary) {
+      if (event.buttons != MouseButtons.primary) {
         return;
       }
       if (this.last_selected_index == index) {

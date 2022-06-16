@@ -200,9 +200,12 @@ let app = new Vue({
 
       // Find the target list item and the associated source item.
       let target = this.drag_target_from_point(event.x, event.y);
+      if (target === null)
+        return;
       let source_id = parseInt(target.dataset.sourceId);
 
       // This is what the `drop` event would do, if it worked reliably:
+      console.log('drop (workaround)');
       this.drag_selected_to_target(source_id);
     },
     drag_enter(event, source) {

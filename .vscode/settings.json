@@ -6,7 +6,8 @@
   "rubyTestExplorer.minitestDirectory": "./tests/standalone",
   "rubyTestExplorer.logpanel": true,
   // As of VSCode 1.59 there is now a native Test Explorer UI.
-  "testExplorer.useNativeTesting": true,
+  // This appear to still be flaky; fails to discover run tests.
+  // "testExplorer.useNativeTesting": true,
   "todo-tree.filtering.excludeGlobs": [
     "**/node_modules",
     ".yardoc/**/*",

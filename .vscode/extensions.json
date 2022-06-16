@@ -12,8 +12,19 @@
     // Essential for Ruby syntax highlighting and debugging.
     "rebornix.ruby",
 
+    // Improved Ruby handling.
+    "wingrunr21.vscode-ruby",
+
     // For code insight and auto-complete.
-    "castwide.solargraph"
+    "castwide.solargraph",
+
+    // Ruby Test Explorer.
+    "connorshea.vscode-ruby-test-adapter",
+
+    // While this extension is deprecated in favor of the native test explorer
+    // in VSCode it appear that the current integation isn't stable.
+    // I keeps failing to either discover and/or run all tests.
+    "hbenl.vscode-test-explorer"
   ],
   // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
   "unwantedRecommendations": []

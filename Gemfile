@@ -14,6 +14,7 @@ group :test do
 end
 
 group :documentation do
+  gem 'commonmarker', '~> 0.23'
   gem 'yard', '~> 0.9'
 end
 

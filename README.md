@@ -23,6 +23,10 @@ bundle exec rake test TEST=tests/standalone/model/extension_source_test.rb TESTO
 ### List undocumented code
 
 ```sh
+bundle exec rake undoc
+```
+
+```sh
 bundle exec yard stats --list-undoc
 ```
 

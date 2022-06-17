@@ -23,4 +23,4 @@ group :analysis do
   gem 'rubocop-minitest', '~> 0.20'
   gem 'rubocop-rake', '~> 0.6'
   gem 'rubocop-sketchup', '~> 1.3.0'
-end
+end if RUBY_VERSION.to_f > 2.5 # For Ruby 2.5 CI, 1.30 restraint is still applied for some reason.

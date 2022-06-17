@@ -18,6 +18,7 @@ end unless IS_CI_ENVIRONMENT
 
 group :test do
   gem 'minitest', '~> 5.15.0' # Regression in 5.16.0 causing failure on Ruby 2.7
+  gem 'minitest-reporters', '~> 1.5'
   gem 'rake', '~> 13.0'
 end
 

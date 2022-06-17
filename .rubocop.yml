@@ -1,4 +1,6 @@
-require: rubocop-sketchup
+require:
+- rubocop-rake
+- rubocop-sketchup
 
 # If you want to use the same codding pattern as SketchUp's projects, enable
 # the next line. RuboCop will then use the coding pattern from the

@@ -25,12 +25,13 @@ AllCops:
     Exclude:
     - Gemfile
     - Rakefile
+    - bin/**/*
     - fixtures/**/*
     - research/**/*
     - profiling/**/*
     - skippy/**/*
     - tests/**/*
-  TargetRubyVersion: 2.5 # Should have been 2.2 but RuboCop dropped support.
+  TargetRubyVersion: 2.2
 
 
 # If DisabledByDefault is set to true then we need to enable the SketchUp

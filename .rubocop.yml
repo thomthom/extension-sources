@@ -22,7 +22,9 @@ AllCops:
   SketchUp:
     SourcePath: src
     TargetSketchUpVersion: 2017 # UI::HtmlDialog.
-    Exclude: # Exclude common folders.
+    Exclude:
+    - Gemfile
+    - Rakefile
     - fixtures/**/*
     - research/**/*
     - profiling/**/*

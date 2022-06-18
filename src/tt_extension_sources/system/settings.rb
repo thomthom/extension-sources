@@ -55,7 +55,7 @@ module TT::Plugins::ExtensionSources
     end
 
     # @api private
-    # @return [Hash{Symbol, Object}>]
+    # @return [Hash{Symbol => Object}>]
     def self.keys_and_defaults
       @keys_and_defaults
     end
@@ -73,7 +73,7 @@ module TT::Plugins::ExtensionSources
       to_s
     end
 
-    # @return [Hash{Symbol, Object}]
+    # @return [Hash{Symbol => Object}]
     def to_h
       Hash[self.class.keys_and_defaults.map { |key, default|
         [key, read(key, default)]

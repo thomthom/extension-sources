@@ -110,7 +110,7 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     # @param [Integer] source_id
-    # @param [Hash{String, Object}] changes
+    # @param [Hash{String => Object}] changes
     def source_changed(dialog, source_id, changes)
       source = extension_sources_manager.find_by_source_id(source_id)
       raise "found no source path for: #{source_id}" if source.nil?
@@ -122,7 +122,7 @@ module TT::Plugins::ExtensionSources
     end
 
     # @param [ExtensionSourcesDialog] dialog
-    # @param Array<Hash{Symbol => Hash{Symbol => Object}}> changes
+    # @param [Array<Hash{Symbol => Hash{Symbol => Object}}>] changes
     def sources_changed(dialog, changes)
       changes.each { |change|
         source_id = change[:source_id]

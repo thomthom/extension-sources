@@ -101,8 +101,8 @@ module TT::Plugins::ExtensionSources
     # Objects passed from JavaScript will have their keys represented as
     # strings. This utility converts the keys to Symbols.
     #
-    # @param [Hash{String, Object}, Enumerable, Object] object
-    # @return [Hash{Symbol, Object}, Enumerable, Object]
+    # @param [Hash{String => Object}, Enumerable, Object] object
+    # @return [Hash{Symbol => Object}, Enumerable, Object]
     def symbolize_keys(object)
       if object.is_a?(Hash)
         Hash[object.map { |k, v| [k.to_sym, symbolize_keys(v)] }]

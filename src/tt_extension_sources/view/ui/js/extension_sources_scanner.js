@@ -144,6 +144,18 @@ let app = new Vue({
     }
   },
   mounted() {
+    // Disable the context menu, except on input elements.
+    document.addEventListener('contextmenu', (event) => {
+      console.log('contextmenu', event);
+      const debug_mode = event.ctrlKey && event.shiftKey;
+      const elements_allowed_context_menu =
+        'input[type=text], input[type=search], textarea';
+      if (!debug_mode && !event.target.matches(elements_allowed_context_menu)) {
+        event.preventDefault();
+      }
+    });
+
+    // Everything ready, notify the Ruby side.
     sketchup.ready();
   },
 });

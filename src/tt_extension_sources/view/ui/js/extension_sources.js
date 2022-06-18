@@ -292,8 +292,19 @@ let app = new Vue({
       sketchup.reload_path(source_id);
     },
     on_source_changed(source_id, changes) {
-      console.log('on_source_changed', source_id, changes)
+      console.log('on_source_changed', source_id, changes);
       sketchup.source_changed(source_id, changes);
+    },
+    on_enabled_toggle(source) {
+      console.log('on_enabled_toggle', source.source_id, source.enabled);
+      let enabled = source.enabled;
+      let changes = this.selected.map(source => {
+        return {
+          source_id: source.source_id,
+          properties: { enabled: enabled }
+        }
+      });
+      sketchup.sources_changed(changes);
     }
   },
   mounted() {

@@ -19,6 +19,7 @@ module TT::Plugins::ExtensionSources
         :reload_path,
         :reorder,
         :source_changed,
+        :sources_changed,
       ]
       super(event_names)
     end
@@ -92,6 +93,16 @@ module TT::Plugins::ExtensionSources
       end
       dialog.add_action_callback('source_changed') do |context, source_id, changes|
         trigger(:source_changed, self, source_id.to_i, changes) # JS returns Float.
+      end
+      dialog.add_action_callback('sources_changed') do |context, changes|
+        changes.map! { |change|
+          # change: { source_id: 123, properties: { enabled: true } }
+          change.transform_keys!(&:to_sym)
+          change[:source_id] = change[:source_id].to_i # JS returns Float.
+          change[:properties].transform_keys!(&:to_sym)
+          change
+        }
+        trigger(:sources_changed, self, changes)
       end
     end
 

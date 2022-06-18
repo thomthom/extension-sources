@@ -122,6 +122,16 @@ module TT::Plugins::ExtensionSources
     end
 
     # @param [ExtensionSourcesDialog] dialog
+    # @param Array<Hash{Symbol => Hash{Symbol => Object}}> changes
+    def sources_changed(dialog, changes)
+      changes.each { |change|
+        source_id = change[:source_id]
+        properties = change[:properties]
+        source_changed(dialog, source_id, properties)
+      }
+    end
+
+    # @param [ExtensionSourcesDialog] dialog
     # @param [Integer] source_id
     def reload_path(dialog, source_id)
       @logger.info { "#{self.class.object_name} reload_path(#{source_id})" }
@@ -282,6 +292,10 @@ module TT::Plugins::ExtensionSources
 
       dialog.on(:source_changed) do |dialog, source_id, changes|
         source_changed(dialog, source_id, changes)
+      end
+
+      dialog.on(:sources_changed) do |dialog, changes|
+        sources_changed(dialog, changes)
       end
 
       dialog.on(:import_paths) do |dialog|

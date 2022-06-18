@@ -17,12 +17,20 @@ const MouseButton = {
   fifth: 4,     // 5th button(typically the "Browser Forward" button)
 };
 
+const userAgentRegex = /SketchUp(?: Pro)\/([0-9.]+)\s+\((\w+)\)/;
+const userAgentMatches = navigator.userAgent.match(userAgentRegex);
 const OS = {
   isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
+  isWindows: navigator.platform.toUpperCase().indexOf('WIN32') >= 0,
+  isSketchUp: typeof sketchup !== 'undefined',
+  sketchupVersion: (userAgentMatches === null) ? null : parseFloat(userAgentMatches[1]),
+};
+
+const Features = {
+  useDragAndDropWorkaround: OS.isWindows && OS.sketchupVersion < 22.1, // Issue #44
 };
 
 // Stub out the callbacks on the `sketchup` object for testing in a browser.
-console.log('sketchup', typeof sketchup);
 if (typeof sketchup === 'undefined') {
   console.log('Shimming `sketchup` object for in-browser testing...');
   window.sketchup = {
@@ -180,6 +188,9 @@ let app = new Vue({
       this.drag_over_source_id = null;
       source.draggable = false; // Because .es-drag-handle onmouseup doesn't trigger after a drag.
 
+      if (!Features.useDragAndDropWorkaround) {
+        return;
+      }
       // Workaround for SketchUp bug:
       // On Windows the `drop` event fails to trigger on the very first drop.
       // (Tested on SketchUp up til SU2022.0).
@@ -229,7 +240,10 @@ let app = new Vue({
       event.preventDefault();
 
       // Bug: This doesn't work properly in SketchUp on Windows. See `drag_end`.
-      // this.drag_selected_to_target(source_id);
+      if (Features.useDragAndDropWorkaround) {
+        return;
+      }
+      this.drag_selected_to_target(source.source_id);
     },
     is_drop_target_before(target, x, y) {
       // console.log('drag_before_or_after', x, y);

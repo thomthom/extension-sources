@@ -47,6 +47,7 @@ module TT::Plugins::ExtensionSources
 
     # @return [ExtensionSourcesDialog]
     def open_extension_sources_dialog
+      @extension_sources_dialog = nil # Workaround for macOS issue. (#37)
       extension_sources_dialog.show
       extension_sources_dialog
     end
@@ -243,6 +244,7 @@ module TT::Plugins::ExtensionSources
         end
       end
 
+      @extension_sources_scanner_dialog = nil # Workaround for macOS issue. (#37)
       extension_sources_scanner_dialog.show(results)
     end
 

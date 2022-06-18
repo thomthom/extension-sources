@@ -90,8 +90,8 @@ module TT::Plugins::ExtensionSources
 
         if extension_sources_manager.include_path?(path)
           message = "Source path '#{path}' already exists. Choose a different path?"
-          result = UI.messagebox(message, MB_OKCANCEL)
-          next if result == IDOK
+          result = UI.messagebox(message, MB_YESNO)
+          next if result == IDYES
 
           return
         end
@@ -105,6 +105,14 @@ module TT::Plugins::ExtensionSources
     # @param [ExtensionSourcesDialog] dialog
     # @param [Integer] source_id
     def remove_path(dialog, source_id)
+      source = extension_sources_manager.find_by_source_id(source_id)
+      raise "found no source path for: #{source_id}" if source.nil?
+
+      # After undo/redo is implemented this messagebox can be removed.
+      message = "Remove path from list of extension sources?\n\nPath: #{source.path}"
+      result = UI.messagebox(message, MB_YESNO)
+      return if result == IDNO
+
       source = extension_sources_manager.remove(source_id)
       raise "found no source path for: #{source_id}" if source.nil?
     end

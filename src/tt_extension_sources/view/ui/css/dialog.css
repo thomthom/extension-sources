@@ -1,0 +1,47 @@
+html {
+  cursor: default;
+}
+
+[v-cloak] {
+  display: none;
+}
+
+/* Vertically align the "Clear Filter" list item */
+.es-filter-footer {
+  display: block !important;
+  text-align: center !important;
+}
+
+.es-filter-footer .modus-icons {
+  vertical-align: bottom;
+}
+
+.es-filter-footer span {
+  line-height: 24px;
+  vertical-align: bottom;
+}
+
+.es-drag-handle {
+  font-size: 24px;
+  margin-left: -8px;
+  padding-right: 8px;
+  cursor: grab;
+}
+
+.es-drag-over.es-drag-before:before,
+.es-drag-over.es-drag-after:after {
+  content: '';
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #333;
+}
+
+.es-drag-over.es-drag-before:before {
+  top: -1px;
+}
+
+.es-drag-over.es-drag-after:after {
+  bottom: -1px;
+}

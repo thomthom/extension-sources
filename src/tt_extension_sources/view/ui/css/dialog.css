@@ -6,6 +6,56 @@ html {
   display: none;
 }
 
+/* *** SketchUp style overrides *** */
+
+/* Text size can probably benefit from being a tad smaller. But that will
+affect the vertical flow of the layout. This is something to revisit later. */
+
+body,
+.list-group-item,
+.dropdown-menu {
+  /* P11 background color */
+  background-color: #f1f1f6;
+}
+
+.list-group-item:hover {
+  background-color: unset;
+}
+
+.dropdown-item:hover {
+  /* P11 toolbar selection color */
+  background-color: #dcedf9;
+}
+
+.dropdown-divider {
+  /* P11 divider color */
+  border-top-color: #e0e1e9;
+}
+
+.btn-text-dark:hover {
+  /* P11 button hover color */
+  background-color: #ffffff;
+}
+
+.btn-icon-only:focus {
+  /* Didn't find a good reference for this, using same as selected items */
+  background-color: #dcedf9 !important;
+}
+
+.bg-selected {
+  /* P11 toolbar selection color */
+  background-color: #dcedf9 !important;
+}
+
+.text-warning {
+  /* Not really SketchUp style */
+  /* The default Modus warning color is an orange with a poor contract against
+  the background. This variant is darker, leaning more toward red */
+  color: #e46325 !important;
+}
+
+/* *** Footer item of filtered lists *** */
+
 /* Vertically align the "Clear Filter" list item */
 .es-filter-footer {
   display: block !important;
@@ -21,6 +71,7 @@ html {
   vertical-align: bottom;
 }
 
+/* *** Drag and Drop *** */
 .es-drag-handle {
   font-size: 24px;
   margin-left: -8px;

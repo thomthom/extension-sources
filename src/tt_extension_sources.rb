@@ -25,7 +25,7 @@ module ExtensionSources # Base namespace for Extension Sources.
   EXTENSION = ::JSON.parse(extension_json, symbolize_names: true).freeze
 
   unless file_loaded?(__FILE__)
-    loader = File.join(PATH, 'app', 'main')
+    loader = File.join(PATH, 'bootstrap')
     @extension = SketchupExtension.new(EXTENSION[:name], loader)
     @extension.description = EXTENSION[:description]
     @extension.version     = EXTENSION[:version]

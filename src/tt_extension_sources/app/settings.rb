@@ -14,6 +14,15 @@ module TT::Plugins::ExtensionSources
       super(product_id)
     end
 
+    # Settings this will not automatically reflect the app's log level.
+    # It will take effect upon next start.
+    #
+    # @example
+    #   TT::Plugins::ExtensionSources.app.settings.log_level = Logger::DEBUG
+    #
+    # @return [Integer]
+    define :log_level, Logger::WARN
+
     # Settings this will not automatically reflect the app's debug state.
     # It will take effect upon next start.
     #
@@ -23,14 +32,14 @@ module TT::Plugins::ExtensionSources
     # @return [Boolean]
     define :debug, false
 
-    # Settings this will not automatically reflect the app's log level.
-    # It will take effect upon next start.
+    # @api private
     #
     # @example
-    #   TT::Plugins::ExtensionSources.app.settings.log_level = Logger::DEBUG
+    #   app = TT::Plugins::ExtensionSources.app
+    #   app.settings.debug_version_check = true
     #
-    # @return [Integer]
-    define :log_level, Logger::WARN
+    # @return [Boolean]
+    define :debug_version_check, false
 
     # @api private
     #

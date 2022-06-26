@@ -7,7 +7,7 @@ module TT::Plugins::ExtensionSources
 
   # @return [App]
   def self.app
-    @app ||= App.new
+    @app ||= App.new(error_handler: Bootstrap::ERROR_REPORTER)
     @app
   end
 
@@ -28,8 +28,20 @@ module TT::Plugins::ExtensionSources
     File.join(IMAGES_PATH, filename)
   end
 
+  # @param [String] title
+  # @return [UI::Command]
+  def self.create_command(title, &block)
+    UI::Command.new(title) {
+      begin
+        block.call
+      rescue Exception => exception
+        ERROR_REPORTER.handle(exception)
+      end
+    }
+  end
+
   unless file_loaded?(__FILE__)
-    cmd = UI::Command.new('Extension Sources…') {
+    cmd = self.create_command('Extension Sources…') {
       self.app.open_extension_sources_dialog
     }
     cmd.tooltip = 'Extension Sources'

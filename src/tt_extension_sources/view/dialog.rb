@@ -6,10 +6,14 @@ module TT::Plugins::ExtensionSources
   # * {#init_action_callbacks}
   class Dialog
 
+    # @return [ErrorHandler, nil]
+    attr_accessor :error_handler
+
     # @param [Array<Symbol>] event_names
     def initialize(event_names)
       @events = setup_events(event_names)
       @dialog = create_dialog
+      @error_handler = nil
     end
 
     # @param [Symbol] event
@@ -86,6 +90,8 @@ module TT::Plugins::ExtensionSources
 
       @events[event].each { |callback| callback.call(*args) }
       nil
+    rescue Exception => error
+      error_handler ? error_handler.handle(error) : raise
     end
 
     # @return [UI::HtmlDialog]

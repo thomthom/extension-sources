@@ -12,13 +12,19 @@ module TT::Plugins::ExtensionSources
 
     include Inspection
 
-    def initialize
+    # @return [ErrorHandler, nil]
+    attr_reader :error_handler
+
+    def initialize(error_handler: nil)
       logger.debug { "#{self.class.object_name} initialize" }
+      @error_handler = error_handler
     end
 
     # This will boot the extension sources manager and load files from the
     # list of additional load-paths.
     def boot
+      # TODO: Probably have to disable the ErrorHandler when the manager loads
+      #   extensions.
       extension_sources_controller.boot
     end
 
@@ -46,6 +52,7 @@ module TT::Plugins::ExtensionSources
       @extension_sources_controller ||= ExtensionSourcesController.new(
         settings: settings,
         logger: logger,
+        error_handler: error_handler,
       )
       @extension_sources_controller
     end

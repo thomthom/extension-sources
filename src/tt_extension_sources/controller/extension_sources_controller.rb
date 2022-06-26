@@ -21,9 +21,13 @@ module TT::Plugins::ExtensionSources
 
     include Inspection
 
+    # @return [ErrorHandler, nil]
+    attr_reader :error_handler
+
     # @param [AppSettings] settings
     # @param [Logger] logger
-    def initialize(settings:, logger: Logger.new(nil))
+    def initialize(settings:, logger: Logger.new(nil), error_handler: nil)
+      @error_handler = error_handler
       @logger = logger
       @logger.debug { "#{self.class.object_name} initialize" }
       @settings = settings
@@ -156,9 +160,13 @@ module TT::Plugins::ExtensionSources
         $VERBOSE = nil
         Dir.glob(pattern).each { |path|
           # @logger.debug { "#{self.class.object_name} * #{path}" }
-          load path
+          begin
+            load path
+          rescue Exception => error
+            error_handler.ignore(error) if error_handler
+          end
         }.size
-      rescue Exception
+      rescue Exception => error
         SKETCHUP_CONSOLE.show
         raise
       ensure
@@ -278,6 +286,7 @@ module TT::Plugins::ExtensionSources
     # @return [ExtensionSourcesDialog]
     def create_extension_sources_dialog
       dialog = ExtensionSourcesDialog.new
+      dialog.error_handler = error_handler
 
       dialog.on(:boot) do |dialog|
         sources = extension_sources_manager.sources
@@ -336,6 +345,7 @@ module TT::Plugins::ExtensionSources
     # @return [ExtensionSourcesScannerDialog]
     def create_extension_sources_scanner_dialog
       dialog = ExtensionSourcesScannerDialog.new
+      dialog.error_handler = error_handler
 
       dialog.on(:boot) do |dialog|
         dialog.update(dialog.sources)

@@ -41,7 +41,7 @@
                 v-on:mousemove="drag_select($event, source, index)" class="list-group-item list-item-left-control"
                 v-bind:class="{ 'bg-selected': source.selected }">
                 <!-- Enabled switch -->
-                <!-- Preventing mousedown/over to avoid interferring with selection. -->
+                <!-- Preventing mousedown/over to avoid interfering with selection. -->
                 <div class="custom-control custom-switch custom-control-inline" title="Toggle source path loading"
                   v-on:mousedown.prevent.stop="" v-on:mousemove.prevent.stop="">
                   <input type="checkbox" v-model="source.enabled" class="custom-control-input"

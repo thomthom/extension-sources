@@ -15,5 +15,10 @@
     "bin/**/*",
     "doc/**/*",
     "**/vue.js"
+  ],
+  "cSpell.words": [
+    "Rakefile",
+    "RuboCop",
+    "SketchUp"
   ]
 }

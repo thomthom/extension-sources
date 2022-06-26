@@ -91,6 +91,7 @@ module TT::Plugins::ExtensionSources
       path = loop do
         path = UI.select_directory(title: title, directory: source.path)
         return if path.nil?
+        return if path == source.path
 
         if extension_sources_manager.include_path?(path)
           message = "Source path '#{path}' already exists. Choose a different path?"

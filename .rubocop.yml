@@ -57,3 +57,8 @@ SketchupBugs:
 SketchupRequirements/LoadPath:
   Exclude:
   - src/tt_extension_sources/extension_sources_manager.rb
+
+
+# Enable the cop that checks for Ruby compatibility.
+Lint/Syntax:
+  Enabled: true

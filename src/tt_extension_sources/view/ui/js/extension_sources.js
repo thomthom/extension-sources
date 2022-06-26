@@ -113,9 +113,11 @@ let app = new Vue({
         };
       }
       for (const item of sources) {
-        item.selected = ui_state[item.source_id]?.selected || false;
-        item.draggable = ui_state[item.source_id]?.draggable || false;
-        // item.selected = (item.source_id in ui_state) ? ui_state[item.source_id].selected : false;
+        // Safe-navigation operator not supported in older SU CEF versions (SU2022- Chrome 64).
+        // item.selected = ui_state[item.source_id]?.selected || false;
+        // item.draggable = ui_state[item.source_id]?.draggable || false;
+        item.selected = (item.source_id in ui_state) ? ui_state[item.source_id].selected : false;
+        item.draggable = (item.source_id in ui_state) ? ui_state[item.source_id].draggable : false;
       }
       this.sources = sources;
     },

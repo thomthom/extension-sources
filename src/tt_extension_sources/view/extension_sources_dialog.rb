@@ -97,13 +97,26 @@ module TT::Plugins::ExtensionSources
       dialog.add_action_callback('sources_changed') do |context, changes|
         changes.map! { |change|
           # change: { source_id: 123, properties: { enabled: true } }
-          change.transform_keys!(&:to_sym)
+          symbolize_keys!(change)
           change[:source_id] = change[:source_id].to_i # JS returns Float.
-          change[:properties].transform_keys!(&:to_sym)
+          symbolize_keys!(change[:properties])
           change
         }
         trigger(:sources_changed, self, changes)
       end
+    end
+
+    # @param [Hash] hash
+    # @return [Hash]
+    def symbolize_keys!(hash)
+      if hash.respond_to?(:transform_keys!)
+        hash.transform_keys!(&:to_sym) # Ruby 2.5
+      else
+        temp = Hash[hash.map { |k, v| [k.to_sym, v] }]
+        hash.clear
+        hash.merge!(temp)
+      end
+      hash
     end
 
   end

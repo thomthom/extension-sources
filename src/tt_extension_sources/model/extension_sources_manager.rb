@@ -199,7 +199,8 @@ module TT::Plugins::ExtensionSources
     # @param [ExtensionSource] source
     # @param [Symbol] event
     def on_source_changed(event, source)
-      @logger.debug { "#{self.class.object_name} on_source_changed: ##{source&.source_id}: #{source&.path}" }
+      # @logger.debug { "#{self.class.object_name} on_source_changed: ##{source&.source_id}: #{source&.path}" }
+      @logger.debug { "#{self.class.object_name} on_source_changed: ##{source ? source.source_id : nil}: #{source ? source.path : nil}" }
       changed
       notify_observers(self, :changed, source)
     end

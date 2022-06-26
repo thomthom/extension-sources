@@ -76,6 +76,9 @@ body,
   font-size: 24px;
   margin-left: -8px;
   padding-right: 8px;
+  /* https: //developer.mozilla.org/en-US/docs/Web/CSS/cursor */
+  cursor: -webkit-grab;
+  /* Chrome 68+ */
   cursor: grab;
 }
 

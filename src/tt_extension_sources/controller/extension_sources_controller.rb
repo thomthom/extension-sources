@@ -60,14 +60,16 @@ module TT::Plugins::ExtensionSources
     def close_extension_sources_dialog
       # NOTE: Deliberately using the instance variable here as the getter will
       #       initialize the dialog.
-      @extension_sources_dialog&.close
+      # @extension_sources_dialog&.close # &. Doesn't work in Ruby 2.2
+      @extension_sources_dialog.close if @extension_sources_dialog
     end
 
     # @param [ExtensionSourcesManager] sources_manager
     # @param [Symbol] event
     # @param [ExtensionSource, nil] source
     def on_sources_changed(sources_manager, event, source = nil)
-      @logger.debug { "#{self.class.object_name} on_sources_changed: #{event} - ##{source&.source_id}: #{source&.path}" }
+      # @logger.debug { "#{self.class.object_name} on_sources_changed: #{event} - ##{source&.source_id}: #{source&.path}" }
+      @logger.debug { "#{self.class.object_name} on_sources_changed: #{event} - ##{source ? source.source_id : nil}: #{source ? source.path : nil}" }
       @sync.call
     end
 

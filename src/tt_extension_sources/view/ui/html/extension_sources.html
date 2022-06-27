@@ -98,7 +98,7 @@
                       title="Path doesn't exist.">warning</i>
                   </div>
                   <!-- Buttons -->
-                  <div class="text-nowrap">
+                  <div class="text-nowrap" v-on:mousedown.prevent.stop="">
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload"
                       v-on:click="reload_path(source.source_id)"
                       v-bind:disabled="!source.enabled || !source.path_exist">

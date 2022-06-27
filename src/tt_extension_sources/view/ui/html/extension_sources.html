@@ -100,7 +100,8 @@
                   <!-- Buttons -->
                   <div class="text-nowrap">
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload"
-                      v-on:click="reload_path(source.source_id)">
+                      v-on:click="reload_path(source.source_id)"
+                      v-bind:disabled="!source.enabled || !source.path_exist">
                       <i class="modus-icons">refresh</i>
                     </button>
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Edit"

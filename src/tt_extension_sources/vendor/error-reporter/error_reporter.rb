@@ -36,10 +36,10 @@ module TT::Plugins::ExtensionSources
       raise handle_unexpected_exception(exception)
     end
 
-    # @param [Exception] error
-    def ignore(error)
-      error.include(Ignore)
-      error
+    # @param [Exception] exception
+    def ignore(exception)
+      exception.include(Ignore)
+      exception
     end
 
     # Enables the error handler.
@@ -66,7 +66,7 @@ module TT::Plugins::ExtensionSources
     #
     # @return [Exception]
     def handle(exception)
-      show_dialog(exception) if enabled? && !ignored?(error)
+      show_dialog(exception) if enabled? && !ignored?(exception)
       raise exception
     end
 
@@ -77,9 +77,9 @@ module TT::Plugins::ExtensionSources
 
     protected
 
-    # @param [Exception] error
-    def ignored?(error)
-      error.is_a?(Ignore)
+    # @param [Exception] exception
+    def ignored?(exception)
+      exception.is_a?(Ignore)
     end
 
     # @param [String] event

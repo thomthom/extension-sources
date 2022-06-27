@@ -38,7 +38,7 @@ module TT::Plugins::ExtensionSources
 
     # @param [Exception] exception
     def ignore(exception)
-      exception.include(Ignore)
+      exception.extend(Ignore)
       exception
     end
 

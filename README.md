@@ -4,6 +4,22 @@
 
 Manage additional sources to load extensions from.
 
+## Known Issues
+
+### Drag and drop irregularities
+
+In SketchUp 2017 - SketchUp 2022.0 the HTML Drag and Drop API isn't fully
+working. In these versions workarounds has been applied which will exhibit some
+deviant in the normal drag and drop behaviour. For instance, it's not possible
+to cancel a drag and drop by pressing ESC. The drag and drop cursor might also
+not reflect it's correct state. This is fixed in SketchUp 2022.1.
+
+### Drag and drop target indicator
+
+In SketchUp 2017 - SketchUp 2020 there is no visual indicator to exactly where
+the item will be dropped. This is due to limitation (bug?) in these SketchUp
+versions.
+
 ## Tests
 
 ```sh

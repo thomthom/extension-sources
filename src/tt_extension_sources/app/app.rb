@@ -23,8 +23,6 @@ module TT::Plugins::ExtensionSources
     # This will boot the extension sources manager and load files from the
     # list of additional load-paths.
     def boot
-      # TODO: Probably have to disable the ErrorHandler when the manager loads
-      #   extensions.
       extension_sources_controller.boot
     end
 

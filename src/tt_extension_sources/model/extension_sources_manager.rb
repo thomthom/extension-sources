@@ -294,6 +294,10 @@ module TT::Plugins::ExtensionSources
     def require_sources(source_path)
       pattern = "#{source_path}/*.rb"
       Dir.glob(pattern).each { |path|
+        # `Sketchup.require` doesn't throw errors when failing to load a file.
+        # So there's no need to disable the error handler.
+        # Would have been useful to know if the method failed or not, but at the
+        # moment that's not possible to detect.
         Sketchup.require(path)
       }.to_a
     end

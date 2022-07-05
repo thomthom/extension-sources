@@ -27,14 +27,11 @@ require_optional('rubocop/rake_task') do
 end
 
 require_optional('yard') do
-  YARD::Rake::YardocTask.new(:doc)
-
-  # TODO: This appear to also generate the HTML output. So can this become `:doc`?
-  YARD::Rake::YardocTask.new(:undoc) do |task|
+  YARD::Rake::YardocTask.new(:doc) do |task|
     task.stats_options << '--list-undoc'
   end
 
-  default_tasks << :undoc
+  default_tasks << :doc
 end
 
 task :default => default_tasks

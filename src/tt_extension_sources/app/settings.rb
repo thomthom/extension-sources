@@ -54,7 +54,7 @@ module TT::Plugins::ExtensionSources
     #
     # @example
     #   app = TT::Plugins::ExtensionSources.app
-    #   app.settings.debug_use_cached_scan_results = true
+    #   app.settings.debug_dump_cached_scan_results = true
     #
     # @return [Boolean]
     define :debug_dump_cached_scan_results, false

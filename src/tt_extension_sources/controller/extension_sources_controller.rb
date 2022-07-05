@@ -239,8 +239,9 @@ module TT::Plugins::ExtensionSources
 
       # The scanner might take time. In order to speed up development on
       # processing the scanner results, UI etc, these debug methods can be used
-      # to read/write the scanner results to a cache.
+      # to read/write the scanner results to/from a cache.
       if @settings.debug_use_cached_scan_results?
+        @logger.debug { "#{self.class.object_name} Using cached scan results: #{debug_scan_dump_path}" }
         results = debug_read_scan_dump(debug_scan_dump_path)
       else
 
@@ -259,6 +260,7 @@ module TT::Plugins::ExtensionSources
         }
 
         if @settings.debug_dump_cached_scan_results?
+          @logger.debug { "#{self.class.object_name} Writing scan results cache to: #{debug_scan_dump_path}" }
           debug_write_scan_dump(debug_scan_dump_path, results)
         end
       end

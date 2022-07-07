@@ -25,12 +25,15 @@ module TT::Plugins::ExtensionSources
     attr_reader :error_handler
 
     # @param [AppSettings] settings
+    # @param [Hash] metadata Metadata attached to the serialized files.
     # @param [Logger] logger
-    def initialize(settings:, logger: Logger.new(nil), error_handler: nil)
+    # @param [ErrorHandler, nil] error_handler
+    def initialize(settings:, metadata: {}, logger: Logger.new(nil), error_handler: nil)
       @error_handler = error_handler
       @logger = logger
       @logger.debug { "#{self.class.object_name} initialize" }
       @settings = settings
+      @metadata = metadata
       # Deferring initialization of the manager because it will cause the
       # extensions to load. Instead the `boot` method takes care of this.
       @extension_sources_manager = nil
@@ -267,7 +270,11 @@ module TT::Plugins::ExtensionSources
 
     # @return [ExtensionSourcesManager]
     def create_extension_sources_manager
-      ExtensionSourcesManager.new(logger: @logger, storage_path: sources_json_path).tap { |manager|
+      ExtensionSourcesManager.new(
+        logger: @logger,
+        storage_path: sources_json_path,
+        metadata: @metadata
+      ).tap { |manager|
         manager.add_observer(self, :on_sources_changed)
       }
     end

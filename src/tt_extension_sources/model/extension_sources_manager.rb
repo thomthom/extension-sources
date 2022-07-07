@@ -4,6 +4,7 @@ require 'logger'
 require 'observer'
 
 require 'tt_extension_sources/model/extension_source'
+require 'tt_extension_sources/model/version'
 require 'tt_extension_sources/utils/inspection'
 require 'tt_extension_sources/utils/timing'
 
@@ -14,17 +15,27 @@ module TT::Plugins::ExtensionSources
   # Manages the list of additional extension load-paths.
   class ExtensionSourcesManager
 
+    # Base class for custom errors raised during import.
+    class ImportError < StandardError; end
+
+    # Raised whenever the imported file is newer than what can be read.
+    class IncompatibleFileVersion < ImportError; end
+
     include Inspection
     include Observable
 
     # @param [String] storage_path Full path to JSON file to serialize data to.
     # @param [Array] load_path
+    # @param [Hash] metadata Additional data to include when serializing to file.
     # @param [Logger] logger
-    def initialize(storage_path:, load_path: $LOAD_PATH, logger: Logger.new(nil), warnings: true)
+    # @param [Boolean] warnings
+    def initialize(storage_path:, load_path: $LOAD_PATH, metadata: {},
+        logger: Logger.new(nil), warnings: true)
       @warnings = warnings
       @logger = logger
       @load_path = load_path
       @storage_path = storage_path
+      @metadata = metadata
       # TODO: Parse startup args:
       # "Config=${input:buildType};Path=${workspaceRoot}/ruby"
       #
@@ -116,9 +127,19 @@ module TT::Plugins::ExtensionSources
       source
     end
 
+    # The file format version this version of the extension will write.
+    CURRENT_FILE_VERSION = Version.new(1, 0, 0).freeze
+    private_constant :CURRENT_FILE_VERSION
+
     # @param [String] export_path
     def export(export_path)
-      data = serialize_as_hash
+      data = {
+        header: {
+          version: CURRENT_FILE_VERSION.to_a,
+          metadata: @metadata,
+        },
+        sources: serialize_as_hash
+      }
       json = JSON.pretty_generate(data)
       File.open(export_path, "w:UTF-8") do |file|
         file.write(json)
@@ -130,21 +151,38 @@ module TT::Plugins::ExtensionSources
     def import(import_path)
       json = File.open(import_path, "r:UTF-8", &:read)
       data = JSON.parse(json, symbolize_names: true)
-      new_data = data.select { |item| !include_path?(item[:path]) }
+
+      # Check if this file version can be read.
+      sources = if data.is_a?(Hash)
+        file_version = Version.new(*data[:header][:version])
+        if CURRENT_FILE_VERSION < file_version
+          message = "unable to read file version: #{file_version} (highest: #{CURRENT_FILE_VERSION})"
+          raise IncompatibleFileVersion, message
+        end
+
+        sources = data[:sources].select { |item| !include_path?(item[:path]) }
+      else
+        # TODO: Remove this after development machines has updated the file versions.
+        warn 'reading pre-release file' if @warnings
+
+        temp = data.is_a?(Hash) ? data[:sources] : data
+        sources = temp.select { |item| !include_path?(item[:path]) }
+      end
+
       # First add all load paths, then require. This is to account for
       # extensions that depend on other extensions. These will assume the
       # dependent extension is present in the load path.
       timing = Timing.new
       timing.measure(label: 'Add load paths') do
 
-        new_data.each { |item|
+        sources.each { |item|
           add_load_path(item[:path]) if item[:enabled]
         }
 
       end
       timing.measure(label: 'Load extensions') do
 
-        new_data.each { |item|
+        sources.each { |item|
           add(item[:path], enabled: item[:enabled])
         }
 

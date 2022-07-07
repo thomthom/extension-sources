@@ -22,6 +22,13 @@ module TT::Plugins::ExtensionSources
       @storage_path.write('[]')
       @storage_path.flush
       @load_path = FAKE_LOAD_PATH.dup
+      @metadata = {
+        extension_version: [1, 2, 3],
+        sketchup_version: [22, 1, 0],
+        ruby_version: [2, 7, 2],
+      }
+      @current_version = [1, 0, 0] # File format version
+      @newer_version = [2, 0, 0] # File format version
     end
 
     def teardown
@@ -353,18 +360,25 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        metadata: @metadata,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
       manager.add('/fake/path/world', enabled: false)
       manager.add('/fake/path/universe', enabled: true)
 
-      expected = manager.sources.map(&:serialize_as_hash)
       assert_nil(manager.export(export_path))
 
       export_path.rewind
       json = export_path.read
       refute_empty(json)
+      expected = {
+        header: {
+          version: @current_version,
+          metadata: @metadata,
+        },
+        sources: manager.sources.map(&:serialize_as_hash),
+      }
       actual = JSON.parse(json, symbolize_names: true)
       assert_equal(expected, actual)
     ensure
@@ -378,6 +392,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        metadata: @metadata,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
@@ -398,11 +413,18 @@ module TT::Plugins::ExtensionSources
           enabled: true,
         },
       ]
-      # Add data for one original path. Ensure the state if different.
+      # Add data for one original path. Ensure the state is different.
       original = original_data.last.dup
       original[:enabled] = !original[:enabled]
       data << original
-      import_path.write(JSON.pretty_generate(data))
+      file_data = {
+        header: {
+          version: @current_version,
+          metadata: @metadata,
+        },
+        sources: data,
+      }
+      import_path.write(JSON.pretty_generate(file_data))
       import_path.flush
 
       mock = Minitest::Mock.new
@@ -427,6 +449,40 @@ module TT::Plugins::ExtensionSources
         assert_equal(expected, @load_path.include?(item[:path]), item)
       }
       assert_mock(mock)
+    ensure
+      import_path.close(true)
+    end
+
+    def test_import_newer_file_format
+      import_path = Tempfile.new(['import', '.json'])
+
+      manager = ExtensionSourcesManager.new(
+        load_path: @load_path,
+        storage_path: @storage_path.path,
+        metadata: @metadata,
+        warnings: false,
+      )
+
+      # Add data for one original path. Ensure the file version is higher.
+      data = {
+        header: {
+          version: @newer_version,
+          metadata: @metadata,
+        },
+        sources: [
+          {
+            path: '/fake/path/mars',
+            enabled: true,
+          },
+        ],
+      }
+      import_path.write(JSON.pretty_generate(data))
+      import_path.flush
+
+      assert_raises(ExtensionSourcesManager::IncompatibleFileVersion) do
+        manager.import(import_path.path)
+      end
+      assert_empty(manager.sources)
     ensure
       import_path.close(true)
     end
@@ -574,6 +630,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        metadata: @metadata,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
@@ -587,7 +644,13 @@ module TT::Plugins::ExtensionSources
       json = @storage_path.read
       data = JSON.parse(json, symbolize_names: true)
       assert_equal(manager.sources.size, data.size)
-      expected = manager.sources.map(&:serialize_as_hash)
+      expected = {
+        header: {
+          version: @current_version,
+          metadata: @metadata,
+        },
+        sources: manager.sources.map(&:serialize_as_hash),
+      }
       assert_equal(expected, data)
     end
 

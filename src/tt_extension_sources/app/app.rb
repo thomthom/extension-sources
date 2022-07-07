@@ -47,8 +47,14 @@ module TT::Plugins::ExtensionSources
 
     # @return [ExtensionSourcesController]
     def extension_sources_controller
+      metadata = {
+        extension_version: Version.parse(EXTENSION[:version]).to_a,
+        sketchup_version: Version.parse(Sketchup.version).to_a,
+        ruby_version: Version.parse(RUBY_VERSION).to_a,
+      }
       @extension_sources_controller ||= ExtensionSourcesController.new(
         settings: settings,
+        metadata: metadata,
         logger: logger,
         error_handler: error_handler,
       )

@@ -205,6 +205,8 @@ module TT::Plugins::ExtensionSources
 
       @logger.info { "#{self.class.object_name} Importing from: #{path}" }
       extension_sources_manager.import(path)
+    rescue ExtensionSourcesManager::ImportError => error
+      handle_import_error(error)
     end
 
     # @param [ExtensionSourcesDialog] dialog
@@ -277,6 +279,8 @@ module TT::Plugins::ExtensionSources
       ).tap { |manager|
         manager.add_observer(self, :on_sources_changed)
       }
+    rescue ExtensionSourcesManager::ImportError => error
+      handle_import_error(error)
     end
 
     # @return [ExtensionSourcesDialog]
@@ -372,6 +376,23 @@ module TT::Plugins::ExtensionSources
         extension_sources_manager.add(item[:path], enabled: item[:enabled])
       }
       nil
+    end
+
+    # @param [ExtensionSourcesManager::ImportError] error
+    def handle_import_error(error)
+      message = case error
+      when ExtensionSourcesManager::IncompatibleFileVersion
+        @logger.debug { error.message }
+        'The extension sources file is newer than what can be read, please update Extension Sources to the latest version.'
+      when ExtensionSourcesManager::ImportError
+        "The extension sources file could not be read due to an error:\n\n#{error.message}"
+      else
+        raise error
+      end
+      # Defer the execution in order to not block SketchUp's startup sequence.
+      Execution.defer do
+        UI.messagebox(message)
+      end
     end
 
     # Call whenever extension sources has changed. This will update the UI and

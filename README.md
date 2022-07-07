@@ -11,7 +11,7 @@ Developer tool for managing additional sources to load SketchUp extensions from.
 Add the path to where your extension source is located from the Extension Sources
 dialog.
 
-![](assets\screenshots\extension-sources-dialog.png)
+![](assets/screenshots/extension-sources-dialog.png)
 
 These paths are added to SketchUp's Ruby `$LOAD_PATH`.
 
@@ -25,7 +25,7 @@ is installed.
 
 If you have a lot of sources they can be quickly filtered.
 
-![](assets\screenshots\extension-sources-dialog-filter.png)
+![](assets/screenshots/extension-sources-dialog-filter.png)
 
 ### Extension Sources Scanner Dialog
 
@@ -37,11 +37,11 @@ a support folder of matching name.
 The scan might take a few seconds or minutes, depending on your file system and
 harddrive speed.
 
-![](assets\screenshots\extension-sources-dialog-menu.png)
+![](assets/screenshots/extension-sources-dialog-menu.png)
 
 `Extension Sources Dialog` › `More…` (`⋮`) › `Scan for Paths…`
 
-![](assets\screenshots\extension-sources-scanner-dialog.png)
+![](assets/screenshots/extension-sources-scanner-dialog.png)
 
 From the scan results the desired sources can be selected. The toggle will control
 whether the source path will be loaded or not.

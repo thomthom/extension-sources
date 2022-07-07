@@ -1,0 +1,8 @@
+{
+  "name": "Extension Sources",
+  "description": "Manage additional sources to load extensions from.",
+  "namespace": "TT::Plugins::ExtensionSources",
+  "author": "Thomas Thomassen",
+  "copyright": "Copyright © 2011—2022",
+  "license": "MIT"
+}

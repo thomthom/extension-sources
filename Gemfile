@@ -11,6 +11,7 @@ IS_CI_ENVIRONMENT = ENV.key?('CI')
 group :development do
   gem 'debase', '~> 0.2'         # VSCode debugging
   gem 'ruby-debug-ide', '~> 0.7' # VSCode debugging
+  gem 'rubyzip', '~> 1.3'        # Skippy task
   gem 'sketchup-api-stubs'       # VSCode SketchUp API insight
   gem 'skippy', '~> 0.5.1.a'
   gem 'solargraph'               # VSCode IDE support

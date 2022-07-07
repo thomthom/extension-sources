@@ -2,7 +2,57 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/j5gcwy6ky3hgmww5/branch/main?svg=true)](https://ci.appveyor.com/project/thomthom/extension-sources/branch/main)
 
-Manage additional sources to load extensions from.
+Developer tool for managing additional sources to load SketchUp extensions from.
+
+## How to Use
+
+### Extension Sources Dialog
+
+Add the path to where your extension source is located from the Extension Sources
+dialog.
+
+![](assets\screenshots\extension-sources-dialog.png)
+
+These paths are added to SketchUp's Ruby `$LOAD_PATH`.
+
+Paths can be managed from within this dialog. Toggling the path will control
+whether the sources will be loaded or not. The order of which the sources are
+added to the `$LOAD_PATH` can also be rearranged by dragging and dropping the
+selected items in the list.
+
+The paths are shared among all installations of SketchUp where Extension Sources
+is installed.
+
+If you have a lot of sources they can be quickly filtered.
+
+![](assets\screenshots\extension-sources-dialog-filter.png)
+
+### Extension Sources Scanner Dialog
+
+To quickly add multiple sources Extension Sources can scan an analyze a given
+directory's sub-directories and look for the signature of extension sources.
+It will look for Ruby files with `Sketchup.register_extension` accompanied by
+a support folder of matching name.
+
+The scan might take a few seconds or minutes, depending on your file system and
+harddrive speed.
+
+![](assets\screenshots\extension-sources-dialog-menu.png)
+
+`Extension Sources Dialog` › `More…` (`⋮`) › `Scan for Paths…`
+
+![](assets\screenshots\extension-sources-scanner-dialog.png)
+
+From the scan results the desired sources can be selected. The toggle will control
+whether the source path will be loaded or not.
+
+Note that paths already added to Extension Sources will not appear in the scan
+results list.
+
+## Compatibility
+
+* SketchUp 2017 and newer
+* Windows, macOS
 
 ## Known Issues
 

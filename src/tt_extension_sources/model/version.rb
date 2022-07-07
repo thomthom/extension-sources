@@ -35,6 +35,15 @@ module TT::Plugins::ExtensionSources
       @patch <=> other.patch
     end
 
+    # Checks if this version is semantically compatible with the other version.
+    # This will only return `false` if this version's major component is larger
+    # than the other version's.
+    #
+    # @param [Version] version
+    def compatible_with?(version)
+      return version.major >= @major
+    end
+
     # @return [Array(Integer, Integer, Integer)]
     def to_a
       [major, minor, patch]

@@ -2,6 +2,7 @@ require 'logger'
 
 require 'tt_extension_sources/app/settings'
 require 'tt_extension_sources/controller/extension_sources_controller'
+require 'tt_extension_sources/model/version'
 require 'tt_extension_sources/utils/inspection'
 require 'tt_extension_sources/system/console'
 require 'tt_extension_sources/system/os'

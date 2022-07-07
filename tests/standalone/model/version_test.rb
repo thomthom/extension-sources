@@ -99,6 +99,18 @@ module TT::Plugins::ExtensionSources
       assert(Version.new(1, 2, 3) == Version.new(1, 2, 3))
     end
 
+    def test_compatible_with
+      minimum = Version.new(1, 2, 3)
+      assert(Version.new(1, 2, 3).compatible_with?(minimum))
+      assert(Version.new(1, 2, 0).compatible_with?(minimum))
+      assert(Version.new(1, 0, 3).compatible_with?(minimum))
+      assert(Version.new(1, 0, 0).compatible_with?(minimum))
+      assert(Version.new(0, 2, 3).compatible_with?(minimum))
+      assert(Version.new(1, 2, 4).compatible_with?(minimum))
+      assert(Version.new(1, 3, 3).compatible_with?(minimum))
+      refute(Version.new(4, 2, 3).compatible_with?(minimum))
+    end
+
     def test_to_a
       version = Version.new(1, 2, 3)
       result = version.to_a

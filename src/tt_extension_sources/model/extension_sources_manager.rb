@@ -155,7 +155,7 @@ module TT::Plugins::ExtensionSources
       # Check if this file version can be read.
       sources = if data.is_a?(Hash)
         file_version = Version.new(*data[:header][:version])
-        if CURRENT_FILE_VERSION < file_version
+        if !file_version.compatible_with?(CURRENT_FILE_VERSION)
           message = "unable to read file version: #{file_version} (highest: #{CURRENT_FILE_VERSION})"
           raise IncompatibleFileVersion, message
         end

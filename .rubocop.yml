@@ -54,6 +54,11 @@ SketchupBugs:
   Enabled: true
 
 
+# Monkey patching the SketchUp API.
+SketchupRequirements/ApiNamespace:
+  Exclude:
+  - src/tt_extension_sources/patch/require.rb
+
 # This extension must make changes to the $LOAD_PATH for it to operate as expected.
 SketchupRequirements/LoadPath:
   Exclude:

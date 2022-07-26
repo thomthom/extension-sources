@@ -65,6 +65,7 @@ module TT::Plugins::ExtensionSources
       ERROR_REPORTER = ErrorReporter.new(config)
 
       begin
+        require 'tt_extension_sources/patch/require'
         require 'tt_extension_sources/app/main'
       rescue Exception => error
         ERROR_REPORTER.handle(error)

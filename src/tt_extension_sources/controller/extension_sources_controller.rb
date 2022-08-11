@@ -169,6 +169,7 @@ module TT::Plugins::ExtensionSources
           begin
             load path
           rescue Exception => error
+            puts error.message
             error_handler.ignore(error) if error_handler
           end
         }.size

@@ -314,12 +314,14 @@ let app = new Vue({
     on_enabled_toggle(source) {
       console.log('on_enabled_toggle', source.source_id, source.enabled);
       let enabled = source.enabled;
-      let changes = this.selected.map(source => {
+      let items = [source].concat(this.selected);
+      let changes = items.map(source => {
         return {
           source_id: source.source_id,
           properties: { enabled: enabled }
         }
       });
+      console.log('> changes', changes);
       sketchup.sources_changed(changes);
     }
   },

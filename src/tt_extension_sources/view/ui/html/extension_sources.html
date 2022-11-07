@@ -97,6 +97,10 @@
                     <i v-if="!source.path_exist" class="modus-icons text-warning align-bottom"
                       title="Path doesn't exist.">warning</i>
                   </div>
+                  <!-- Timings -->
+                  <div class="text-nowrap es-load-time">
+                    {{ format_seconds(source.load_time) }}
+                  </div>
                   <!-- Buttons -->
                   <div class="text-nowrap" v-on:mousedown.prevent.stop="">
                     <button class="btn btn-text-dark btn-ms btn-icon-only" title="Reload"

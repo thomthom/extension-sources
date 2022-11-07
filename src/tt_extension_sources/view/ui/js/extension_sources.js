@@ -101,6 +101,13 @@ let app = new Vue({
     clear_filter() {
       this.filter = "";
     },
+    format_seconds(seconds) {
+      if (seconds < 1.0) {
+        let ms = seconds * 1000;
+        return `${ms.toFixed(4)} ms`
+      }
+      return `${seconds.toFixed(4)} s`
+    },
     update(sources) {
       // Inject additional properties that only the Vue app cares about.
       // For Vue's reactor to pick up the changes they must be added to

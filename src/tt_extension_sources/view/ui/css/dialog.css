@@ -99,3 +99,7 @@ body,
 .es-drag-over.es-drag-after:after {
   bottom: -1px;
 }
+
+.es-load-time {
+  color: #999;
+}

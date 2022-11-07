@@ -25,12 +25,16 @@ module TT::Plugins::ExtensionSources
     # @return [Numeric]
     attr_reader :source_id
 
+    # @return [Float, nil]
+    attr_accessor :load_time
+
     # @param [String] path
     # @param [Boolean] enabled
     def initialize(path:, enabled: true)
       @source_id = self.class.generate_source_id
       @path = path
       @enabled = enabled
+      @load_time = nil
     end
 
     def path_exist?
@@ -72,6 +76,7 @@ module TT::Plugins::ExtensionSources
         path_exist: path_exist?,
         path: path,
         enabled: enabled?,
+        load_time: load_time,
       }
     end
 

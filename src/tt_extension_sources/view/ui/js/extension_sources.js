@@ -106,7 +106,7 @@ let app = new Vue({
         let ms = seconds * 1000;
         return `${ms.toFixed(4)} ms`
       }
-      return `${seconds.toFixed(4)} s`
+      return `🔥 ${seconds.toFixed(4)} s`
     },
     update(sources) {
       // Inject additional properties that only the Vue app cares about.

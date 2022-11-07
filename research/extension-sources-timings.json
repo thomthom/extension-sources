@@ -1,0 +1,50 @@
+{
+  "header": {
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "metadata": {
+      "extension_version": [
+        1,
+        0,
+        0
+      ],
+      "sketchup_version": [
+        22,
+        0,
+        354
+      ],
+      "ruby_version": [
+        2,
+        7,
+        2
+      ]
+    }
+  },
+  "sources": {
+    "C:/Users/Thomas/SourceTree/tt-library-2": {
+      "averages": {
+        "mean": 229, // average value
+        "median": 226 // middle value
+      },
+      "measurements": [
+        {
+          "id": 24, // Assign a unique id per "launch" for filtering.
+          "sketchup_version": "22.0.354",
+          "extension_version": "2.14.3",
+          "timestamp": 1667832206,
+          "measurement": 231
+        },
+        {
+          "id": 25,
+          "sketchup_version": "22.0.354",
+          "extension_version": "2.14.3",
+          "timestamp": 1667832106,
+          "measurement": 224
+        }
+      ]
+    }
+  }
+}

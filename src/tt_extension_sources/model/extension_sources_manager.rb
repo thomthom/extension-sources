@@ -58,7 +58,9 @@ module TT::Plugins::ExtensionSources
 
       if source.enabled?
         add_load_path(source.path)
-        require_sources(source.path)
+        record_require_time(source) do
+          require_sources(source.path)
+        end
       end
 
       source.add_observer(self, :on_source_changed)
@@ -120,7 +122,9 @@ module TT::Plugins::ExtensionSources
         source.path = path
         if source.enabled?
           add_load_path(source.path)
-          require_sources(source.path)
+          record_require_time(source) do
+            require_sources(source.path)
+          end
         end
       end
 
@@ -360,6 +364,16 @@ module TT::Plugins::ExtensionSources
     # @return [String]
     def storage_path
       @storage_path
+    end
+
+    # @param [ExtensionSource] source
+    def record_require_time(source, &block)
+      timing = Timing.new
+      timing.measure do
+        block.call
+      end
+      source.load_time = timing.lapsed
+      nil
     end
 
     # Serializes the state of the manager to {storage_path}.

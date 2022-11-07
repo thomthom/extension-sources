@@ -72,6 +72,11 @@ module TT::Plugins::ExtensionSources
       output.string.rstrip
     end
 
+    # @return [Float, nil]
+    def lapsed
+      @measurements.sum(&:lapsed)
+    end
+
     # @return [String]
     def to_s
       format

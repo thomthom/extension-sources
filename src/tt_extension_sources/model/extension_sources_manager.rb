@@ -2,6 +2,7 @@ require 'fileutils'
 require 'json'
 require 'logger'
 require 'observer'
+require 'time'
 
 require 'tt_extension_sources/model/extension_source'
 require 'tt_extension_sources/model/version'
@@ -373,6 +374,28 @@ module TT::Plugins::ExtensionSources
         block.call
       end
       source.load_time = timing.lapsed
+      write_load_time(source, timing.lapsed)
+      nil
+    end
+
+    # @param [ExtensionSource] source
+    # @param [Float] seconds
+    def write_load_time(source, seconds)
+      app_data_path = File.dirname(storage_path)
+      # TODO: Dependency injection of path. (Option not to write).
+      # TODO: Use CSV library.
+      # TODO: Split this logic into separate Measurement class that is injected.
+      file_path = File.join(app_data_path, 'extension-sources-timings.csv')
+      File.open(file_path, "a:UTF-8") do |file|
+        if file.size == 0
+          header = 'SketchUp,Path,Load Time,Timestamp'
+          file.puts(header)
+        end
+        path = source.path
+        sketchup_version = (@metadata[:sketchup_version] || [0, 0, 0]).join('.')
+        data = "#{sketchup_version},#{path},#{seconds},#{Time.now.iso8601}"
+        file.puts(data)
+      end
       nil
     end
 

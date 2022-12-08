@@ -131,13 +131,7 @@ module TT::Plugins::ExtensionSources
     # @param [Integer] source_id
     # @param [Hash{String => Object}] changes
     def source_changed(dialog, source_id, changes)
-      source = extension_sources_manager.find_by_source_id(source_id)
-      raise "found no source path for: #{source_id}" if source.nil?
-
-      changes.each { |property, value|
-        setter = "#{property}=".to_sym
-        source.public_send(setter, value)
-      }
+      extension_sources_manager.update(source_id: source_id, **changes)
     end
 
     # @param [ExtensionSourcesDialog] dialog

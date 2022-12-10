@@ -9,8 +9,7 @@ class Version < Skippy::Command
     say project.description
 
     # SketchUp Extension
-    # TODO: Resolve src and extension filename from project.
-    extension_json = project.path.join('src/tt_extension_sources/extension.json')
+    extension_json = extension_json_path
     extension = JSON.parse(extension_json.read, symbolize_names: true)
     say
     say 'Extension', [:yellow, :bold]
@@ -24,10 +23,9 @@ class Version < Skippy::Command
     desc 'build', 'Increase build version.'
     def build
       edit_info { |extension|
-        # TODO: Convert build number to be an integer.
-        old_build = extension[:build].to_i
+        old_build = extension[:build]
         new_build = old_build + 1
-        extension[:build] = new_build.to_s
+        extension[:build] = new_build
       }
     end
 
@@ -76,7 +74,7 @@ class Version < Skippy::Command
         # Reset the lower numbers to zero.
         (index + 1...parts.size).each { |i| parts[i] = 0 }
         # Reset build version.
-        extension[:build] = 1
+        extension[:build] = 0
 
         version = parts.join('.')
         extension[:version] = version
@@ -93,8 +91,9 @@ class Version < Skippy::Command
 
     def extension_json_path
       project = Skippy::Project::current_or_fail
-      # TODO: Resolve src and extension filename from project.
-      project.path.join('src/tt_extension_sources/extension.json')
+      pattern = project.path.join('src/*/extension.json')
+      path = Dir.glob(pattern).first
+      Pathname.new(path)
     end
 
   end # Build

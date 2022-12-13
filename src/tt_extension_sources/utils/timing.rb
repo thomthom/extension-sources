@@ -74,7 +74,13 @@ module TT::Plugins::ExtensionSources
 
     # @return [Float, nil]
     def lapsed
-      @measurements.sum(&:lapsed)
+      if @measurements.respond_to?(:sum)
+        @measurements.sum(&:lapsed)
+      else
+        # Array#sum was added in Ruby 2.4. Fall back to manual, possibly slower
+        # sum.
+        @measurements.inject(0) { |sum, measurement| sum + measurement.lapsed }
+      end
     end
 
     # @return [String]

@@ -26,6 +26,7 @@ AllCops:
     - Gemfile
     - Rakefile
     - bin/**/*
+    - benchmarks/**/*
     - fixtures/**/*
     - research/**/*
     - profiling/**/*

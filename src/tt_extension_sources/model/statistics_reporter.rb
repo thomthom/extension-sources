@@ -1,25 +1,39 @@
 require 'csv'
 
 module TT::Plugins::ExtensionSources
+  # Processes the raw data from {Statistics#read} into a nested hierarchy based
+  # on path (extension) and SketchUp version.
+  #
+  # @see #report
   class StatisticsReporter
-
-    Record = Struct.new(:sketchup, :path, :load_time, :timestamp,
-      keyword_init: true
-    )
-
-    Metrics = Struct.new(:min, :max, :mean, :median,
-      keyword_init: true
-    )
 
     attr_reader :path
     attr_reader :data
 
     # @param [String] path
-    def initialize(path:)
+    def initialize(path:) # TODO: pass in data from Statistics#read
       @path = path
       @data = read(path)
     end
 
+    # The returned nested hash has the following structure:
+    #
+    # ```
+    # path/sketchup/rows
+    # ```
+    #
+    # ```rb
+    # data = reporter.report
+    # rows = data[sketchup][path]
+    # ```
+    #
+    # The rows is an `Array` or `Hash`es with the following structure:
+    #
+    # ```
+    # row = { min:, max:, mean:, median: }
+    # ```
+    #
+    # @return [Hash]
     def report
       report = {}
 
@@ -41,7 +55,6 @@ module TT::Plugins::ExtensionSources
 
           report[path] ||= {}
           report[path][sketchup] = { min: min, max: max, mean: mean, median: median }
-          # report[path][sketchup] = Metrics.new(min: min, max: max, mean: mean, median: median)
         }
       }
 

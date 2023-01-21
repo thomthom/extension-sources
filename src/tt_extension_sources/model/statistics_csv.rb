@@ -14,6 +14,11 @@ module TT::Plugins::ExtensionSources
 
     # @param [IO] io
     def initialize(io:)
+      # TODO: Accept file path or IO.
+      # Somewhat troublesome to have a file IO open at app level with no
+      # mechanism to automatically open/close. What about when you have multiple
+      # instances of SketchUp open? Probably should open/close only around
+      # read/write.
       @io = io
     end
 

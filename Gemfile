@@ -23,6 +23,11 @@ group :test do
   gem 'rake', '~> 13.0'
 end
 
+group :performance do
+  gem 'benchmark', '~> 0.2'
+  gem 'benchmark-ips', '~> 2.10'
+end unless IS_CI_ENVIRONMENT
+
 group :documentation do
   gem 'commonmarker', '~> 0.23'
   gem 'yard', '~> 0.9'

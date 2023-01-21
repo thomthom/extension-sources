@@ -1,4 +1,5 @@
 require 'csv'
+require 'time'
 
 require 'tt_extension_sources/model/statistics'
 
@@ -35,7 +36,12 @@ module TT::Plugins::ExtensionSources
       )
       csv.read.map { |record|
         sketchup, path, load_time, timestamp = record.fields
-        Statistics::Record.new(sketchup: sketchup, path: path, load_time: load_time, timestamp: timestamp)
+        Statistics::Record.new(
+          sketchup: sketchup,
+          path: path,
+          load_time: load_time.to_f,
+          timestamp: Time.iso8601(timestamp)
+        )
       }
     end
 

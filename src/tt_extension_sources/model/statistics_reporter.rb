@@ -22,14 +22,14 @@ module TT::Plugins::ExtensionSources
     # row = { min:, max:, mean:, median: }
     # ```
     #
-    # @param [Array[Statistics::Record]] records
+    # @param [Array<Statistics::Record>] records
     # @return [Hash]
     def report(records)
       report = {}
 
       grouped = {}
-      records.each { |row|
-        sketchup, path, load_time, _timestamp = row.fields
+      records.each { |record|
+        sketchup, path, load_time, _timestamp = record.values
 
         grouped[path] ||= {}
         grouped[path][sketchup] ||= []

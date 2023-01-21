@@ -10,8 +10,9 @@ module TT::Plugins::ExtensionSources
 
     def test_report
       path = File.join(__dir__, 'load-times.csv')
-      file = File.open(path)
-      records = StatisticsCSV.new(file).read
+      records = File.open(path) { |file|
+        StatisticsCSV.new(io: file).read
+      }
 
       stats = StatisticsReporter.new
       report = stats.report(records)
@@ -37,8 +38,6 @@ module TT::Plugins::ExtensionSources
         assert_equal(versions.keys.sort, report[path].keys.sort)
       }
       assert_equal(expected.keys.sort, report.keys.sort)
-    rescue
-      file.close
     end
 
   end # class

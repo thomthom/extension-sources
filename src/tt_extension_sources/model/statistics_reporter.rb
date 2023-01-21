@@ -1,20 +1,9 @@
-require 'csv'
-
 module TT::Plugins::ExtensionSources
   # Processes the raw data from {Statistics#read} into a nested hierarchy based
   # on path (extension) and SketchUp version.
   #
   # @see #report
   class StatisticsReporter
-
-    attr_reader :path
-    attr_reader :data
-
-    # @param [String] path
-    def initialize(path:) # TODO: pass in data from Statistics#read
-      @path = path
-      @data = read(path)
-    end
 
     # The returned nested hash has the following structure:
     #
@@ -33,12 +22,13 @@ module TT::Plugins::ExtensionSources
     # row = { min:, max:, mean:, median: }
     # ```
     #
+    # @param [Array[Statistics::Record]] records
     # @return [Hash]
-    def report
+    def report(records)
       report = {}
 
       grouped = {}
-      data.each { |row|
+      records.each { |row|
         sketchup, path, load_time, _timestamp = row.fields
 
         grouped[path] ||= {}
@@ -61,12 +51,6 @@ module TT::Plugins::ExtensionSources
       report
     end
 
-    # @return [String]
-    # def inspect(*args)
-    #   hex_id = "0x%x" % (object_id << 1)
-    #   %{#<ExtensionSource:#{hex_id} id=#{source_id.inspect} path=#{path.inspect} enabled=#{enabled?.inspect}>}
-    # end
-
     private
 
     # @param [Array] items
@@ -75,18 +59,6 @@ module TT::Plugins::ExtensionSources
       sorted = items.sort
       mid = (sorted.length - 1) / 2.0
       (sorted[mid.floor] + sorted[mid.ceil]) / 2.0
-    end
-
-    # @param [String] path
-    def read(path)
-      options = {
-        encoding: 'utf-8',
-        headers: :first_row,
-        return_headers: false,
-        # strip: true,
-      }
-      rows = CSV.read(path, **options)
-      rows
     end
 
   end # class

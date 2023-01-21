@@ -10,8 +10,11 @@ module TT::Plugins::ExtensionSources
 
     def test_report
       path = File.join(__dir__, 'load-times.csv')
-      stats = StatisticsReporter.new(path: path)
-      report = stats.report
+      file = File.open(path)
+      records = StatisticsCSV.new(file).read
+
+      stats = StatisticsReporter.new
+      report = stats.report(records)
       assert_kind_of(Hash, report)
       # puts
       # puts JSON.pretty_generate(report)
@@ -34,6 +37,8 @@ module TT::Plugins::ExtensionSources
         assert_equal(versions.keys.sort, report[path].keys.sort)
       }
       assert_equal(expected.keys.sort, report.keys.sort)
+    rescue
+      file.close
     end
 
   end # class

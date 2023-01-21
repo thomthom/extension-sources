@@ -6,8 +6,10 @@ module TT::Plugins::ExtensionSources
   # Serialize statistics in CSV format.
   class StatisticsCSV < Statistics
 
+    # @private
     # The names of the statistics headers.
     HEADERS = ['SketchUp', 'Path', 'Load Time', 'Timestamp'].freeze
+    private_constant :HEADERS
 
     # @return [IO]
     attr_reader :io

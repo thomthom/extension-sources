@@ -10,28 +10,28 @@ module TT::Plugins::ExtensionSources
 
     def test_read
       path = File.join(__dir__, 'load-times.csv')
-      file = File.open(path)
-      statistics = StatisticsCSV.new(io: file)
-      data = statistics.read
+      data = File.open(path) { |file|
+        statistics = StatisticsCSV.new(io: file)
+        statistics.read
+      }
       assert_kind_of(Array, data)
       data.each { |row| assert_kind_of(Statistics::Record, row) }
       assert_equal(187, data.size)
-    ensure
-      file.close
     end
 
     def test_read_multiple_times
       path = File.join(__dir__, 'load-times.csv')
-      file = File.open(path)
-      statistics = StatisticsCSV.new(io: file)
-      data = statistics.read
-      assert_kind_of(Array, data)
-      assert_equal(187, data.size)
-      data = statistics.read
-      assert_kind_of(Array, data)
-      assert_equal(187, data.size)
-    ensure
-      file.close
+      File.open(path) { |file|
+        statistics = StatisticsCSV.new(io: file)
+
+        data = statistics.read
+        assert_kind_of(Array, data)
+        assert_equal(187, data.size)
+
+        data = statistics.read
+        assert_kind_of(Array, data)
+        assert_equal(187, data.size)
+      }
     end
 
     def test_write

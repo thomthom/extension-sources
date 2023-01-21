@@ -14,14 +14,15 @@ module TT::Plugins::ExtensionSources
 
     # @param [IO] io
     def initialize(io:)
-      # TODO: Accept file path or IO.
-      # Somewhat troublesome to have a file IO open at app level with no
-      # mechanism to automatically open/close. What about when you have multiple
-      # instances of SketchUp open? Probably should open/close only around
-      # read/write.
       @io = io
     end
 
+    # @example
+    #   data = File.open(file_path, "r:UTF-8") do |file|
+    #     statistics = StatisticsCSV.new(io: file)
+    #     statistics.read
+    #   end
+    #
     # @return [Array<Statistics::Record>]
     def read
       @io.rewind
@@ -31,11 +32,18 @@ module TT::Plugins::ExtensionSources
         **default_options
       )
       csv.read.map { |record|
-        sketchup, path, load_time, timestamp = record
+        sketchup, path, load_time, timestamp = record.fields
         Statistics::Record.new(sketchup: sketchup, path: path, load_time: load_time, timestamp: timestamp)
       }
     end
 
+    # @example
+    #   row = ...
+    #   File.open(file_path, "a:UTF-8") do |file|
+    #     statistics = StatisticsCSV.new(io: file)
+    #     statistics.record(row)
+    #   end
+    #
     # @param [Statistics::Record] record
     def record(record)
       csv = CSV.new(@io,

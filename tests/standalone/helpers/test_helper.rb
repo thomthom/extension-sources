@@ -12,6 +12,15 @@ require 'set'
 $LOADED_FEATURES << 'Win32/Console/ANSI'
 Minitest::Reporters.use!
 
+# In case there is no diff tool, try to find the diff tool from the default
+# installation directory.
+if Minitest::Assertions.diff.nil?
+  win_diff = "#{ENV['ProgramFiles']}/Git/usr/bin/diff.exe"
+  if system(win_diff, __FILE__, __FILE__)
+    Minitest::Assertions.diff = %["#{win_diff}" -u]
+  end
+end
+
 # Make it easier to verify the absence of a call to a mock.
 class Minitest::Mock
 

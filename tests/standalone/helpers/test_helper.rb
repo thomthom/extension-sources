@@ -48,6 +48,39 @@ class Minitest::Mock
 end
 
 
+# Because this project targets SketchUp 2017 it has to remain compatible with
+# Ruby 2.2. This means <<~ heredocs won't work. As a workaround this utility
+# can be used instead:
+#
+# string = <<~EOT
+#   Indented string.
+#     Of multiline.
+# EOT
+#
+# Becomes:
+#
+# string = <<-EOT.undent_heredoc
+#   Indented string.
+#     Of multiline.
+# EOT
+#
+# https://stackoverflow.com/a/16150611/486990
+class String
+  def try(*a, &b)
+    if a.empty? && block_given?
+      yield self
+    else
+      __send__(*a, &b)
+    end
+  end
+
+  def undent_heredoc
+    indent = scan(/^[ \t]*(?=\S)/).min.try(:size) || 0
+    gsub(/^[ \t]{#{indent}}/, '')
+  end
+end
+
+
 # Define the nested extension namespace.
 module TT
   module Plugins

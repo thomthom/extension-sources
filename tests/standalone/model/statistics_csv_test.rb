@@ -47,10 +47,10 @@ module TT::Plugins::ExtensionSources
       refute_equal(0, io.size)
       # puts
       # puts io.string
-      expected = <<~EOF
+      expected = <<-EOT.undent_heredoc
         SketchUp,Path,Load Time,Timestamp
         22.0.354,C:/Users/Thomas/SourceTree/tt-library-2,0.2650976,2022-11-07T18:15:41+01:00
-      EOF
+      EOT
       assert_equal(expected, io.string)
     end
 
@@ -73,11 +73,11 @@ module TT::Plugins::ExtensionSources
       statistics.record(record1)
       statistics.record(record2)
 
-      expected = <<~EOF
+      expected = <<-EOT.undent_heredoc
         SketchUp,Path,Load Time,Timestamp
         22.0.354,C:/Users/Thomas/SourceTree/tt-library-2,0.2650976,2022-11-07T18:15:41+01:00
         22.0.200,C:/Users/Thomas/SourceTree/TestUp2/src,0.2772595,2022-11-07T18:15:41+01:00
-      EOF
+      EOT
       assert_equal(expected, io.string)
     end
 
@@ -102,11 +102,11 @@ module TT::Plugins::ExtensionSources
       statistics = StatisticsCSV.new(io: io)
       statistics.record(record2)
 
-      expected = <<~EOF
+      expected = <<-EOT.undent_heredoc
         SketchUp,Path,Load Time,Timestamp
         22.0.354,C:/Users/Thomas/SourceTree/tt-library-2,0.2650976,2022-11-07T18:15:41+01:00
         22.0.200,C:/Users/Thomas/SourceTree/TestUp2/src,0.2772595,2022-11-07T18:15:41+01:00
-      EOF
+      EOT
       assert_equal(expected, io.string)
     end
 
@@ -132,11 +132,11 @@ module TT::Plugins::ExtensionSources
 
       statistics.record(record2)
 
-      expected = <<~EOF
+      expected = <<-EOT.undent_heredoc
         SketchUp,Path,Load Time,Timestamp
         22.0.354,C:/Users/Thomas/SourceTree/tt-library-2,0.2650976,2022-11-07T18:15:41+01:00
         22.0.200,C:/Users/Thomas/SourceTree/TestUp2/src,0.2772595,2022-11-07T18:15:41+01:00
-      EOF
+      EOT
       assert_equal(expected, io.string)
     end
 

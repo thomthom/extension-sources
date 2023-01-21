@@ -3,10 +3,13 @@ require 'csv'
 require 'tt_extension_sources/model/statistics'
 
 module TT::Plugins::ExtensionSources
+  # Serialize statistics in CSV format.
   class StatisticsCSV < Statistics
 
+    # The names of the statistics headers.
     HEADERS = ['SketchUp', 'Path', 'Load Time', 'Timestamp'].freeze
 
+    # @return [IO]
     attr_reader :io
 
     # @param [IO] io
@@ -46,6 +49,7 @@ module TT::Plugins::ExtensionSources
 
     private
 
+    # @return [Hash]
     def default_options
       {
         encoding: 'utf-8',

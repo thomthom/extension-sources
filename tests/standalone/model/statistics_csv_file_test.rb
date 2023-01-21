@@ -1,6 +1,8 @@
 require 'minitest/autorun'
 require 'test_helper'
 
+require 'tempfile'
+
 require 'tt_extension_sources/model/statistics_csv_file'
 
 module TT::Plugins::ExtensionSources

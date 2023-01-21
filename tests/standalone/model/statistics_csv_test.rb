@@ -17,6 +17,20 @@ module TT::Plugins::ExtensionSources
       assert_kind_of(Array, data)
       data.each { |row| assert_kind_of(Statistics::Record, row) }
       assert_equal(187, data.size)
+
+      row = data.first
+
+      assert_kind_of(String, row.sketchup)
+      assert_equal('22.0.354', row.sketchup)
+
+      assert_kind_of(String, row.path)
+      assert_equal('C:/Users/Thomas/SourceTree/tt-library-2', row.path)
+
+      assert_kind_of(Float, row.load_time)
+      assert_equal(0.2650976, row.load_time)
+
+      assert_kind_of(Time, row.timestamp)
+      assert_equal(Time.iso8601('2022-11-07T18:15:41+01:00'), row.timestamp)
     end
 
     def test_read_multiple_times

@@ -135,7 +135,7 @@ module TT::Plugins::ExtensionSources
       tempfile.close
       headers = HEADERS.join(',')
       data.each { |record|
-        File.open(tempfile.path) { |file|
+        File.open(tempfile.path, "a:UTF-8") { |file|
           if file.size == 0
             file.puts(headers)
           end

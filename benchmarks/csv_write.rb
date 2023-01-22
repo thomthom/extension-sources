@@ -110,6 +110,25 @@ module TT::Plugins::ExtensionSources
       tempfile.unlink
     end
 
+    x.report('Manual (Flush)') do
+      tempfile = Tempfile.new('benchmark_manual_csv_flush')
+      headers = HEADERS.join(',')
+      data.each { |record|
+        if tempfile.size == 0
+          tempfile.puts(headers)
+        end
+        sketchup_version = record.sketchup
+        path = record.path
+        seconds = record.load_time
+        timestamp = record.timestamp
+        row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
+        tempfile.puts(row)
+        tempfile.flush
+      }
+      tempfile.close
+      tempfile.unlink
+    end
+
     x.report('Manual (Reopen)') do
       tempfile = Tempfile.new('benchmark_manual_reopen_csv')
       tempfile.close

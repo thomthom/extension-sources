@@ -3,6 +3,7 @@
 
 require_relative 'boot'
 
+require 'csv'
 require 'tempfile'
 
 require 'tt_extension_sources/model/statistics_csv_file'
@@ -14,29 +15,50 @@ module TT::Plugins::ExtensionSources
   statistics = StatisticsCSVFile.new(csv_path)
   data = statistics.read
 
+  HEADERS = ['SketchUp', 'Path', 'Load Time', 'Timestamp'].freeze
+
   puts "Number of records: #{data.size}"
   puts
 
   BenchmarkRunner.start do |x|
 
-    x.report('CSV Lib') do
-      tempfile = Tempfile.new('benchmark_csv_lib')
+    x.report('Implemented') do
+      tempfile = Tempfile.new('benchmark_csv_impl')
       tempfile.close
       stats = StatisticsCSVFile.new(tempfile.path)
       data.each { |record|
         stats.record(record)
       }
+      tempfile.close
+      tempfile.unlink
     end
 
-    # TODO: Add report for CSV directly. (duplicate CVS logic)
-    # TODO: Rename 'CSV Lib' report to 'StatisticsCSVFile'
+    x.report('CSV Lib') do
+      tempfile = Tempfile.new('benchmark_csv_lib')
+      headers = ['SketchUp', 'Path', 'Load Time', 'Timestamp'].freeze
+      csv = CSV.new(tempfile,
+        encoding: 'utf-8',
+        headers: headers,
+        write_headers: true,
+      )
+      data.each { |record|
+        csv << [
+          record.sketchup,
+          record.path,
+          record.load_time,
+          record.timestamp.iso8601
+        ]
+      }
+      tempfile.close
+      tempfile.unlink
+    end
 
     x.report('Manual') do
       tempfile = Tempfile.new('benchmark_manual_csv')
       data.each { |record|
         if tempfile.size == 0
-          header = 'SketchUp,Path,Load Time,Timestamp'
-          tempfile.puts(header)
+          headers = HEADERS.join(',')
+          tempfile.puts(headers)
         end
         sketchup_version = record.sketchup
         path = record.path
@@ -45,6 +67,28 @@ module TT::Plugins::ExtensionSources
         row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
         tempfile.puts(row)
       }
+      tempfile.close
+      tempfile.unlink
+    end
+
+    x.report('Manual (Reopen)') do
+      tempfile = Tempfile.new('benchmark_manual_reopen_csv')
+      tempfile.close
+      data.each { |record|
+        tempfile.open
+        if tempfile.size == 0
+          headers = HEADERS.join(',')
+          tempfile.puts(headers)
+        end
+        sketchup_version = record.sketchup
+        path = record.path
+        seconds = record.load_time
+        timestamp = record.timestamp
+        row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
+        tempfile.puts(row)
+        tempfile.close
+      }
+      tempfile.unlink
     end
 
   end # benchmark

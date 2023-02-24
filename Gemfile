@@ -26,6 +26,7 @@ end
 group :performance do
   gem 'benchmark', '~> 0.2'
   gem 'benchmark-ips', '~> 2.10'
+  gem 'ruby-prof', '~> 1.6'
 end unless IS_CI_ENVIRONMENT
 
 group :documentation do

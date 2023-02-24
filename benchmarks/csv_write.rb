@@ -6,30 +6,60 @@ require_relative 'boot'
 require 'csv'
 require 'tempfile'
 
-require 'tt_extension_sources/model/statistics_csv_file'
+require 'tt_extension_sources/model/statistics_csv'
 
 module TT::Plugins::ExtensionSources
 
   test_files_path = File.join(BenchmarkRunner::PROJECT_PATH, 'tests', 'standalone', 'model')
   csv_path = File.join(test_files_path, 'load-times.csv')
-  statistics = StatisticsCSVFile.new(csv_path)
+  statistics = StatisticsCSV.new(io: File.open(csv_path, 'r'))
   data = statistics.read
+
+  expected_path = File.join(__dir__, 'master.csv')
+  EXPECTED_DATA = File.read(expected_path)
 
   HEADERS = ['SketchUp', 'Path', 'Load Time', 'Timestamp'].freeze
 
   puts "Number of records: #{data.size}"
   puts
 
+  VALIDATE = ARGV.any? { |arg| arg && arg.downcase == 'validate' }
+
+  module Helper
+
+    def self.diff(text1, text2)
+      tempfile1 = Tempfile.new('benchmark_diff1')
+      tempfile2 = Tempfile.new('benchmark_diff2')
+      tempfile1.write(text1)
+      tempfile2.write(text2)
+      tempfile1.flush
+      tempfile2.flush
+      result = `git diff --no-index #{tempfile1.path} #{tempfile2.path}`
+      tempfile2.unlink
+      tempfile1.unlink
+      result
+    end
+
+    def self.validate(actual)
+      return unless VALIDATE
+      actual_data = File.read(actual)
+      if actual_data != EXPECTED_DATA
+        raise "Output mismatch: (#{EXPECTED_DATA.size} vs #{actual_data.size})\n#{Helper.diff(EXPECTED_DATA, actual_data)}"
+      end
+    end
+
+  end
+
   BenchmarkRunner.start do |x|
 
-    x.report('Implemented') do
+    x.report('StatisticsCSV') do
       tempfile = Tempfile.new('benchmark_csv_impl')
-      tempfile.close
-      stats = StatisticsCSVFile.new(tempfile.path)
+      stats = StatisticsCSV.new(io: tempfile)
       data.each { |record|
         stats.record(record)
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -49,6 +79,7 @@ module TT::Plugins::ExtensionSources
         ]
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -69,6 +100,7 @@ module TT::Plugins::ExtensionSources
         ]
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -89,6 +121,7 @@ module TT::Plugins::ExtensionSources
         ]
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -102,11 +135,12 @@ module TT::Plugins::ExtensionSources
         sketchup_version = record.sketchup
         path = record.path
         seconds = record.load_time
-        timestamp = record.timestamp
+        timestamp = record.timestamp.iso8601
         row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
         tempfile.puts(row)
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -120,12 +154,35 @@ module TT::Plugins::ExtensionSources
         sketchup_version = record.sketchup
         path = record.path
         seconds = record.load_time
-        timestamp = record.timestamp
+        timestamp = record.timestamp.iso8601
         row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
         tempfile.puts(row)
         tempfile.flush
       }
       tempfile.close
+      Helper.validate(tempfile.path)
+      tempfile.unlink
+    end
+
+    x.report('Manual (Flush&Seek)') do
+      tempfile = Tempfile.new('benchmark_manual_csv_flush')
+      headers = HEADERS.join(',')
+      data.each { |record|
+        if tempfile.size == 0
+          tempfile.puts(headers)
+        else
+          tempfile.seek(0, IO::SEEK_END)
+        end
+        sketchup_version = record.sketchup
+        path = record.path
+        seconds = record.load_time
+        timestamp = record.timestamp.iso8601
+        row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
+        tempfile.puts(row)
+        tempfile.flush
+      }
+      tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -137,15 +194,19 @@ module TT::Plugins::ExtensionSources
         tempfile.open
         if tempfile.size == 0
           tempfile.puts(headers)
+        else
+          tempfile.seek(0, IO::SEEK_END)
         end
         sketchup_version = record.sketchup
         path = record.path
         seconds = record.load_time
-        timestamp = record.timestamp
+        timestamp = record.timestamp.iso8601
         row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
         tempfile.puts(row)
         tempfile.close
       }
+      tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -161,11 +222,13 @@ module TT::Plugins::ExtensionSources
           sketchup_version = record.sketchup
           path = record.path
           seconds = record.load_time
-          timestamp = record.timestamp
+          timestamp = record.timestamp.iso8601
           row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
           file.puts(row)
         }
       }
+      tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 

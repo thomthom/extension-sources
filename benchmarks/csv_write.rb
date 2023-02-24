@@ -7,6 +7,8 @@ require 'csv'
 require 'tempfile'
 
 require 'tt_extension_sources/model/statistics_csv_file'
+require 'tt_extension_sources/model/statistics_csv_reuse'
+require 'tt_extension_sources/model/statistics_csv_manual'
 
 module TT::Plugins::ExtensionSources
 
@@ -22,7 +24,7 @@ module TT::Plugins::ExtensionSources
 
   BenchmarkRunner.start do |x|
 
-    x.report('Implemented') do
+    x.report('StatisticsCSVFile*') do
       tempfile = Tempfile.new('benchmark_csv_impl')
       tempfile.close
       stats = StatisticsCSVFile.new(tempfile.path)
@@ -30,6 +32,33 @@ module TT::Plugins::ExtensionSources
         stats.record(record)
       }
       tempfile.close
+      tempfile.unlink
+    end
+
+    x.report('StatisticsCSV') do
+      tempfile = Tempfile.new('benchmark_csv_impl')
+      stats = StatisticsCSV.new(io: tempfile)
+      data.each { |record|
+        stats.record(record)
+      }
+      tempfile.unlink
+    end
+
+    x.report('StatisticsCSVReuse') do
+      tempfile = Tempfile.new('benchmark_csv_impl')
+      stats = StatisticsCSVReuse.new(io: tempfile)
+      data.each { |record|
+        stats.record(record)
+      }
+      tempfile.unlink
+    end
+
+    x.report('StatisticsCSVManual') do
+      tempfile = Tempfile.new('benchmark_csv_impl')
+      stats = StatisticsCSVManual.new(io: tempfile)
+      data.each { |record|
+        stats.record(record)
+      }
       tempfile.unlink
     end
 
@@ -116,6 +145,27 @@ module TT::Plugins::ExtensionSources
       data.each { |record|
         if tempfile.size == 0
           tempfile.puts(headers)
+        end
+        sketchup_version = record.sketchup
+        path = record.path
+        seconds = record.load_time
+        timestamp = record.timestamp
+        row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
+        tempfile.puts(row)
+        tempfile.flush
+      }
+      tempfile.close
+      tempfile.unlink
+    end
+
+    x.report('Manual (Flush&Seek)') do
+      tempfile = Tempfile.new('benchmark_manual_csv_flush')
+      headers = HEADERS.join(',')
+      data.each { |record|
+        if tempfile.size == 0
+          tempfile.puts(headers)
+        else
+          tempfile.seek(0, IO::SEEK_END)
         end
         sketchup_version = record.sketchup
         path = record.path

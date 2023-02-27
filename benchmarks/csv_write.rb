@@ -17,10 +17,40 @@ module TT::Plugins::ExtensionSources
   statistics = StatisticsCSVFile.new(csv_path)
   data = statistics.read
 
+  expected_path = File.join(__dir__, 'master.csv')
+  EXPECTED_DATA = File.read(expected_path)
+
   HEADERS = ['SketchUp', 'Path', 'Load Time', 'Timestamp'].freeze
 
   puts "Number of records: #{data.size}"
   puts
+
+  VALIDATE = ARGV.any? { |arg| arg&.downcase == 'validate' }
+
+  module Helper
+
+    def self.diff(text1, text2)
+      tempfile1 = Tempfile.new('benchmark_diff1')
+      tempfile2 = Tempfile.new('benchmark_diff2')
+      tempfile1.write(text1)
+      tempfile2.write(text2)
+      tempfile1.flush
+      tempfile2.flush
+      result = `git diff --no-index #{tempfile1.path} #{tempfile2.path}`
+      tempfile2.unlink
+      tempfile1.unlink
+      result
+    end
+
+    def self.validate(actual)
+      return unless VALIDATE
+      actual_data = File.read(actual)
+      if actual_data != EXPECTED_DATA
+        raise "Output mismatch: (#{EXPECTED_DATA.size} vs #{actual_data.size})\n#{Helper.diff(EXPECTED_DATA, actual_data)}"
+      end
+    end
+
+  end
 
   BenchmarkRunner.start do |x|
 
@@ -32,6 +62,7 @@ module TT::Plugins::ExtensionSources
         stats.record(record)
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -41,6 +72,8 @@ module TT::Plugins::ExtensionSources
       data.each { |record|
         stats.record(record)
       }
+      tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -50,6 +83,8 @@ module TT::Plugins::ExtensionSources
       data.each { |record|
         stats.record(record)
       }
+      tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -59,6 +94,8 @@ module TT::Plugins::ExtensionSources
       data.each { |record|
         stats.record(record)
       }
+      tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -74,10 +111,11 @@ module TT::Plugins::ExtensionSources
           record.sketchup,
           record.path,
           record.load_time,
-          record.timestamp.iso8601
+          record.timestamp.to_s
         ]
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -94,10 +132,11 @@ module TT::Plugins::ExtensionSources
           record.sketchup,
           record.path,
           record.load_time,
-          record.timestamp.iso8601
+          record.timestamp.to_s
         ]
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -114,10 +153,11 @@ module TT::Plugins::ExtensionSources
           record.sketchup,
           record.path,
           record.load_time,
-          record.timestamp.iso8601
+          record.timestamp.to_s
         ]
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -136,6 +176,7 @@ module TT::Plugins::ExtensionSources
         tempfile.puts(row)
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -155,6 +196,7 @@ module TT::Plugins::ExtensionSources
         tempfile.flush
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -176,6 +218,7 @@ module TT::Plugins::ExtensionSources
         tempfile.flush
       }
       tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -196,6 +239,8 @@ module TT::Plugins::ExtensionSources
         tempfile.puts(row)
         tempfile.close
       }
+      tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 
@@ -216,6 +261,8 @@ module TT::Plugins::ExtensionSources
           file.puts(row)
         }
       }
+      tempfile.close
+      Helper.validate(tempfile.path)
       tempfile.unlink
     end
 

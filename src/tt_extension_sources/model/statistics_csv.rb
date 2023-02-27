@@ -64,7 +64,8 @@ module TT::Plugins::ExtensionSources
         record.sketchup,
         record.path,
         record.load_time,
-        record.timestamp.iso8601
+        # record.timestamp.iso8601
+        record.timestamp.to_s
       ]
     end
 

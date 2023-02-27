@@ -230,6 +230,8 @@ module TT::Plugins::ExtensionSources
         tempfile.open
         if tempfile.size == 0
           tempfile.puts(headers)
+        else
+          tempfile.seek(0, IO::SEEK_END)
         end
         sketchup_version = record.sketchup
         path = record.path

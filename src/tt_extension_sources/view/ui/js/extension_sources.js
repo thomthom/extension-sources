@@ -47,6 +47,7 @@ if (typeof sketchup === 'undefined') {
     reload_path() { },
     reorder() { },
     source_changed() { },
+    open_statistics() { },
     ready() {
       console.log('shim: ready()')
       let items = [
@@ -330,6 +331,9 @@ let app = new Vue({
       });
       console.log('> changes', changes);
       sketchup.sources_changed(changes);
+    },
+    open_statistics() {
+      sketchup.open_statistics();
     }
   },
   mounted() {

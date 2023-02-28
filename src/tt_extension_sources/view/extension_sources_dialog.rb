@@ -20,6 +20,7 @@ module TT::Plugins::ExtensionSources
         :reorder,
         :source_changed,
         :sources_changed,
+        :open_statistics,
       ]
       super(event_names)
     end
@@ -103,6 +104,9 @@ module TT::Plugins::ExtensionSources
           change
         }
         trigger(:sources_changed, self, changes)
+      end
+      dialog.add_action_callback('open_statistics') do
+        trigger(:open_statistics, self)
       end
     end
 

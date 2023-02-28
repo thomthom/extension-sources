@@ -31,11 +31,12 @@ module TT::Plugins::ExtensionSources
   # @param [String] title
   # @return [UI::Command]
   def self.create_command(title, &block)
+    # TODO: Make the command/UI creation logic part of App.
     UI::Command.new(title) {
       begin
         block.call
       rescue Exception => exception
-        ERROR_REPORTER.handle(exception)
+        Bootstrap::ERROR_REPORTER.handle(exception)
       end
     }
   end

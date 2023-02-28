@@ -23,7 +23,7 @@ module TT::Plugins::ExtensionSources
   puts "Number of records: #{data.size}"
   puts
 
-  VALIDATE = ARGV.any? { |arg| arg&.downcase == 'validate' }
+  VALIDATE = ARGV.any? { |arg| arg && arg.downcase == 'validate' }
 
   module Helper
 

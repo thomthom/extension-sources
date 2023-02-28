@@ -3,6 +3,7 @@ require 'logger'
 require 'tt_extension_sources/model/extension_source'
 require 'tt_extension_sources/model/extension_sources_manager'
 require 'tt_extension_sources/model/extension_sources_scanner'
+require 'tt_extension_sources/model/statistics_csv'
 require 'tt_extension_sources/system/os'
 require 'tt_extension_sources/utils/inspection'
 require 'tt_extension_sources/utils/execution'
@@ -18,6 +19,11 @@ module TT::Plugins::ExtensionSources
     # Filename, excluding path, of the JSON file to serialize to/from.
     EXTENSION_SOURCES_JSON = 'extension_sources.json'.freeze
     private_constant :EXTENSION_SOURCES_JSON
+
+    # @private
+    # Filename, excluding path, of the file where the timing logs will be stored.
+    EXTENSIONS_TIMING_LOG = 'extension-sources-timings.csv'.freeze
+    private_constant :EXTENSIONS_TIMING_LOG
 
     include Inspection
 
@@ -267,10 +273,14 @@ module TT::Plugins::ExtensionSources
 
     # @return [ExtensionSourcesManager]
     def create_extension_sources_manager
+      statistics_file = File.open(timing_log_path, 'a:UTF-8')
+      statistics = StatisticsCSV.new(io: statistics_file)
+
       ExtensionSourcesManager.new(
         logger: @logger,
         storage_path: sources_json_path,
-        metadata: @metadata
+        metadata: @metadata,
+        statistics: statistics,
       ).tap { |manager|
         manager.add_observer(self, :on_sources_changed)
       }
@@ -424,6 +434,13 @@ module TT::Plugins::ExtensionSources
     # @return [String]
     def sources_json_path
       File.join(storage_dir, EXTENSION_SOURCES_JSON)
+    end
+
+    # The absolute path where the timing logs will be stored.
+    #
+    # @return [String]
+    def timing_log_path
+      File.join(storage_dir, EXTENSIONS_TIMING_LOG)
     end
 
     # ExtensionSourcesScanner debug methods:

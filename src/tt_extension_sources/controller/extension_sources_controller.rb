@@ -10,6 +10,7 @@ require 'tt_extension_sources/utils/execution'
 require 'tt_extension_sources/utils/timing'
 require 'tt_extension_sources/view/extension_sources_dialog'
 require 'tt_extension_sources/view/extension_sources_scanner_dialog'
+require 'tt_extension_sources/view/extension_statistics_dialog'
 
 module TT::Plugins::ExtensionSources
   # Application logic binding the extension sources manager with the UI.
@@ -265,6 +266,11 @@ module TT::Plugins::ExtensionSources
       extension_sources_scanner_dialog.show(results)
     end
 
+    # @return [void]
+    def open_statistics
+      extension_statistics_dialog.show([])
+    end
+
     # @return [ExtensionSourcesManager]
     def extension_sources_manager
       raise '`boot` has not been called yet' if @extension_sources_manager.nil?
@@ -340,6 +346,10 @@ module TT::Plugins::ExtensionSources
         scan_paths(dialog)
       end
 
+      dialog.on(:open_statistics) do |dialog|
+        open_statistics
+      end
+
       dialog.on(:reorder) do |dialog, selected_ids, target_id, before|
         reorder(dialog, selected_ids, target_id, before)
       end
@@ -398,6 +408,33 @@ module TT::Plugins::ExtensionSources
       Execution.defer do
         UI.messagebox(message)
       end
+    end
+
+    # @return [ExtensionStatisticsDialog]
+    def extension_statistics_dialog
+      @extension_statistics_dialog ||= create_extension_statistics_dialog
+      @extension_statistics_dialog
+    end
+
+    # @return [ExtensionStatisticsDialog]
+    def create_extension_statistics_dialog
+      dialog = ExtensionStatisticsDialog.new
+      dialog.error_handler = error_handler
+
+      dialog.on(:boot) do |dialog|
+        dialog.update(dialog.sources)
+      end
+
+      dialog.on(:accept) do |dialog, selected|
+        dialog.close
+        # add_extension_sources(selected)
+      end
+
+      dialog.on(:cancel) do |dialog|
+        dialog.close
+      end
+
+      dialog
     end
 
     # Call whenever extension sources has changed. This will update the UI and

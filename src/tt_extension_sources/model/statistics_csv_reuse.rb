@@ -86,7 +86,7 @@ module TT::Plugins::ExtensionSources
 
     # @private
     # ISO8601 format string when the time is not UTC.
-    ISO8601_FORMAT = "%FT%T:z".freeze
+    ISO8601_FORMAT = "%FT%T%:z".freeze
     private_constant :ISO8601_FORMAT
 
     # Optimized version of the standard library's Time#iso8601.

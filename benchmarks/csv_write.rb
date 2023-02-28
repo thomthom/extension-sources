@@ -6,15 +6,13 @@ require_relative 'boot'
 require 'csv'
 require 'tempfile'
 
-require 'tt_extension_sources/model/statistics_csv_file'
-require 'tt_extension_sources/model/statistics_csv_reuse'
-require 'tt_extension_sources/model/statistics_csv_manual'
+require 'tt_extension_sources/model/statistics_csv'
 
 module TT::Plugins::ExtensionSources
 
   test_files_path = File.join(BenchmarkRunner::PROJECT_PATH, 'tests', 'standalone', 'model')
   csv_path = File.join(test_files_path, 'load-times.csv')
-  statistics = StatisticsCSVFile.new(csv_path)
+  statistics = StatisticsCSV.new(io: File.open(csv_path, 'r'))
   data = statistics.read
 
   expected_path = File.join(__dir__, 'master.csv')
@@ -54,43 +52,9 @@ module TT::Plugins::ExtensionSources
 
   BenchmarkRunner.start do |x|
 
-    x.report('StatisticsCSVFile*') do
-      tempfile = Tempfile.new('benchmark_csv_impl')
-      tempfile.close
-      stats = StatisticsCSVFile.new(tempfile.path)
-      data.each { |record|
-        stats.record(record)
-      }
-      tempfile.close
-      Helper.validate(tempfile.path)
-      tempfile.unlink
-    end
-
     x.report('StatisticsCSV') do
       tempfile = Tempfile.new('benchmark_csv_impl')
       stats = StatisticsCSV.new(io: tempfile)
-      data.each { |record|
-        stats.record(record)
-      }
-      tempfile.close
-      Helper.validate(tempfile.path)
-      tempfile.unlink
-    end
-
-    x.report('StatisticsCSVReuse') do
-      tempfile = Tempfile.new('benchmark_csv_impl')
-      stats = StatisticsCSVReuse.new(io: tempfile)
-      data.each { |record|
-        stats.record(record)
-      }
-      tempfile.close
-      Helper.validate(tempfile.path)
-      tempfile.unlink
-    end
-
-    x.report('StatisticsCSVManual') do
-      tempfile = Tempfile.new('benchmark_csv_impl')
-      stats = StatisticsCSVManual.new(io: tempfile)
       data.each { |record|
         stats.record(record)
       }

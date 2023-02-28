@@ -29,11 +29,13 @@ module TT::Plugins::ExtensionSources
     # @param [Array] load_path
     # @param [Hash] metadata Additional data to include when serializing to file.
     # @param [Logger] logger
+    # @param [Statistics] statistics
     # @param [Boolean] warnings
     def initialize(storage_path:, load_path: $LOAD_PATH, metadata: {},
-        logger: Logger.new(nil), warnings: true)
+        logger: Logger.new(nil), statistics: nil, warnings: true)
       @warnings = warnings
       @logger = logger
+      @statistics = statistics
       @load_path = load_path
       @storage_path = storage_path
       @metadata = metadata
@@ -374,28 +376,22 @@ module TT::Plugins::ExtensionSources
         block.call
       end
       source.load_time = timing.lapsed
-      write_load_time(source, timing.lapsed)
+      log_require_time(source)
       nil
     end
 
     # @param [ExtensionSource] source
-    # @param [Float] seconds
-    def write_load_time(source, seconds)
-      app_data_path = File.dirname(storage_path)
-      # TODO: Dependency injection of path. (Option not to write).
-      # TODO: Use CSV library.
-      # TODO: Split this logic into separate Measurement class that is injected.
-      file_path = File.join(app_data_path, 'extension-sources-timings.csv')
-      File.open(file_path, "a:UTF-8") do |file|
-        if file.size == 0
-          header = 'SketchUp,Path,Load Time,Timestamp'
-          file.puts(header)
-        end
-        path = source.path
-        sketchup_version = (@metadata[:sketchup_version] || [0, 0, 0]).join('.')
-        data = "#{sketchup_version},#{path},#{seconds},#{Time.now.iso8601}"
-        file.puts(data)
-      end
+    def log_require_time(source)
+      return if @statistics.nil?
+
+      sketchup_version = (@metadata[:sketchup_version] || [0, 0, 0]).join('.')
+      row = Statistics::Record.new(
+        sketchup: sketchup_version,
+        path: source.path,
+        load_time: source.load_time,
+        timestamp: Time.now
+      )
+      @statistics.record(row)
       nil
     end
 

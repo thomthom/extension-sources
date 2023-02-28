@@ -6,6 +6,7 @@ require 'tempfile'
 
 require 'tt_extension_sources/model/extension_sources_manager'
 require 'tt_extension_sources/model/extension_source'
+require 'tt_extension_sources/model/statistics_csv'
 
 module TT::Plugins::ExtensionSources
   class ExtensionSourcesManagerTest < Minitest::Test
@@ -27,6 +28,8 @@ module TT::Plugins::ExtensionSources
         sketchup_version: [22, 1, 0],
         ruby_version: [2, 7, 2],
       }
+      @timing_log_path = Tempfile.new(['extension-sources-timings', '.csv'])
+      @statistics = StatisticsCSV.new(io: @timing_log_path)
       @current_version = [1, 0, 0] # File format version
       @newer_version = [2, 0, 0] # File format version
     end
@@ -98,6 +101,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: storage_path,
+        statistics: @statistics,
         warnings: false,
       )
       assert_empty(manager.sources)
@@ -108,6 +112,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       assert_empty(manager.sources)
@@ -131,6 +136,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       enabled_data = data.select { |item| item[:enabled] }
@@ -143,6 +149,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -158,6 +165,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -174,6 +182,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -190,6 +199,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -207,6 +217,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -222,6 +233,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path1 = '/fake/path/hello'
@@ -243,6 +255,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -261,6 +274,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -280,6 +294,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -298,6 +313,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -316,6 +332,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path = '/fake/path'
@@ -335,6 +352,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       path1 = '/fake/path/hello'
@@ -360,6 +378,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         metadata: @metadata,
         warnings: false,
       )
@@ -392,6 +411,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         metadata: @metadata,
         warnings: false,
       )
@@ -459,6 +479,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         metadata: @metadata,
         warnings: false,
       )
@@ -492,6 +513,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -506,6 +528,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
@@ -520,6 +543,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -534,6 +558,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
@@ -548,6 +573,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -561,6 +587,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
@@ -574,6 +601,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -593,6 +621,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -612,6 +641,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
@@ -630,6 +660,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         metadata: @metadata,
         warnings: false,
       )
@@ -659,6 +690,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -684,6 +716,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -709,6 +742,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -734,6 +768,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -759,6 +794,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -785,6 +821,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -810,6 +847,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -840,6 +878,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -865,6 +904,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)
@@ -891,6 +931,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       _source1 = manager.add('/fake/path/hello', enabled: true)
@@ -908,6 +949,7 @@ module TT::Plugins::ExtensionSources
       manager = ExtensionSourcesManager.new(
         load_path: @load_path,
         storage_path: @storage_path.path,
+        statistics: @statistics,
         warnings: false,
       )
       source1 = manager.add('/fake/path/hello', enabled: true)

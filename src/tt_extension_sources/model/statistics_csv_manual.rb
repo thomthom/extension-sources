@@ -82,7 +82,7 @@ module TT::Plugins::ExtensionSources
       # timestamp = record.timestamp.strftime("%FT%T")
       # TODO: Check if this is always UTF compatible format.
       # Calling .iso8601 or .strftime("%FT%T") is 2x slower than Time.to_s
-      timestamp = record.timestamp
+      timestamp = record.timestamp.iso8601
       row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
       @io.puts(row)
       @io.flush

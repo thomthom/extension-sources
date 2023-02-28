@@ -111,7 +111,7 @@ module TT::Plugins::ExtensionSources
           record.sketchup,
           record.path,
           record.load_time,
-          record.timestamp.to_s
+          record.timestamp.iso8601
         ]
       }
       tempfile.close
@@ -132,7 +132,7 @@ module TT::Plugins::ExtensionSources
           record.sketchup,
           record.path,
           record.load_time,
-          record.timestamp.to_s
+          record.timestamp.iso8601
         ]
       }
       tempfile.close
@@ -153,7 +153,7 @@ module TT::Plugins::ExtensionSources
           record.sketchup,
           record.path,
           record.load_time,
-          record.timestamp.to_s
+          record.timestamp.iso8601
         ]
       }
       tempfile.close
@@ -171,7 +171,7 @@ module TT::Plugins::ExtensionSources
         sketchup_version = record.sketchup
         path = record.path
         seconds = record.load_time
-        timestamp = record.timestamp
+        timestamp = record.timestamp.iso8601
         row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
         tempfile.puts(row)
       }
@@ -190,7 +190,7 @@ module TT::Plugins::ExtensionSources
         sketchup_version = record.sketchup
         path = record.path
         seconds = record.load_time
-        timestamp = record.timestamp
+        timestamp = record.timestamp.iso8601
         row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
         tempfile.puts(row)
         tempfile.flush
@@ -212,7 +212,7 @@ module TT::Plugins::ExtensionSources
         sketchup_version = record.sketchup
         path = record.path
         seconds = record.load_time
-        timestamp = record.timestamp
+        timestamp = record.timestamp.iso8601
         row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
         tempfile.puts(row)
         tempfile.flush
@@ -236,7 +236,7 @@ module TT::Plugins::ExtensionSources
         sketchup_version = record.sketchup
         path = record.path
         seconds = record.load_time
-        timestamp = record.timestamp
+        timestamp = record.timestamp.iso8601
         row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
         tempfile.puts(row)
         tempfile.close
@@ -258,7 +258,7 @@ module TT::Plugins::ExtensionSources
           sketchup_version = record.sketchup
           path = record.path
           seconds = record.load_time
-          timestamp = record.timestamp
+          timestamp = record.timestamp.iso8601
           row = "#{sketchup_version},#{path},#{seconds},#{timestamp}"
           file.puts(row)
         }

@@ -59,19 +59,14 @@ module TT::Plugins::ExtensionSources
     #
     # @param [Statistics::Record] record
     def record(record)
-      # csv = CSV.new(@io,
-      #   headers: HEADERS,
-      #   write_headers: @io.size == 0,
-      #   **default_options
-      # )
       @io.seek(0, IO::SEEK_END)
       @write_csv << [
         record.sketchup,
         record.path,
         record.load_time,
-        # record.timestamp.iso8601
-        record.timestamp.to_s
+        record.timestamp.iso8601
       ]
+      @io.flush
     end
 
     private

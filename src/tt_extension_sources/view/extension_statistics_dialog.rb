@@ -1,10 +1,14 @@
 require 'tt_extension_sources/view/dialog'
 
+# TODO: Pass in from controller.
+require 'tt_extension_sources/model/statistics_csv'
+require 'tt_extension_sources/model/statistics_reporter'
+
 module TT::Plugins::ExtensionSources
   # A dialog displaying statistics for the managed extensions.
   class ExtensionStatisticsDialog < Dialog
 
-    attr_reader :sources
+    attr_reader :report
 
     def initialize
       event_names = [
@@ -13,18 +17,34 @@ module TT::Plugins::ExtensionSources
         :cancel,
       ]
       super(event_names)
-      @sources = []
+      @report = []
+    end
+
+    # @param [Hash] report
+    def update(report)
+      call_js('app.update', report)
     end
 
     # @param [Array<ExtensionSource>] sources
-    def update(sources)
-      call_js('app.update', sources)
-    end
-
-    # @param [Array<ExtensionSource>] sources
-    def show(sources)
+    def show(_report)
       # TODO: Pass in stats.
-      @sources = sources
+
+      app_data = File.join(OS.app_data_path, 'CookieWare', 'Extension Source Manager')
+      timing_log_path = File.join(app_data, 'extension-sources-timings.csv')
+      puts timing_log_path
+
+      records = []
+      File.open(timing_log_path, 'r:UTF-8') { |file|
+        statistics = StatisticsCSV.new(io: file)
+        records = statistics.read
+      }
+      puts "Records: #{records.size}"
+
+      reporter = StatisticsReporter.new
+      report = reporter.report(records)
+      puts "Report: #{report.size}"
+
+      @report = report
       super()
     end
 
@@ -53,7 +73,7 @@ module TT::Plugins::ExtensionSources
         min_height: 200,
         style: UI::HtmlDialog::STYLE_DIALOG,
       })
-      html_file = File.join(ui_path, 'html', 'extension_sources_statistics.html')
+      html_file = File.join(ui_path, 'html', 'extension_statistics.html')
       dialog.set_file(html_file)
       dialog
     end

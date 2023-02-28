@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+
+  <title>Extension Statistics</title>
+
+  <link rel="stylesheet" href="../css/modus.min-1.3.1.css">
+  <link rel="stylesheet" href="../css/modus-layout.min-1.3.1.css"><!-- Optional Layout -->
+  <link rel="stylesheet" href="../fonts/modus-icons.css"> <!-- 0.5.1 -->
+  <link rel="stylesheet" href="../css/dialog.css">
+  <script src="../js/vue.js"></script>
+</head>
+
+<body class="user-select-none">
+  <div id="app" class="modus-layout" v-cloak>
+    <div class="modus-body">
+      <!-- Header -->
+      <div class="modus-content-rows">
+        <div class="modus-toolbar d-flex">
+          <h4 class="mb-0">Extension Statistics</h4>
+          <!-- Filter search -->
+          <form class="form-inline flex-grow-1 ml-3">
+            <div class="form-group w-100">
+              <div class="input-with-icon-left w-100">
+                <input type="search" v-model="filter" class="form-control w-100"
+                  placeholder="Type to filter source paths…">
+                <div class="input-icon">
+                  <i class="modus-icons">search</i>
+                </div>
+              </div>
+            </div>
+          </form>
+          <!-- More... -->
+          <div class="dropdown">
+            <button class="btn btn-text-dark btn-lg btn-icon-only" id="dropdownMenuButton" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false" title="More…">
+              <i class="modus-icons">more_vertical</i>
+            </button>
+            <div class="dropdown-menu shadow" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#" v-on:click.prevent="export_stats">Export…</a>
+            </div>
+          </div>
+        </div>
+        <!-- Content (List) -->
+        <div class="modus-content-columns">
+          <div class="modus-content">
+            <div style="position: relative; height:100%; width:100vw;">
+              <canvas id="chart"></canvas>
+            </div>
+          </div>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button class="btn btn-outline-primary" v-on:click.prevent="cancel">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/jquery.slim.min.js"></script>
+  <script src="../js/bootstrap.bundle.min.js"></script>
+  <script src="../js/modus-layout.min-1.3.1.js"></script><!-- Optional Layout -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/extension_statistics.js"></script>
+</body>
+
+</html>

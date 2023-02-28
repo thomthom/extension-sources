@@ -13,7 +13,7 @@ module TT::Plugins::ExtensionSources
     #
     # ```rb
     # data = reporter.report
-    # rows = data[sketchup][path]
+    # rows = data[path][sketchup]
     # ```
     #
     # The rows is an `Array` or `Hash`es with the following structure:

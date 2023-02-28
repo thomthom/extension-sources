@@ -369,7 +369,7 @@ module TT::Plugins::ExtensionSources
       dialog.error_handler = error_handler
 
       dialog.on(:boot) do |dialog|
-        dialog.update(dialog.sources)
+        dialog.update(dialog.report)
       end
 
       dialog.on(:accept) do |dialog, selected|
@@ -422,7 +422,7 @@ module TT::Plugins::ExtensionSources
       dialog.error_handler = error_handler
 
       dialog.on(:boot) do |dialog|
-        dialog.update(dialog.sources)
+        dialog.update(dialog.report)
       end
 
       dialog.on(:accept) do |dialog, selected|

@@ -81,6 +81,14 @@ let app = new Vue({
         });
       }
       // console.log('data', data);
+
+      // TODO: Sort by user config. Ascending/descending.
+      // Median is a good default accounting for outliers due to load errors
+      // that could impact the extension load time.
+      // TODO: Don't record load time when extension is disabled.
+      // TODO: Don't record load time if require reports errors.
+      data.sort((a, b) => b.median - a.median);
+
       return data;
     }
   },

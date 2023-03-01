@@ -16,7 +16,7 @@ module TT::Plugins::ExtensionSources
     # rows = data[sketchup][path]
     # ```
     #
-    # The rows is an `Array` or `Hash`es with the following structure:
+    # The rows is an `Array` of `Hash`es with the following structure:
     #
     # ```
     # row = { min:, max:, mean:, median: }

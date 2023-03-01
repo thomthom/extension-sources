@@ -11,6 +11,15 @@
   <link rel="stylesheet" href="../fonts/modus-icons.css"> <!-- 0.5.1 -->
   <link rel="stylesheet" href="../css/dialog.css">
   <script src="../js/vue.js"></script>
+  <style>
+    .record .data {
+      display: none;
+    }
+
+    .record:hover .data {
+      display: initial;
+    }
+  </style>
 </head>
 
 <body class="user-select-none">
@@ -47,14 +56,12 @@
         <div class="modus-content-columns">
           <div class="modus-content">
             <ul style="list-style: none; padding: 0;">
-              <li v-for="(item, index) in filtered_chart_data" v-bind:key="item.path"
+              <li class="record" v-for="(item, index) in filtered_chart_data" v-bind:key="item.path"
                 style="background: #ccc; margin-bottom: 5px;">
                 <div><b :title="item.path">{{ item.label }}</b>
+                  <!-- TODO: sort-by value -->
                   <span style="float: right;">
-                    (min: <samp>{{ item.min.toFixed(3) }}s</samp>,
-                    max: <samp>{{ item.max.toFixed(3) }}s</samp>,
-                    mean: <samp>{{ item.mean.toFixed(3) }}s</samp>,
-                    median: <samp>{{ item.median.toFixed(3) }}s</samp>)
+                    (median: <samp>{{ item.median.toFixed(3) }}s</samp>)
                   </span>
                 </div>
                 <div style="position: relative; width: 100%; height: 20px; background: #666;">
@@ -64,6 +71,12 @@
                     :style="{ left: item.mean_left + '%' }"></div>
                   <div style="position: absolute; height: 100%; width: 3px; background: #933;"
                     :style="{ left: item.median_left + '%' }">
+                  </div>
+                  <div class="data" style="position: absolute; color: #fff; right: 0;">
+                    (min: <samp>{{ item.min.toFixed(3) }}s</samp>,
+                    max: <samp>{{ item.max.toFixed(3) }}s</samp>,
+                    mean: <samp>{{ item.mean.toFixed(3) }}s</samp>,
+                    median: <samp>{{ item.median.toFixed(3) }}s</samp>)
                   </div>
                 </div>
 

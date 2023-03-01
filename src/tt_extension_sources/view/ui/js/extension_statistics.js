@@ -16,63 +16,57 @@ let app = new Vue({
   el: '#app',
   data: {
     filter: "",
-    mousedown_index: null,
-    last_selected_index: null,
-    sources: [],
     report: [],
   },
   computed: {
     is_filtered() {
       return this.filter.length != 0;
     },
-    filtered_sources() {
+    filtered_paths() {
       if (!this.is_filtered) {
-        return this.sources;
+        return Object.keys(this.report);
       }
       const upper_case_filter = this.filter.toUpperCase();
-      return this.sources.filter((source) => {
-        const upper_case_path = source.path.toUpperCase();
+      return Object.keys(this.report).filter(path => {
+        const upper_case_path = path.toUpperCase();
         return upper_case_path.includes(upper_case_filter);
       });
     },
-    filtered_source_ids() {
-      return this.filtered_sources.map(source => source.source_id);
-    },
-    selected() {
-      return this.sources.filter((source) => {
-        return source.selected;
-      });
+    sorted_filtered_paths() {
+      // TODO: Sort by user options.
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator/Collator#options
+      return this.filtered_paths.sort(
+        (a, b) => a.localeCompare(b, undefined, { sensitivity: 'accent' }));
     },
     filtered_chart_data() {
-      const paths = Object.keys(this.report);
+      const paths = this.sorted_filtered_paths;
       console.log('paths', paths);
 
       // TODO: Improve. Might not be a single common prefix.
       const common_prefix = this.longest_common_prefix(paths);
       const pattern = new RegExp(`^${common_prefix}`, 'i');
-      const labels = paths.map(x => x.replace(pattern, ''));
-      console.log('labels', labels);
+      // const labels = paths.map(x => x.replace(pattern, ''));
+      // console.log('labels', labels);
 
-      // const data = labels.map(x => 2);
-      // https://stackoverflow.com/a/14810722/486990
-      const objectMap = (obj, fn) =>
-        Object.fromEntries(
-          Object.entries(obj).map(
-            ([k, v], i) => [k, fn(v, k, i)]
-          )
-        );
-      const max_range = 1.2;
-      const data = objectMap(this.report, (v, path, i) => {
-        // TODO:
-        // return Object.values(path)[0].mean;
-        const row = Object.values(v)[0];
-        return {
+      const max_range = 1.2; // TODO: Compute max range.
+      let data = [];
+      for (path of paths) {
+        // console.log(`> path: ${path}`);
+
+        const item = this.report[path];
+        // console.log(`> item:`, item, Object.values(item));
+
+        // TODO: Compute for all (filtered) SketchUp versions.
+        const row = Object.values(item)[0];
+        // console.log(`> row:`, row);
+
+        data.push({
           path: path,
+          // values: row,
           min: row.min,
           max: row.max,
           mean: row.mean,
           median: row.median,
-          row: row,
 
           label: path.replace(pattern, ''),
           left: (row.min / max_range) * 100,
@@ -80,16 +74,13 @@ let app = new Vue({
 
           mean_left: (row.mean / max_range) * 100,
           median_left: (row.median / max_range) * 100,
-        };
-      });
-      console.log('data', data);
+        });
+      }
+      // console.log('data', data);
       return data;
     }
   },
   methods: {
-    source_enabled_id(source_id) {
-      return `sourceEnabled${source_id}`;
-    },
     clear_filter() {
       this.filter = "";
     },
@@ -97,90 +88,15 @@ let app = new Vue({
       console.log('update...');
       console.log(report);
       this.report = report;
-      this.update_chart();
-    },
-    enable_toggle(source) {
-      // console.log('enable_toggle', source.enabled);
-      // Check clicked toggle have already changed state. This handler will
-      // apply the same state to the whole selection.
-      const enabled = source.enabled;
-      for (let item of this.selected) {
-        item.enabled = enabled;
-      }
     },
     trace(message) {
       console.log(message);
-    },
-    can_select(source_id) {
-      if (!this.is_filtered) return true;
-      return this.filtered_source_ids.includes(source_id);
-    },
-    select(event, source, index) {
-      if (event.buttons != MouseButtons.primary) {
-        // console.log('select', 'not primary buttons', event.buttons)
-        return;
-      }
-      // console.log('select', source, source.source_id, 'selected:', source.selected, event);
-      this.mousedown_index = index;
-      // Clear existing selection unless Ctrl is pressed.
-      const addKey = OS.isMac ? event.metaKey : event.ctrlKey;
-      if (!addKey) {
-        // console.log('> clear-select');
-        for (const item of this.sources) {
-          item.selected = false;
-        }
-      }
-      if (event.shiftKey && this.last_selected_index !== null) {
-        // console.log('> multi-select', app.filtered_source_ids);
-        const min = Math.min(this.last_selected_index, index);
-        const max = Math.max(this.last_selected_index, index);
-        for (let i = min; i <= max; ++i) {
-          this.filtered_sources[i].selected = true;
-        }
-      } else {
-        // console.log('> single-select');
-        source.selected = !source.selected;
-      }
-      this.last_selected_index = index;
-    },
-    drag_select(event, source, index) {
-      if (event.buttons != MouseButtons.primary) {
-        return;
-      }
-      if (this.last_selected_index == index) {
-        return;
-      }
-      // console.log('drag_select', source, source.source_id, 'selected:', source.selected, event);
-      const toggleKey = OS.isMac ? event.metaKey : event.ctrlKey;
-      if (toggleKey) {
-        // console.log('> toggle');
-        source.selected = !source.selected;
-      } else {
-        // console.log('> range');
-        // console.log(this.filtered_source_ids);
-        const min = Math.min(this.mousedown_index, index);
-        const max = Math.max(this.mousedown_index, index);
-        const selectable_ids = this.filtered_source_ids.slice(min, max + 1);
-        // console.log(index, min, max, selectable_ids);
-        for (let item of this.sources) {
-          if (selectable_ids.includes(item.source_id)) {
-            item.selected = true;
-          } else {
-            item.selected = false;
-          }
-        }
-      }
-      this.last_selected_index = index;
     },
     accept() {
       sketchup.accept(this.selected);
     },
     cancel() {
       sketchup.cancel();
-    },
-    on_source_changed(source_id, changes) {
-      console.log('on_source_changed', source_id, changes)
-      sketchup.source_changed(source_id, changes);
     },
     // https://www.geeksforgeeks.org/longest-common-prefix-using-sorting/
     longest_common_prefix(a) {
@@ -194,89 +110,20 @@ let app = new Vue({
         return a[0];
 
       /* sort the array of strings */
-      a.sort();
+      // a.sort();
+      const s = [...a].sort(); // https://stackoverflow.com/a/42442909/486990
 
       /* find the minimum length from first and last string */
-      let end = Math.min(a[0].length, a[size - 1].length);
+      let end = Math.min(s[0].length, s[size - 1].length);
 
       /* find the common prefix between the first and
          last string */
       let i = 0;
-      while (i < end && a[0][i] == a[size - 1][i])
+      while (i < end && s[0][i] == s[size - 1][i])
         i++;
 
-      let pre = a[0].substring(0, i);
+      let pre = s[0].substring(0, i);
       return pre;
-    },
-    create_chart() {
-      const ctx = document.getElementById('chart');
-
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-          datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    },
-    update_chart() {
-      const ctx = document.getElementById('chart');
-
-      const paths = Object.keys(this.report);
-
-      // TODO: Improve. Might not be a single common prefix.
-      const common_prefix = this.longest_common_prefix(paths);
-      const pattern = new RegExp(`^${common_prefix}`, 'i');
-      const labels = paths.map(x => x.replace(pattern, ''));
-      console.log('labels', labels);
-
-      // const data = labels.map(x => 2);
-      // https://stackoverflow.com/a/14810722/486990
-      const objectMap = (obj, fn) =>
-        Object.fromEntries(
-          Object.entries(obj).map(
-            ([k, v], i) => [k, fn(v, k, i)]
-          )
-        );
-      const data = objectMap(this.report, path => {
-        // TODO:
-        return Object.values(path)[0].mean;
-      });
-      console.log('data', data);
-
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          // labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-          labels: labels,
-          datasets: [{
-            label: 'Extension load time (seconds)',
-            // data: [12, 19, 3, 5, 2, 3],
-            data: data,
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
     }
   },
   mounted() {
@@ -290,8 +137,6 @@ let app = new Vue({
         event.preventDefault();
       }
     });
-
-    // this.create_chart(); // TODO: debug
 
     // Everything ready, notify the Ruby side.
     sketchup.ready();

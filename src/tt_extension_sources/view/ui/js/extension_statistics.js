@@ -34,6 +34,7 @@ let app = new Vue({
     },
     sorted_filtered_paths() {
       // TODO: Sort by user options.
+      // TODO: Filter on label (sans common prefix?)
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator/Collator#options
       return this.filtered_paths.sort(
         (a, b) => a.localeCompare(b, undefined, { sensitivity: 'accent' }));
@@ -43,6 +44,7 @@ let app = new Vue({
       console.log('paths', paths);
 
       // TODO: Improve. Might not be a single common prefix.
+      // TODO: Account for only one item.
       const common_prefix = this.longest_common_prefix(Object.keys(this.report));
       const pattern = new RegExp(`^${common_prefix}`, 'i');
       // const labels = paths.map(x => x.replace(pattern, ''));
@@ -69,6 +71,8 @@ let app = new Vue({
           median: row.median,
 
           label: path.replace(pattern, ''),
+
+          // TODO: Make style objects.
           left: (row.min / max_range) * 100,
           width: ((row.max / max_range) - (row.min / max_range)) * 100,
 
@@ -91,9 +95,6 @@ let app = new Vue({
     },
     trace(message) {
       console.log(message);
-    },
-    accept() {
-      sketchup.accept(this.selected);
     },
     cancel() {
       sketchup.cancel();

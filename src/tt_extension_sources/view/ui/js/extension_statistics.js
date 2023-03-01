@@ -42,6 +42,48 @@ let app = new Vue({
       return this.sources.filter((source) => {
         return source.selected;
       });
+    },
+    filtered_chart_data() {
+      const paths = Object.keys(this.report);
+      console.log('paths', paths);
+
+      // TODO: Improve. Might not be a single common prefix.
+      const common_prefix = this.longest_common_prefix(paths);
+      const pattern = new RegExp(`^${common_prefix}`, 'i');
+      const labels = paths.map(x => x.replace(pattern, ''));
+      console.log('labels', labels);
+
+      // const data = labels.map(x => 2);
+      // https://stackoverflow.com/a/14810722/486990
+      const objectMap = (obj, fn) =>
+        Object.fromEntries(
+          Object.entries(obj).map(
+            ([k, v], i) => [k, fn(v, k, i)]
+          )
+        );
+      const max_range = 1.2;
+      const data = objectMap(this.report, (v, path, i) => {
+        // TODO:
+        // return Object.values(path)[0].mean;
+        const row = Object.values(v)[0];
+        return {
+          path: path,
+          min: row.min,
+          max: row.max,
+          mean: row.mean,
+          median: row.median,
+          row: row,
+
+          label: path.replace(pattern, ''),
+          left: (row.min / max_range) * 100,
+          width: ((row.max / max_range) - (row.min / max_range)) * 100,
+
+          mean_left: (row.mean / max_range) * 100,
+          median_left: (row.median / max_range) * 100,
+        };
+      });
+      console.log('data', data);
+      return data;
     }
   },
   methods: {

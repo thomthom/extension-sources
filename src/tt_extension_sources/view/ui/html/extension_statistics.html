@@ -46,9 +46,29 @@
         <!-- Content (List) -->
         <div class="modus-content-columns">
           <div class="modus-content">
-            <div style="position: relative; height:100%; width:100vw;">
-              <canvas id="chart"></canvas>
-            </div>
+            <ul style="list-style: none; padding: 0;">
+              <li v-for="(item, index) in filtered_chart_data" v-bind:key="item.path"
+                style="background: #ccc; margin-bottom: 5px;">
+                <div style="position: relative; width: 100%; height: 20px; background: #666;">
+                  <div style="position: absolute; height: 100%; background: #88b;"
+                    :style="{ left: item.left + '%', width: item.width + '%' }"></div>
+                  <div style="position: absolute; height: 100%; width: 3px; background: #933;"
+                    :style="{ left: item.mean_left + '%' }"></div>
+                  <div style="position: absolute; height: 100%; width: 3px; background: #339;"
+                    :style="{ left: item.median_left + '%' }">
+                  </div>
+                </div>
+                <div>{{ item.label }}
+                  (
+                  min: {{ item.min.toFixed(3) }},
+                  max: {{ item.max.toFixed(3) }},
+                  mean: {{ item.mean.toFixed(3) }},
+                  median: {{ item.median.toFixed(3) }},
+                  )
+                </div>
+                <!-- <div>{{ item }}</div> -->
+              </li>
+            </ul>
           </div>
         </div>
         <!-- Footer -->

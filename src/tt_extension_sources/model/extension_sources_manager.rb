@@ -351,6 +351,9 @@ module TT::Plugins::ExtensionSources
         # moment that's not possible to detect.
         # TODO: Switch to normal `require`?
         # TODO: Will that interfere with SketchUp's own Load Error handling?
+        # TODO: This file should not use Sketchup.require directly. It's just
+        #   by accident that the errors don't fail. They omit this because the
+        #   tests use fake paths so the glob never matches anything.
         loaded = Sketchup.require(path) # or return nil # or raise RequireError
         # Signal failure to load the extension.
         # TODO: How does this work if a Sketchup.require within the extension

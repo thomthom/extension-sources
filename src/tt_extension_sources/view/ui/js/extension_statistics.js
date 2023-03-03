@@ -17,6 +17,7 @@ let app = new Vue({
   data: {
     filter: "",
     report: [],
+    showVersions: false,
   },
   computed: {
     is_filtered() {
@@ -59,25 +60,18 @@ let app = new Vue({
         const item = this.report[path];
         // console.log(`> item:`, item, Object.values(item));
 
-        const row = item.total;
-        // console.log(`> row:`, row);
+        let versions = Object.keys(item.versions).map(version => {
+          let version_data = this.graph_data(item.versions[version], max_range);
+          version_data.version = version;
+          return version_data;
+        });
+        versions.sort((a, b) => b.values.median - a.values.median);
+
         data.push({
           path: path,
           label: path.replace(pattern, ''),
-          values: row,
-
-          styles: {
-            minmax: {
-              left: `${(row.min / max_range) * 100}%`,
-              width: `${((row.max / max_range) - (row.min / max_range)) * 100}%`,
-            },
-            mean: {
-              left: `${(row.mean / max_range) * 100}%`,
-            },
-            median: {
-              left: `${(row.median / max_range) * 100}%`,
-            },
-          },
+          total: this.graph_data(item.total, max_range),
+          versions: versions,
         });
       }
 
@@ -86,7 +80,7 @@ let app = new Vue({
       // that could impact the extension load time.
       // TODO: Don't record load time when extension is disabled.
       // TODO: Don't record load time if require reports errors.
-      data.sort((a, b) => b.values.median - a.values.median);
+      data.sort((a, b) => b.total.values.median - a.total.values.median);
 
       return data;
     }
@@ -94,6 +88,23 @@ let app = new Vue({
   methods: {
     clear_filter() {
       this.filter = "";
+    },
+    graph_data(row, max_range) {
+      return {
+        values: row,
+        styles: {
+          minmax: {
+            left: `${(row.min / max_range) * 100}%`,
+            width: `${((row.max / max_range) - (row.min / max_range)) * 100}%`,
+          },
+          mean: {
+            left: `${(row.mean / max_range) * 100}%`,
+          },
+          median: {
+            left: `${(row.median / max_range) * 100}%`,
+          },
+        },
+      };
     },
     update(report) {
       console.log('update...');

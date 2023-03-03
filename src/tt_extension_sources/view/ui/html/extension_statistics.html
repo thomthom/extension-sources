@@ -24,6 +24,11 @@
       background: #666;
     }
 
+    .record .graph-bar.secondary {
+      height: 10px;
+      border-top: 1px solid #555;
+    }
+
     .graph-bar .graph-item {
       position: absolute;
       height: 100%;
@@ -43,11 +48,35 @@
       background: #933;
     }
 
+    .record .label {
+      position: absolute;
+      color: #fff;
+      left: 0;
+    }
+
     .record .data {
       display: none;
       position: absolute;
       color: #fff;
       right: 0;
+    }
+
+    .record .secondary .label,
+    .record .secondary .data {
+      top: -1px;
+      line-height: 10px;
+      font-size: 8px;
+    }
+
+    .record .secondary:hover {
+      height: 20px;
+    }
+
+    .record .secondary:hover .label,
+    .record .secondary:hover .data {
+      top: none;
+      line-height: inherit;
+      font-size: inherit;
     }
 
     .record:hover .data {
@@ -94,19 +123,36 @@
                 <div><b :title="item.path">{{ item.label }}</b>
                   <!-- TODO: sort-by value -->
                   <span style="float: right;">
-                    (median: <samp>{{ item.values.median.toFixed(3) }}s</samp>)
+                    (median: <samp>{{ item.total.values.median.toFixed(3) }}s</samp>)
                   </span>
                 </div>
-                <div class="graph-bar">
-                  <div class="graph-item graph-minmax" :style="item.styles.minmax"></div>
-                  <div class="graph-item graph-mean" :style="item.styles.mean"></div>
-                  <div class="graph-item graph-median" :style="item.styles.median"></div>
+                <!-- Total stats -->
+                <div class="graph-bar" v-on:click="showVersions = !showVersions">
+                  <div class="graph-item graph-minmax" :style="item.total.styles.minmax"></div>
+                  <div class="graph-item graph-mean" :style="item.total.styles.mean"></div>
+                  <div class="graph-item graph-median" :style="item.total.styles.median"></div>
                   <div class="data">
-                    (min: <samp>{{ item.values.min.toFixed(3) }}s</samp>,
-                    max: <samp>{{ item.values.max.toFixed(3) }}s</samp>,
-                    mean: <samp>{{ item.values.mean.toFixed(3) }}s</samp>,
-                    median: <samp>{{ item.values.median.toFixed(3) }}s</samp>,
-                    count: <samp>{{ item.values.count }}</samp>)
+                    (min: <samp>{{ item.total.values.min.toFixed(3) }}s</samp>,
+                    max: <samp>{{ item.total.values.max.toFixed(3) }}s</samp>,
+                    mean: <samp>{{ item.total.values.mean.toFixed(3) }}s</samp>,
+                    median: <samp>{{ item.total.values.median.toFixed(3) }}s</samp>,
+                    count: <samp>{{ item.total.values.count }}</samp>)
+                    show: {{ showVersions }}
+                  </div>
+                </div>
+                <!-- Per-SketchUp stats -->
+                <div class="graph-bar secondary" v-for="su in item.versions" v-bind:key="su.version"
+                  v-show="showVersions">
+                  <div class="graph-item graph-minmax" :style="su.styles.minmax"></div>
+                  <div class="graph-item graph-mean" :style="su.styles.mean"></div>
+                  <div class="graph-item graph-median" :style="su.styles.median"></div>
+                  <div class="label">{{ su.version }}</div>
+                  <div class="data">
+                    (min: <samp>{{ su.values.min.toFixed(3) }}s</samp>,
+                    max: <samp>{{ su.values.max.toFixed(3) }}s</samp>,
+                    mean: <samp>{{ su.values.mean.toFixed(3) }}s</samp>,
+                    median: <samp>{{ su.values.median.toFixed(3) }}s</samp>,
+                    count: <samp>{{ su.values.count }}</samp>)
                   </div>
                 </div>
               </li>

@@ -50,7 +50,8 @@ let app = new Vue({
       // const labels = paths.map(x => x.replace(pattern, ''));
       // console.log('labels', labels);
 
-      const max_range = 1.2; // TODO: Compute max range.
+      const max_range = Math.max(...Object.values(this.report).map(item => item.total.max))
+
       let data = [];
       for (path of paths) {
         // console.log(`> path: ${path}`);
@@ -58,10 +59,8 @@ let app = new Vue({
         const item = this.report[path];
         // console.log(`> item:`, item, Object.values(item));
 
-        // TODO: Compute for all (filtered) SketchUp versions.
-        const row = Object.values(item)[0];
+        const row = item.total;
         // console.log(`> row:`, row);
-
         data.push({
           path: path,
           label: path.replace(pattern, ''),
@@ -81,7 +80,6 @@ let app = new Vue({
           },
         });
       }
-      // console.log('data', data);
 
       // TODO: Sort by user config. Ascending/descending.
       // Median is a good default accounting for outliers due to load errors

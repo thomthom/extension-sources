@@ -8,18 +8,31 @@ module TT::Plugins::ExtensionSources
     # The returned nested hash has the following structure:
     #
     # ```
-    # path/sketchup/rows
+    # data[path] = {
+    #   total: { ... }
+    #   versions: {
+    #     "22.0.0": { ... },
+    #     "23.0.0": { ... },
+    #   }
+    # }
     # ```
     #
     # ```rb
     # data = reporter.report
-    # rows = data[path][sketchup]
+    # rows = data[path][:total]
+    # ```
+    #
+    # ```rb
+    # data = reporter.report
+    # data[path][:versions].each { |sketchup_version, rows|
+    #   # ...
+    # }
     # ```
     #
     # The rows is an `Array` or `Hash`es with the following structure:
     #
     # ```
-    # row = { min:, max:, mean:, median: }
+    # row = { min:, max:, mean:, median:, count: }
     # ```
     #
     # @param [Array<Statistics::Record>] records
@@ -33,18 +46,37 @@ module TT::Plugins::ExtensionSources
 
         grouped[path] ||= {}
         grouped[path][sketchup] ||= []
-
         grouped[path][sketchup] << load_time.to_f
       }
 
       grouped.each { |path, sketchup_versions|
-        sketchup_versions.each { |sketchup, times|
-          min, max = times.minmax
-          mean = times.sum.to_f / times.size.to_f
-          median = median(times)
+        all_times = []
 
-          report[path] ||= {}
-          report[path][sketchup] = { min: min, max: max, mean: mean, median: median }
+        report[path] = {
+          total: nil,
+          versions: {},
+        }
+
+        sketchup_versions.each { |sketchup, times|
+          all_times.concat(times)
+
+          min, max = times.minmax
+          report[path][:versions][sketchup] = {
+            min: min,
+            max: max,
+            mean: times.sum.to_f / times.size.to_f,
+            median: median(times),
+            count: times.size,
+          }
+        }
+
+        min, max = all_times.minmax
+        report[path][:total] = {
+          min: min,
+          max: max,
+          mean: all_times.sum.to_f / all_times.size.to_f,
+          median: median(all_times),
+          count: all_times.size,
         }
       }
 

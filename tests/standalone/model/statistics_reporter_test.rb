@@ -24,18 +24,29 @@ module TT::Plugins::ExtensionSources
       expected_path = File.join(__dir__, 'load-times.json')
       expected = JSON.parse(File.read(expected_path))
 
-      expected.each { |path, versions|
+      # Enable to regenerate expected JSON data:
+      # File.write(expected_path, JSON.pretty_generate(report))
+
+      # assert(report.key?('total'), "expected: 'total'")
+      # assert(report.key?('versions'), "expected: 'versions'")
+
+      # expected.each { |path, versions|
+      expected.keys.each { |path|
         assert(report.key?(path), "expected: #{path}")
 
-        versions.each { |version, data|
-          assert(report[path].key?(version), "expected: #{path}:#{version}")
+        expected_total = expected[path]['total'].transform_keys(&:to_sym)
+        assert_equal(expected_total, report[path][:total])
+
+        versions = expected[path]['versions']
+        expected[path]['versions'].each { |version, data|
+          assert(report[path][:versions].key?(version), "expected: #{path}:#{version}")
 
           expected_data = data.transform_keys(&:to_sym)
           # assert_kind_of(Statistics::Record, report[path][version])
           # assert_equal(expected_data, report[path][version].to_h)
-          assert_equal(expected_data, report[path][version])
+          assert_equal(expected_data, report[path][:versions][version])
         }
-        assert_equal(versions.keys.sort, report[path].keys.sort)
+        assert_equal(versions.keys.sort, report[path][:versions].keys.sort)
       }
       assert_equal(expected.keys.sort, report.keys.sort)
     end

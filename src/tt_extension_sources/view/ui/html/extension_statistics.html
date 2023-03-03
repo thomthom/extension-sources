@@ -12,8 +12,42 @@
   <link rel="stylesheet" href="../css/dialog.css">
   <script src="../js/vue.js"></script>
   <style>
+    .record {
+      background: #ccc;
+      margin-bottom: 5px;
+    }
+
+    .record .graph-bar {
+      position: relative;
+      width: 100%;
+      height: 20px;
+      background: #666;
+    }
+
+    .graph-bar .graph-item {
+      position: absolute;
+      height: 100%;
+    }
+
+    .graph-bar .graph-minmax {
+      background: #88b;
+    }
+
+    .graph-bar .graph-mean {
+      width: 3px;
+      background: #669;
+    }
+
+    .graph-bar .graph-median {
+      width: 3px;
+      background: #933;
+    }
+
     .record .data {
       display: none;
+      position: absolute;
+      color: #fff;
+      right: 0;
     }
 
     .record:hover .data {
@@ -56,31 +90,24 @@
         <div class="modus-content-columns">
           <div class="modus-content">
             <ul style="list-style: none; padding: 0;">
-              <li class="record" v-for="(item, index) in filtered_chart_data" v-bind:key="item.path"
-                style="background: #ccc; margin-bottom: 5px;">
+              <li class="record" v-for="(item, index) in filtered_chart_data" v-bind:key="item.path">
                 <div><b :title="item.path">{{ item.label }}</b>
                   <!-- TODO: sort-by value -->
                   <span style="float: right;">
-                    (median: <samp>{{ item.median.toFixed(3) }}s</samp>)
+                    (median: <samp>{{ item.values.median.toFixed(3) }}s</samp>)
                   </span>
                 </div>
-                <div style="position: relative; width: 100%; height: 20px; background: #666;">
-                  <div style="position: absolute; height: 100%; background: #88b;"
-                    :style="{ left: item.left + '%', width: item.width + '%' }"></div>
-                  <div style="position: absolute; height: 100%; width: 3px; background: #669;"
-                    :style="{ left: item.mean_left + '%' }"></div>
-                  <div style="position: absolute; height: 100%; width: 3px; background: #933;"
-                    :style="{ left: item.median_left + '%' }">
-                  </div>
-                  <div class="data" style="position: absolute; color: #fff; right: 0;">
-                    (min: <samp>{{ item.min.toFixed(3) }}s</samp>,
-                    max: <samp>{{ item.max.toFixed(3) }}s</samp>,
-                    mean: <samp>{{ item.mean.toFixed(3) }}s</samp>,
-                    median: <samp>{{ item.median.toFixed(3) }}s</samp>)
+                <div class="graph-bar">
+                  <div class="graph-item graph-minmax" :style="item.styles.minmax"></div>
+                  <div class="graph-item graph-mean" :style="item.styles.mean"></div>
+                  <div class="graph-item graph-median" :style="item.styles.median"></div>
+                  <div class="data">
+                    (min: <samp>{{ item.values.min.toFixed(3) }}s</samp>,
+                    max: <samp>{{ item.values.max.toFixed(3) }}s</samp>,
+                    mean: <samp>{{ item.values.mean.toFixed(3) }}s</samp>,
+                    median: <samp>{{ item.values.median.toFixed(3) }}s</samp>)
                   </div>
                 </div>
-
-                <!-- <div>{{ item }}</div> -->
               </li>
             </ul>
           </div>

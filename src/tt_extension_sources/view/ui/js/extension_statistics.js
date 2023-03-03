@@ -41,7 +41,7 @@ let app = new Vue({
     },
     filtered_chart_data() {
       const paths = this.sorted_filtered_paths;
-      console.log('paths', paths);
+      // console.log('paths', paths);
 
       // TODO: Improve. Might not be a single common prefix.
       // TODO: Account for only one item.
@@ -64,20 +64,21 @@ let app = new Vue({
 
         data.push({
           path: path,
-          // values: row,
-          min: row.min,
-          max: row.max,
-          mean: row.mean,
-          median: row.median,
-
           label: path.replace(pattern, ''),
+          values: row,
 
-          // TODO: Make style objects.
-          left: (row.min / max_range) * 100,
-          width: ((row.max / max_range) - (row.min / max_range)) * 100,
-
-          mean_left: (row.mean / max_range) * 100,
-          median_left: (row.median / max_range) * 100,
+          styles: {
+            minmax: {
+              left: `${(row.min / max_range) * 100}%`,
+              width: `${((row.max / max_range) - (row.min / max_range)) * 100}%`,
+            },
+            mean: {
+              left: `${(row.mean / max_range) * 100}%`,
+            },
+            median: {
+              left: `${(row.median / max_range) * 100}%`,
+            },
+          },
         });
       }
       // console.log('data', data);
@@ -87,7 +88,7 @@ let app = new Vue({
       // that could impact the extension load time.
       // TODO: Don't record load time when extension is disabled.
       // TODO: Don't record load time if require reports errors.
-      data.sort((a, b) => b.median - a.median);
+      data.sort((a, b) => b.values.median - a.values.median);
 
       return data;
     }

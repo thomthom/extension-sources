@@ -22,6 +22,9 @@ module TT::Plugins::ExtensionSources
     # Raised whenever the imported file is newer than what can be read.
     class IncompatibleFileVersion < ImportError; end
 
+    # Raised whenever the an extension fails to load.
+    class RequireError < StandardError; end
+
     include Inspection
     include Observable
 
@@ -337,13 +340,25 @@ module TT::Plugins::ExtensionSources
     # @param [String] source_path
     # @return [Array<String>]
     def require_sources(source_path)
+      # TODO: Also load .rbs and .rbe?
+      # TODO: Report load errors.
       pattern = "#{source_path}/*.rb"
       Dir.glob(pattern).each { |path|
+        already_loaded = $LOADED_FEATURES.include?(path)
         # `Sketchup.require` doesn't throw errors when failing to load a file.
         # So there's no need to disable the error handler.
         # Would have been useful to know if the method failed or not, but at the
         # moment that's not possible to detect.
-        Sketchup.require(path)
+        # TODO: Switch to normal `require`?
+        # TODO: Will that interfere with SketchUp's own Load Error handling?
+        loaded = Sketchup.require(path) # or return nil # or raise RequireError
+        # Signal failure to load the extension.
+        # TODO: How does this work if a Sketchup.require within the extension
+        #   fails to load?
+        # extension = Sketchup.extensions.find { |ex| ex.extension_path == path }
+        # extension.loaded?
+        # TODO: Exclude all this logic from timing results?
+        raise RequireError, path if !already_loaded && !loaded
       }.to_a
     end
 
@@ -376,8 +391,13 @@ module TT::Plugins::ExtensionSources
         block.call
       end
       source.load_time = timing.lapsed
+      # TODO: Don't log if extension was disabled or failed to load.
       log_require_time(source)
       nil
+    rescue RequireError
+      # This rescue clause ensures that times are not logged for extensions that
+      # fails to load.
+      warn "Failed to load: #{source.path}"
     end
 
     # @param [ExtensionSource] source

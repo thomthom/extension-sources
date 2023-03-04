@@ -23,13 +23,13 @@ selected items in the list.
 The paths are shared among all installations of SketchUp where Extension Sources
 is installed.
 
-If you have a lot of sources they can be quickly filtered.
+If you have a lot of sources they can be quickly filtered by using the quick filter textbox.
 
 ![](assets/screenshots/extension-sources-dialog-filter.png)
 
 ### Extension Sources Scanner Dialog
 
-To quickly add multiple sources Extension Sources can scan an analyze a given
+To quickly add multiple sources Extension Sources can scan and analyze a given
 directory's sub-directories and look for the signature of extension sources.
 It will look for Ruby files with `Sketchup.register_extension` accompanied by
 a support folder of matching name.
@@ -43,7 +43,7 @@ harddrive speed.
 
 ![](assets/screenshots/extension-sources-scanner-dialog.png)
 
-From the scan results the desired sources can be selected. The toggle will control
+From the scan results the desired sources can be selected. The toggle switch will control
 whether the source path will be loaded or not.
 
 Note that paths already added to Extension Sources will not appear in the scan
@@ -60,13 +60,13 @@ results list.
 
 In SketchUp 2017 - SketchUp 2022.0 the HTML Drag and Drop API isn't fully
 working. In these versions workarounds has been applied which will exhibit some
-deviant in the normal drag and drop behaviour. For instance, it's not possible
+deviance from the normal drag and drop behaviour. For instance, it's not possible
 to cancel a drag and drop by pressing ESC. The drag and drop cursor might also
 not reflect it's correct state. This is fixed in SketchUp 2022.1.
 
 ### Drag and drop target indicator
 
-In SketchUp 2017 - SketchUp 2020 there is no visual indicator to exactly where
+In SketchUp 2017 to SketchUp 2020 there is no visual indicator to exactly where
 the item will be dropped. This is due to limitation (bug?) in these SketchUp
 versions.
 

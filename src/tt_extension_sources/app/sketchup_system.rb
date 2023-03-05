@@ -9,7 +9,6 @@ module TT::Plugins::ExtensionSources
       @settings = AppSettings.new
       @os = SketchUpOS.new
       @ui = SketchUpUI.new
-      # TODO: Store `Version` type. Ensure it converts to JSON as arrays.
       @metadata = {
         extension_sources_version: Version.parse(EXTENSION[:version]),
         sketchup_version: Version.parse(Sketchup.version),

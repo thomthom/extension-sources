@@ -59,6 +59,18 @@ module TT::Plugins::ExtensionSources
       "#<ExtensionSources::Version #{to_s}>"
     end
 
+    # @param [Hash] options
+    # @return [Array]
+    def as_json(**options)
+      to_a
+    end
+
+    # @param [Array] args
+    # @return [Array]
+    def to_json(*args)
+      as_json.to_json(*args)
+    end
+
     private
 
     # @param [Object] argument

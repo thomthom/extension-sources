@@ -25,7 +25,7 @@ module TT::Plugins::ExtensionSources
       call_js('app.update', report)
     end
 
-    # @param [Array<ExtensionSource>] sources
+    # @param [Hash] _report
     def show(_report)
       # TODO: Pass in stats.
 

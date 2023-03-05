@@ -1,6 +1,7 @@
 require 'minitest/autorun'
 require 'test_helper'
 
+require 'json'
 require 'tempfile'
 
 require 'tt_extension_sources/model/version'
@@ -130,6 +131,27 @@ module TT::Plugins::ExtensionSources
       result = version.inspect
       assert_kind_of(String, result)
       assert_equal('#<ExtensionSources::Version 1.2.3>', result)
+    end
+
+    def test_as_json
+      version = Version.new(1, 2, 3)
+      result = version.as_json
+      assert_kind_of(Array, result)
+      assert_equal([1, 2, 3], result)
+    end
+
+    def test_to_json
+      version = Version.new(1, 2, 3)
+      result = version.to_json
+      assert_kind_of(String, result)
+      assert_equal('[1,2,3]', result)
+    end
+
+    def test_to_json_pretty_generate
+      version = Version.new(1, 2, 3)
+      result = JSON.pretty_generate(version)
+      assert_kind_of(String, result)
+      assert_equal("[\n  1,\n  2,\n  3\n]", result)
     end
 
   end # class

@@ -4,7 +4,6 @@ require 'tt_extension_sources/model/extension_source'
 require 'tt_extension_sources/model/extension_sources_manager'
 require 'tt_extension_sources/model/extension_sources_scanner'
 require 'tt_extension_sources/model/statistics_csv'
-require 'tt_extension_sources/system/os'
 require 'tt_extension_sources/utils/inspection'
 require 'tt_extension_sources/utils/execution'
 require 'tt_extension_sources/utils/timing'
@@ -31,16 +30,16 @@ module TT::Plugins::ExtensionSources
     # @return [ErrorHandler, nil]
     attr_reader :error_handler
 
+    # @param [SystemInterface] system
     # @param [AppSettings] settings
-    # @param [Hash] metadata Metadata attached to the serialized files.
     # @param [Logger] logger
     # @param [ErrorHandler, nil] error_handler
-    def initialize(settings:, metadata: {}, logger: Logger.new(nil), error_handler: nil)
+    def initialize(system:, settings:, logger: Logger.new(nil), error_handler: nil)
       @error_handler = error_handler
       @logger = logger
       @logger.debug { "#{self.class.object_name} initialize" }
+      @system = system
       @settings = settings
-      @metadata = metadata
       # Deferring initialization of the manager because it will cause the
       # extensions to load. Instead the `boot` method takes care of this.
       @extension_sources_manager = nil
@@ -87,7 +86,7 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     def add_path(dialog)
-      path = UI.select_directory(title: "Select Extension Source Directory")
+      path = @system.ui.select_directory(title: "Select Extension Source Directory")
       return if path.nil?
 
       extension_sources_manager.add(path)
@@ -101,13 +100,13 @@ module TT::Plugins::ExtensionSources
 
       title = "Select Extension Source Directory"
       path = loop do
-        path = UI.select_directory(title: title, directory: source.path)
+        path = @system.ui.select_directory(title: title, directory: source.path)
         return if path.nil?
         return if path == source.path
 
         if extension_sources_manager.include_path?(path)
           message = "Source path '#{path}' already exists. Choose a different path?"
-          result = UI.messagebox(message, MB_YESNO)
+          result = @system.ui.messagebox(message, type: MB_YESNO)
           next if result == IDYES
 
           return
@@ -127,7 +126,7 @@ module TT::Plugins::ExtensionSources
 
       # After undo/redo is implemented this messagebox can be removed.
       message = "Remove path from list of extension sources?\n\nPath: #{source.path}"
-      result = UI.messagebox(message, MB_YESNO)
+      result = @system.ui.messagebox(message, type: MB_YESNO)
       return if result == IDNO
 
       source = extension_sources_manager.remove(source_id)
@@ -175,7 +174,7 @@ module TT::Plugins::ExtensionSources
           end
         }.size
       rescue Exception => error
-        SKETCHUP_CONSOLE.show
+        @system.ui.console.show
         raise
       ensure
         $VERBOSE = original_verbose
@@ -185,7 +184,8 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     def export_paths(dialog)
-      path = UI.savepanel("Export Source Paths", nil, EXTENSION_SOURCES_JSON)
+      path = @system.ui.select_file(type: :save, title: "Export Source Paths",
+        filename: EXTENSION_SOURCES_JSON)
       return if path.nil?
 
       if File.exist?(path)
@@ -200,7 +200,8 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     def import_paths(dialog)
-      path = UI.openpanel("Import Source Paths", nil, EXTENSION_SOURCES_JSON)
+      path = @system.ui.select_file(type: :open, title: "Import Source Paths",
+        filename: EXTENSION_SOURCES_JSON)
       return if path.nil?
 
       raise "path not found: #{path}" unless File.exist?(path)
@@ -229,7 +230,7 @@ module TT::Plugins::ExtensionSources
 
     # @param [ExtensionSourcesDialog] dialog
     def scan_paths(dialog)
-      directory = UI.select_directory(title: "Select Directory to Scan")
+      directory = @system.ui.select_directory(title: "Select Directory to Scan")
       return if directory.nil?
 
       existing_paths = extension_sources_manager.sources.map(&:path)
@@ -283,9 +284,9 @@ module TT::Plugins::ExtensionSources
       statistics = StatisticsCSV.new(io: statistics_file)
 
       ExtensionSourcesManager.new(
+        system: @system,
         logger: @logger,
         storage_path: sources_json_path,
-        metadata: @metadata,
         statistics: statistics,
       ).tap { |manager|
         manager.add_observer(self, :on_sources_changed)
@@ -406,7 +407,7 @@ module TT::Plugins::ExtensionSources
       end
       # Defer the execution in order to not block SketchUp's startup sequence.
       Execution.defer do
-        UI.messagebox(message)
+        @system.ui.messagebox(message)
       end
     end
 
@@ -463,7 +464,7 @@ module TT::Plugins::ExtensionSources
 
     # @return [String]
     def storage_dir
-      File.join(OS.app_data_path, 'CookieWare', 'Extension Source Manager')
+      File.join(@system.os.app_data_path, 'CookieWare', 'Extension Source Manager')
     end
 
     # The absolute path where the manager will serialize to/from.

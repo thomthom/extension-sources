@@ -1,3 +1,4 @@
+require 'tt_extension_sources/model/system_interface'
 require 'tt_extension_sources/system/console'
 require 'tt_extension_sources/system/os'
 
@@ -6,7 +7,6 @@ module TT::Plugins::ExtensionSources
   class SketchUpSystem < SystemInterface
 
     def initialize
-      @settings = AppSettings.new
       @os = SketchUpOS.new
       @ui = SketchUpUI.new
       @metadata = {
@@ -39,7 +39,7 @@ module TT::Plugins::ExtensionSources
   end # class
 
   # Interface for UI related application logic.
-  class SketchUpUI
+  class SketchUpUI < UIInterface
 
     def initialize
       @console = SketchUpConsole.new(SKETCHUP_CONSOLE)
@@ -97,7 +97,7 @@ module TT::Plugins::ExtensionSources
   end # class
 
   # Interface to return information about the host system/OS.
-  class SketchUpOS
+  class SketchUpOS < OSInterface
 
     # @return [Boolean]
     def windows?

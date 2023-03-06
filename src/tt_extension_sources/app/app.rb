@@ -1,6 +1,7 @@
 require 'logger'
 
 require 'tt_extension_sources/app/settings'
+require 'tt_extension_sources/app/sketchup_system'
 require 'tt_extension_sources/controller/extension_sources_controller'
 require 'tt_extension_sources/model/version'
 require 'tt_extension_sources/utils/inspection'
@@ -48,14 +49,9 @@ module TT::Plugins::ExtensionSources
 
     # @return [ExtensionSourcesController]
     def extension_sources_controller
-      metadata = {
-        extension_version: Version.parse(EXTENSION[:version]).to_a,
-        sketchup_version: Version.parse(Sketchup.version).to_a,
-        ruby_version: Version.parse(RUBY_VERSION).to_a,
-      }
       @extension_sources_controller ||= ExtensionSourcesController.new(
+        system: SketchUpSystem.new,
         settings: settings,
-        metadata: metadata,
         logger: logger,
         error_handler: error_handler,
       )

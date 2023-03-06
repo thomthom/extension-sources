@@ -25,20 +25,20 @@ module TT::Plugins::ExtensionSources
     include Inspection
     include Observable
 
+    # @param [SystemInterface] system
     # @param [String] storage_path Full path to JSON file to serialize data to.
     # @param [Array] load_path
-    # @param [Hash] metadata Additional data to include when serializing to file.
     # @param [Logger] logger
     # @param [Statistics] statistics
     # @param [Boolean] warnings
-    def initialize(storage_path:, load_path: $LOAD_PATH, metadata: {},
+    def initialize(system:, storage_path:, load_path: $LOAD_PATH,
         logger: Logger.new(nil), statistics: nil, warnings: true)
       @warnings = warnings
       @logger = logger
+      @system = system
       @statistics = statistics
       @load_path = load_path
       @storage_path = storage_path
-      @metadata = metadata
       # TODO: Parse startup args:
       # "Config=${input:buildType};Path=${workspaceRoot}/ruby"
       #
@@ -143,7 +143,7 @@ module TT::Plugins::ExtensionSources
       data = {
         header: {
           version: CURRENT_FILE_VERSION.to_a,
-          metadata: @metadata,
+          metadata: @system.metadata,
         },
         sources: serialize_as_hash
       }
@@ -343,7 +343,7 @@ module TT::Plugins::ExtensionSources
         # So there's no need to disable the error handler.
         # Would have been useful to know if the method failed or not, but at the
         # moment that's not possible to detect.
-        Sketchup.require(path)
+        @system.require(path)
       }.to_a
     end
 
@@ -384,9 +384,9 @@ module TT::Plugins::ExtensionSources
     def log_require_time(source)
       return if @statistics.nil?
 
-      sketchup_version = (@metadata[:sketchup_version] || [0, 0, 0]).join('.')
+      sketchup_version = @system.metadata[:sketchup_version] || Version.new
       row = Statistics::Record.new(
-        sketchup: sketchup_version,
+        sketchup: sketchup_version.to_s,
         path: source.path,
         load_time: source.load_time,
         timestamp: Time.now

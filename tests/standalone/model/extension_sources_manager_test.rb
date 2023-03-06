@@ -1,5 +1,6 @@
 require 'minitest/autorun'
 require 'test_helper'
+require 'test_system'
 
 require 'json'
 require 'tempfile'
@@ -23,11 +24,7 @@ module TT::Plugins::ExtensionSources
       @storage_path.write('[]')
       @storage_path.flush
       @load_path = FAKE_LOAD_PATH.dup
-      @metadata = {
-        extension_version: [1, 2, 3],
-        sketchup_version: [22, 1, 0],
-        ruby_version: [2, 7, 2],
-      }
+      @system = TestSystem.new
       @timing_log_path = Tempfile.new(['extension-sources-timings', '.csv'])
       @statistics = StatisticsCSV.new(io: @timing_log_path)
       @current_version = [1, 0, 0] # File format version
@@ -99,6 +96,7 @@ module TT::Plugins::ExtensionSources
     def test_initialize_no_storage_path_file
       storage_path = '/fake/filename.json'
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: storage_path,
         statistics: @statistics,
@@ -110,6 +108,7 @@ module TT::Plugins::ExtensionSources
 
     def test_initialize_no_serialized_data
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -134,6 +133,7 @@ module TT::Plugins::ExtensionSources
       end
 
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -147,6 +147,7 @@ module TT::Plugins::ExtensionSources
 
     def test_add_enabled_path
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -163,6 +164,7 @@ module TT::Plugins::ExtensionSources
 
     def test_add_disabled_path
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -180,6 +182,7 @@ module TT::Plugins::ExtensionSources
 
     def test_add_default_enabled
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -197,6 +200,7 @@ module TT::Plugins::ExtensionSources
 
     def test_remove
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -215,6 +219,7 @@ module TT::Plugins::ExtensionSources
 
     def test_remove_invalid_source_id
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -231,6 +236,7 @@ module TT::Plugins::ExtensionSources
 
     def test_update_path
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -253,6 +259,7 @@ module TT::Plugins::ExtensionSources
 
     def test_update_enable_source
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -272,6 +279,7 @@ module TT::Plugins::ExtensionSources
 
     def test_update_disable_source
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -292,6 +300,7 @@ module TT::Plugins::ExtensionSources
 
     def test_update_nothing
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -311,6 +320,7 @@ module TT::Plugins::ExtensionSources
 
     def test_update_enabled_no_change
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -330,6 +340,7 @@ module TT::Plugins::ExtensionSources
 
     def test_update_path_no_change
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -350,6 +361,7 @@ module TT::Plugins::ExtensionSources
 
     def test_update_path_already_exist
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -376,10 +388,10 @@ module TT::Plugins::ExtensionSources
       export_path = Tempfile.new(['export', '.json'])
 
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
-        metadata: @metadata,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
@@ -394,12 +406,12 @@ module TT::Plugins::ExtensionSources
       expected = {
         header: {
           version: @current_version,
-          metadata: @metadata,
+          metadata: @system.metadata,
         },
         sources: manager.sources.map(&:serialize_as_hash),
       }
       actual = JSON.parse(json, symbolize_names: true)
-      assert_equal(expected, actual)
+      assert_equal(expected.to_json, actual.to_json)
     ensure
       export_path.close(true)
     end
@@ -409,10 +421,10 @@ module TT::Plugins::ExtensionSources
       import_path = Tempfile.new(['import', '.json'])
 
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
-        metadata: @metadata,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
@@ -440,7 +452,7 @@ module TT::Plugins::ExtensionSources
       file_data = {
         header: {
           version: @current_version,
-          metadata: @metadata,
+          metadata: @system.metadata,
         },
         sources: data,
       }
@@ -477,10 +489,10 @@ module TT::Plugins::ExtensionSources
       import_path = Tempfile.new(['import', '.json'])
 
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
-        metadata: @metadata,
         warnings: false,
       )
 
@@ -488,7 +500,7 @@ module TT::Plugins::ExtensionSources
       data = {
         header: {
           version: @newer_version,
-          metadata: @metadata,
+          metadata: @system.metadata,
         },
         sources: [
           {
@@ -511,6 +523,7 @@ module TT::Plugins::ExtensionSources
 
     def test_find_by_source_id_valid_id
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -526,6 +539,7 @@ module TT::Plugins::ExtensionSources
 
     def test_find_by_source_id_not_found
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -541,6 +555,7 @@ module TT::Plugins::ExtensionSources
 
     def test_find_by_path_valid_path
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -556,6 +571,7 @@ module TT::Plugins::ExtensionSources
 
     def test_find_by_path_not_found
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -571,6 +587,7 @@ module TT::Plugins::ExtensionSources
 
     def test_include_path
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -585,6 +602,7 @@ module TT::Plugins::ExtensionSources
 
     def test_include_path_not_added
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -599,6 +617,7 @@ module TT::Plugins::ExtensionSources
 
     def test_sources
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -619,6 +638,7 @@ module TT::Plugins::ExtensionSources
 
     def test_as_json
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -639,6 +659,7 @@ module TT::Plugins::ExtensionSources
 
     def test_to_json
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -658,10 +679,10 @@ module TT::Plugins::ExtensionSources
       assert_equal(2, @storage_path.size)
 
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
-        metadata: @metadata,
         warnings: false,
       )
       manager.add('/fake/path/hello', enabled: true)
@@ -678,16 +699,17 @@ module TT::Plugins::ExtensionSources
       expected = {
         header: {
           version: @current_version,
-          metadata: @metadata,
+          metadata: @system.metadata,
         },
         sources: manager.sources.map(&:serialize_as_hash),
       }
-      assert_equal(expected, data)
+      assert_equal(expected.to_json, data.to_json)
     end
 
 
     def test_move_before
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -714,6 +736,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_after
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -740,6 +763,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_before_including_self
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -766,6 +790,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_after_including_self
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -792,6 +817,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_to_end
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -819,6 +845,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_down_below_last_selected
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -845,6 +872,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_mixed
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -876,6 +904,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_no_sources
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -902,6 +931,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_all_to_middle
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -929,6 +959,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_missing_target
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,
@@ -947,6 +978,7 @@ module TT::Plugins::ExtensionSources
 
     def test_move_both_target_args
       manager = ExtensionSourcesManager.new(
+        system: @system,
         load_path: @load_path,
         storage_path: @storage_path.path,
         statistics: @statistics,

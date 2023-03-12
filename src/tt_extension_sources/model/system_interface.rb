@@ -18,6 +18,11 @@ module TT::Plugins::ExtensionSources
       raise NotImplementedError
     end
 
+    # @return [Sketchup::ExtensionsManager]
+    def extensions
+      raise NotImplementedError
+    end
+
     # return [OSInterface]
     def os
       raise NotImplementedError

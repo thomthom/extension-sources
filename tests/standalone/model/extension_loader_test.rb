@@ -20,9 +20,12 @@ module TT::Plugins::ExtensionSources
       @statistics = TestStatistics.new
       @sketchup = TestSketchUp.new(system: @system)
 
+      # Because the fixtures require files we want to reset the list of loaded
+      # features between each tests.
       @loaded_features = $LOADED_FEATURES.dup
       # Make `TEST_SKETCHUP` available to the test files loaded.
       Object.const_set(:TEST_SKETCHUP, @sketchup)
+      # Make `TestExample` available with `TestExtension`.
       Object.const_set(:TestExample, Module.new)
       Object::TestExample.const_set(:TestExtension, TT::Plugins::ExtensionSources::TestExtension)
     end

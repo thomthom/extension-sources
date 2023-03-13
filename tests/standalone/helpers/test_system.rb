@@ -26,7 +26,7 @@ module TT::Plugins::ExtensionSources
     end
 
     def require(path)
-      require path
+      Kernel.require(path)
     rescue Exception
       # Simulate Sketchup.require.
       false
@@ -172,6 +172,10 @@ module TT::Plugins::ExtensionSources
     # Path to the root Ruby file that initialized the extension object.
     # @return [String]
     attr_reader :extension_path
+
+    # Path to the Ruby file to be loaded when the extension is enabled.
+    # @return [String]
+    attr_reader :path
 
     def initialize(name, path)
       @name = name
@@ -334,34 +338,42 @@ module TT::Plugins::ExtensionSources
       @extensions.map(&:name)
     end
 
+    # @param [TestExtension] extension
+    def <<(extension)
+      @extensions << extension
+    end
+
   end # class
 
   # TEST_SKETCHUP = TestSketchUp.new(system: @system)
   class TestSketchUp
 
-    # @return [Array]
-    attr_reader :extensions
-
     # @param [SystemInterface] system
     def initialize(system:)
       @system = system
-      @extensions = []
+    end
+
+    # @return [TestExtensionManager]
+    def extensions
+      @system.extensions
     end
 
     # @param [TestExtension] extension
     # @param [Boolean] load_on_start
     # @return [Boolean] `true` if extension registered properly.
     def register_extension(extension, load_on_start = false)
-      return false if @extensions.any? { |ex| ex.name == extension.name }
-
-      @extensions << extension
+      return false if extensions.any? { |ex| ex.name == extension.name }
 
       extension.register_from_sketchup
-      if extension.load_on_start?
-        return false unless @system.require(extension.path)
+      if load_on_start
+        unless @system.require(extension.path)
+          return false
+        end
+
         extension.check
       end
 
+      extensions << extension
       true
     end
 

@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require 'fixtures'
 require 'test_helper'
 require 'test_system'
 
@@ -12,19 +13,24 @@ require 'tt_extension_sources/model/statistics_csv'
 module TT::Plugins::ExtensionSources
   class ExtensionLoaderTest < Minitest::Test
 
+    include ExtensionSourcesFixtures
+
     def setup
       @system = TestSystem.new
-      @statistics = TestStatistics.new # TODO:
+      @statistics = TestStatistics.new
       @sketchup = TestSketchUp.new(system: @system)
-      @source = nil # TODO:
 
+      @loaded_features = $LOADED_FEATURES.dup
       # Make `TEST_SKETCHUP` available to the test files loaded.
       Object.const_set(:TEST_SKETCHUP, @sketchup)
     end
 
     def teardown
+      $LOADED_FEATURES.delete_if { |feature| @loaded_features.include?(feature) }
       Object.class_eval do
         remove_const(:TEST_SKETCHUP)
+        # The fixtures uses a TestExample module to sandbox the test logic.
+        remove_const(:TestExample) if const_defined?(:TestExample)
       end
     end
 
@@ -35,13 +41,18 @@ module TT::Plugins::ExtensionSources
         statistics: @statistics,
       )
 
-      loader.require_source(@source)
+      source = ExtensionSource.new(path: fixture('dummy_valid_extension'))
+      files = loader.require_source(source)
 
-      assert_equal(1, loader.loaded_extensions.size)
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+      assert_equal(File.join(source.path, 'dummy_valid_extension.rb'), files[0])
+
+      assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
       assert(loader.valid_measurement?)
 
-      assert_equal(1, @statistics.size)
-      assert_equal(source_path, @statistics.rows[0].path)
+      assert_equal(1, @statistics.rows.size, 'Rows in stats')
+      assert_equal(source.path, @statistics.rows[0].path)
     end
 
     def test_require_source_too_many_extensions

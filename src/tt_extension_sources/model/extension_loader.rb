@@ -35,7 +35,7 @@ module TT::Plugins::ExtensionSources
         # Only keep track of new extensions registered.
         if extension.nil?
           extension = find_extension(path)
-          @loaded_extensions << extension
+          @loaded_extensions << extension if extension
         end
       }.to_a
 
@@ -61,7 +61,7 @@ module TT::Plugins::ExtensionSources
     # @return [SketchupExtension]
     def find_extension(path)
       @system.extensions.find { |extension|
-        extension.path == path
+        extension.extension_path == path
       }
     end
 

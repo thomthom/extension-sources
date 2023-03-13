@@ -23,6 +23,8 @@ module TT::Plugins::ExtensionSources
       @loaded_features = $LOADED_FEATURES.dup
       # Make `TEST_SKETCHUP` available to the test files loaded.
       Object.const_set(:TEST_SKETCHUP, @sketchup)
+      Object.const_set(:TestExample, Module.new)
+      Object::TestExample.const_set(:TestExtension, TT::Plugins::ExtensionSources::TestExtension)
     end
 
     def teardown
@@ -56,7 +58,21 @@ module TT::Plugins::ExtensionSources
     end
 
     def test_require_source_too_many_extensions
-      # TODO:
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      source = ExtensionSource.new(path: fixture('dummy_two_valid_extensions'))
+      files = loader.require_source(source)
+
+      assert_kind_of(Array, files)
+      assert_equal(2, files.size, 'Files iterated')
+
+      assert_equal(2, loader.loaded_extensions.size, 'Extensions loaded')
+      refute(loader.valid_measurement?)
+
+      assert_empty(@statistics.rows, 'Rows in stats')
     end
 
     def test_require_source_too_few_extensions

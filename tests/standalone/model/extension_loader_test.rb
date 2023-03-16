@@ -49,6 +49,7 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_valid_extension'))
       files = loader.require_source(source)
 
+      refute(loader.errors_detected?)
       assert_kind_of(Float, source.load_time)
 
       assert_kind_of(Array, files)
@@ -56,6 +57,7 @@ module TT::Plugins::ExtensionSources
       assert_equal(File.join(source.path, 'dummy_valid_extension.rb'), files[0])
 
       assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      assert(loader.loaded_extensions[0].loaded?)
       assert(loader.valid_measurement?)
 
       assert_equal(1, @statistics.rows.size, 'Rows in stats')
@@ -71,6 +73,7 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_two_valid_extensions'))
       files = loader.require_source(source)
 
+      refute(loader.errors_detected?)
       assert_nil(source.load_time)
 
       assert_kind_of(Array, files)
@@ -91,6 +94,7 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_too_few_extensions'))
       files = loader.require_source(source)
 
+      refute(loader.errors_detected?)
       assert_nil(source.load_time)
 
       assert_kind_of(Array, files)
@@ -111,6 +115,7 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_extension_root_error_before_register'))
       files = loader.require_source(source)
 
+      assert(loader.errors_detected?)
       assert_nil(source.load_time)
 
       assert_kind_of(Array, files)
@@ -131,12 +136,14 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_extension_root_error_after_register'))
       files = loader.require_source(source)
 
+      assert(loader.errors_detected?)
       assert_nil(source.load_time)
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
 
       assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      assert(loader.loaded_extensions[0].loaded?)
       refute(loader.valid_measurement?)
 
       assert_empty(@statistics.rows, 'Rows in stats')
@@ -151,12 +158,14 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_extension_error_in_loader'))
       files = loader.require_source(source)
 
+      refute(loader.errors_detected?)
       assert_nil(source.load_time)
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
 
       assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      refute(loader.loaded_extensions[0].loaded?)
       refute(loader.valid_measurement?)
 
       assert_empty(@statistics.rows, 'Rows in stats')
@@ -171,7 +180,7 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_extension_ruby_require_error'))
       files = loader.require_source(source)
 
-      assert_nil(source.load_time)
+      refute(loader.errors_detected?) # Sketchup.register_extension uses Sketchup.register.
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
@@ -202,12 +211,14 @@ module TT::Plugins::ExtensionSources
       )
       files = loader2.require_source(source)
 
+      assert(loader2.errors_detected?)
       assert_equal(load_time, source.load_time)
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
 
       assert_empty(loader2.loaded_extensions, 'Extensions loaded')
+      assert(@system.extensions[0].loaded?)
       refute(loader2.valid_measurement?)
 
       assert_empty(@statistics.rows, 'Rows in stats')
@@ -222,12 +233,14 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_extension_not_loading'))
       files = loader.require_source(source)
 
+      refute(loader.errors_detected?)
       assert_nil(source.load_time)
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
 
       assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      refute(loader.loaded_extensions[0].loaded?)
       refute(loader.valid_measurement?)
 
       assert_empty(@statistics.rows, 'Rows in stats')

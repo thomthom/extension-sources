@@ -49,6 +49,8 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_valid_extension'))
       files = loader.require_source(source)
 
+      assert_kind_of(Float, source.load_time)
+
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
       assert_equal(File.join(source.path, 'dummy_valid_extension.rb'), files[0])
@@ -69,6 +71,8 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_two_valid_extensions'))
       files = loader.require_source(source)
 
+      assert_nil(source.load_time)
+
       assert_kind_of(Array, files)
       assert_equal(2, files.size, 'Files iterated')
 
@@ -86,6 +90,8 @@ module TT::Plugins::ExtensionSources
 
       source = ExtensionSource.new(path: fixture('dummy_too_few_extensions'))
       files = loader.require_source(source)
+
+      assert_nil(source.load_time)
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
@@ -105,6 +111,8 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_extension_root_error_before_register'))
       files = loader.require_source(source)
 
+      assert_nil(source.load_time)
+
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
 
@@ -123,6 +131,8 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_extension_root_error_after_register'))
       files = loader.require_source(source)
 
+      assert_nil(source.load_time)
+
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
 
@@ -140,6 +150,8 @@ module TT::Plugins::ExtensionSources
 
       source = ExtensionSource.new(path: fixture('dummy_extension_error_in_loader'))
       files = loader.require_source(source)
+
+      assert_nil(source.load_time)
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
@@ -163,11 +175,15 @@ module TT::Plugins::ExtensionSources
       )
       loader1.require_source(source)
 
+      load_time = source.load_time
+
       loader2 = ExtensionLoader.new(
         system: @system,
         statistics: @statistics,
       )
       files = loader2.require_source(source)
+
+      assert_equal(load_time, source.load_time)
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')
@@ -186,6 +202,8 @@ module TT::Plugins::ExtensionSources
 
       source = ExtensionSource.new(path: fixture('dummy_extension_not_loading'))
       files = loader.require_source(source)
+
+      assert_nil(source.load_time)
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')

@@ -11,6 +11,129 @@ module TT::Plugins::ExtensionSources
 
     attr_reader :loaded_extensions
 
+    module RequireHook
+
+      class RequireResult
+        attr_accessor :success, :error
+        def initialize(success:, error:)
+          @success = success
+          @error = error
+        end
+      end # class
+
+      # @example
+      #   ExtensionLoader::RequireHook.install_to(Sketchup)
+      #
+      # @param [Module, Object] obj
+      def self.install_to(obj)
+        unless obj.is_a?(ExtensionLoader::RequireHook)
+          obj.singleton_class.prepend(ExtensionLoader::RequireHook)
+        end
+      end
+
+      # alias :es_require_original :require
+
+      # @param [String] path
+      # @return [Boolean]
+      def require(path)
+        loaded_features = $LOADED_FEATURES.dup
+        # success = es_require_original(path)
+        success = super(path)
+        unless success
+          es_hook_record_require_errors(path, loaded_features)
+        end
+        success
+      end
+
+      # @private
+      #
+      # @example
+      #   result = Sketchup.es_hook_require_with_errors(path)
+      #   if result.error
+      #     # ...
+      #   end
+      #
+      # @param [String] path
+      def es_hook_require_with_errors(path)
+        es_hook_detect_require_errors = true
+        require_result = self.require(path)
+        result = RequireResult.new(
+          success: require_result,
+          error: !es_hook_require_errors.empty?
+        )
+        es_hook_detect_require_errors = false
+        result
+      end
+
+      ES_REQUIRE_EXT = ['.rbe', '.rbs', '.rb', '.so', '.bundle'].freeze
+
+      # @private
+      # @return [Boolean]
+      def es_hook_detect_require_errors?
+        !!@es_detect_require_errors
+      end
+
+      # @private
+      # @param [Boolean] value
+      def es_hook_detect_require_errors=(value)
+        @es_detect_require_errors = value
+        es_hook_require_errors.clear
+      end
+
+      # @private
+      # @return [Boolean]
+      def es_hook_require_errors
+        @es_require_errors ||= []
+      end
+
+      # @private
+      # @param [String] path
+      # @param [Array<String>] loaded_features
+      def es_hook_record_require_errors(path, loaded_features)
+        # TODO: Disable timing for this logic.
+        return unless es_hook_detect_require_errors?
+
+        # If the file was already loaded, then there was no error.
+        expanded_path = es_expand_required_path(path, loaded_features)
+        return if expanded_path && File.exist?(expanded_path)
+
+        # Assume an error was the cause of the file failing to load.
+        es_hook_require_errors << path
+      end
+
+      # @private
+      # @param [String] path
+      # @param [Array<String>] loaded_features
+      # @return [String, nil]
+      def es_hook_expand_required_path(path, loaded_features)
+        # If the path was already in loaded features it's not an error.
+        # Check with increasing costly search.
+
+        # Check absolute path.
+        return path if loaded_features.include?(path)
+
+        # Check absolute path with expanded file extension.
+        ES_REQUIRE_EXT.each { |ext|
+          expanded_path = "#{path}.#{ext}"
+          return expanded_path if loaded_features.include?(expanded_path)
+        }
+
+        # Check paths relative to $LOAD_PATH.
+        $LOAD_PATH.each { |load_path|
+          expanded_path = File.join(load_path, path)
+          return expanded_path if loaded_features.include?(expanded_path)
+
+          ES_REQUIRE_EXT.each { |ext|
+            expanded_path = File.join(load_path, "#{path}.#{ext}")
+            return expanded_path if loaded_features.include?(expanded_path)
+          }
+        }
+
+        nil
+      end
+
+    end # class
+
     # @param [SystemInterface] system
     # @param [Statistics] statistics
     def initialize(system:, statistics: nil)

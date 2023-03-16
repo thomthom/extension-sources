@@ -18,6 +18,7 @@ module TT::Plugins::ExtensionSources
       @statistics = statistics
       @timing = Timing.new
       @loaded_extensions = []
+      @errors_detected = false
     end
 
     # @param [ExtensionSource] source
@@ -28,9 +29,11 @@ module TT::Plugins::ExtensionSources
         # Check if an extension is already loaded for the given path.
         extension = find_extension(path)
 
+        require_result = nil
         @timing.measure do
-          @system.require(path)
+          require_result = @system.require(path)
         end
+        @errors_detected = true unless require_result
 
         # Only keep track of new extensions registered.
         if extension.nil?
@@ -52,7 +55,11 @@ module TT::Plugins::ExtensionSources
     # if it's detected that an extension matching the filepath required is
     # marked as loaded.
     def valid_measurement?
-      loaded_extensions.size == 1
+      !errors_detected? && loaded_extensions.size == 1
+    end
+
+    def errors_detected?
+      @errors_detected
     end
 
     private

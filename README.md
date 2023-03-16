@@ -84,6 +84,10 @@ bundle exec rake test TEST=tests/standalone/model/extension_source_test.rb
 bundle exec rake test TEST=tests/standalone/model/extension_source_test.rb TESTOPTS="--name=/test_enabled.*/ -v"
 ```
 
+```sh
+bundle exec rake test TESTOPTS="--seed=64943"
+```
+
 ## Documentation
 
 ### List undocumented code

@@ -162,9 +162,27 @@ module TT::Plugins::ExtensionSources
       assert_empty(@statistics.rows, 'Rows in stats')
     end
 
-    # TODO: Error in file required by loaded (Using Ruby require).
+    def test_require_source_load_errors_in_loader_dependency_ruby_require
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      source = ExtensionSource.new(path: fixture('dummy_extension_ruby_require_error'))
+      files = loader.require_source(source)
+
+      assert_nil(source.load_time)
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+
+      assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      refute(loader.valid_measurement?)
+
+      assert_empty(@statistics.rows, 'Rows in stats')
 
     # TODO: Error in file required by loaded (Using Sketchup.require).
+    end
 
     def test_require_source_already_loaded
       source = ExtensionSource.new(path: fixture('dummy_valid_extension'))

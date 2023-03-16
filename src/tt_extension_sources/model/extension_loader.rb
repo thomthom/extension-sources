@@ -55,7 +55,10 @@ module TT::Plugins::ExtensionSources
     # if it's detected that an extension matching the filepath required is
     # marked as loaded.
     def valid_measurement?
-      !errors_detected? && loaded_extensions.size == 1
+      !errors_detected? &&
+          loaded_extensions.size == 1 &&
+          loaded_extensions[0] &&
+          loaded_extensions[0].loaded?
     end
 
     def errors_detected?

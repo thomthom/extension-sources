@@ -27,7 +27,8 @@ module TT::Plugins::ExtensionSources
 
     def require(path)
       Kernel.require(path)
-    rescue Exception
+    rescue Exception => exception
+      e = exception # Allowing VSCode debugger to inspect the error.
       # Simulate Sketchup.require.
       false
     end
@@ -351,6 +352,12 @@ module TT::Plugins::ExtensionSources
     # @param [SystemInterface] system
     def initialize(system:)
       @system = system
+    end
+
+    # @param [String] path
+    # @return [Boolean]
+    def require(path)
+      @system.require(path)
     end
 
     # @return [TestExtensionManager]

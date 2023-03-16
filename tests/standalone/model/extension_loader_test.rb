@@ -180,6 +180,7 @@ module TT::Plugins::ExtensionSources
       refute(loader.valid_measurement?)
 
       assert_empty(@statistics.rows, 'Rows in stats')
+    end
 
     # TODO: Error in file required by loaded (Using Sketchup.require).
     end
@@ -212,7 +213,7 @@ module TT::Plugins::ExtensionSources
       assert_empty(@statistics.rows, 'Rows in stats')
     end
 
-    def test_require_source_load_errors_in_loader
+    def test_require_source_extension_not_loading
       loader = ExtensionLoader.new(
         system: @system,
         statistics: @statistics,

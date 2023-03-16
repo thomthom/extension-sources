@@ -39,6 +39,22 @@ new_features = $LOADED_FEATURES - features
 puts
 p result
 p new_features
+
+["C:/Users/Thomas/SourceTree/extension-sources/hello.rb"]
+=> ["C:/Users/Thomas/SourceTree/extension-sources/hello.rb"]
+=end
+
+=begin
+$LOAD_PATH << 'c:/users/thomas/sourcetree/extension-sources'
+features = $LOADED_FEATURES.dup
+result = Sketchup.require 'hello'
+new_features = $LOADED_FEATURES - features
+puts
+p result
+p new_features
+
+["c:/users/thomas/sourcetree/extension-sources/hello.rb"]
+=> ["c:/users/thomas/sourcetree/extension-sources/hello.rb"]
 =end
 
 =begin

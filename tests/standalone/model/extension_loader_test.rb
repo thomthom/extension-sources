@@ -96,9 +96,43 @@ module TT::Plugins::ExtensionSources
       assert_empty(@statistics.rows, 'Rows in stats')
     end
 
-    def test_require_source_load_errors
-      # TODO:
+    def test_require_source_load_errors_before_register_in_root
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      source = ExtensionSource.new(path: fixture('dummy_extension_root_error_before_register'))
+      files = loader.require_source(source)
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+
+      assert_empty(loader.loaded_extensions, 'Extensions loaded')
+      refute(loader.valid_measurement?)
+
+      assert_empty(@statistics.rows, 'Rows in stats')
     end
+
+    def test_require_source_load_errors_after_register_in_root
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      source = ExtensionSource.new(path: fixture('dummy_extension_root_error_after_register'))
+      files = loader.require_source(source)
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+
+      assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      refute(loader.valid_measurement?)
+
+      assert_empty(@statistics.rows, 'Rows in stats')
+    end
+
+    # TODO: Test error in loaded extension files.
 
     def test_require_source_already_loaded
       # TODO:

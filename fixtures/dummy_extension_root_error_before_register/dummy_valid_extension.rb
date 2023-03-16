@@ -1,6 +1,7 @@
 module TestExample
 
-  5 / 0 # Intentional error - triggering LoadError
+  if 5 / 0 # Intentional error - triggering LoadError
+  end
 
   loader = File.join(__dir__, File.basename(__FILE__, '.*'), 'main')
   extension = TestExtension.new('Valid Extension', loader)

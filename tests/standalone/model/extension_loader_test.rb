@@ -135,7 +135,27 @@ module TT::Plugins::ExtensionSources
     # TODO: Test error in loaded extension files.
 
     def test_require_source_already_loaded
-      # TODO:
+      source = ExtensionSource.new(path: fixture('dummy_valid_extension'))
+
+      loader1 = ExtensionLoader.new(
+        system: @system,
+        statistics: TestStatistics.new,
+      )
+      loader1.require_source(source)
+
+      loader2 = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+      files = loader2.require_source(source)
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+
+      assert_empty(loader2.loaded_extensions, 'Extensions loaded')
+      refute(loader2.valid_measurement?)
+
+      assert_empty(@statistics.rows, 'Rows in stats')
     end
 
   end # class

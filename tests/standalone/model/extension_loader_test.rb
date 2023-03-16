@@ -31,7 +31,7 @@ module TT::Plugins::ExtensionSources
     end
 
     def teardown
-      $LOADED_FEATURES.delete_if { |feature| @loaded_features.include?(feature) }
+      $LOADED_FEATURES.delete_if { |feature| !@loaded_features.include?(feature) }
       Object.class_eval do
         remove_const(:TEST_SKETCHUP)
         # The fixtures uses a TestExample module to sandbox the test logic.

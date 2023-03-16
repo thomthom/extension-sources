@@ -178,7 +178,23 @@ module TT::Plugins::ExtensionSources
       assert_empty(@statistics.rows, 'Rows in stats')
     end
 
-    # Test extension not set to load.
+    def test_require_source_load_errors_in_loader
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      source = ExtensionSource.new(path: fixture('dummy_extension_not_loading'))
+      files = loader.require_source(source)
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+
+      assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      refute(loader.valid_measurement?)
+
+      assert_empty(@statistics.rows, 'Rows in stats')
+    end
 
   end # class
 end # module

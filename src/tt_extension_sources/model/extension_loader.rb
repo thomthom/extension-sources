@@ -42,8 +42,10 @@ module TT::Plugins::ExtensionSources
         end
       }.to_a
 
-      source.load_time = @timing.lapsed
-      log_require_time(source) if valid_measurement?
+      if valid_measurement?
+        source.load_time = @timing.lapsed
+        log_require_time(source)
+      end
 
       files
     end

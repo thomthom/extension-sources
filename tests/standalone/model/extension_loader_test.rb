@@ -186,12 +186,36 @@ module TT::Plugins::ExtensionSources
       assert_equal(1, files.size, 'Files iterated')
 
       assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      refute(loader.loaded_extensions[0].loaded?)
       refute(loader.valid_measurement?)
 
       assert_empty(@statistics.rows, 'Rows in stats')
+
+      assert_nil(source.load_time)
     end
 
     # TODO: Error in file required by loaded (Using Sketchup.require).
+    def test_require_source_load_errors_in_loader_dependency_sketchup_require
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      source = ExtensionSource.new(path: fixture('dummy_extension_sketchup_require_error'))
+      files = loader.require_source(source)
+
+      refute(loader.errors_detected?) # Sketchup.register_extension uses Sketchup.register.
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+
+      assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      assert(loader.loaded_extensions[0].loaded?) # Not ideal. But due to Sketchup.require eating errors.
+      refute(loader.valid_measurement?)
+
+      assert_empty(@statistics.rows, 'Rows in stats')
+
+      assert_nil(source.load_time)
     end
 
     def test_require_source_already_loaded

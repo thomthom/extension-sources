@@ -79,7 +79,21 @@ module TT::Plugins::ExtensionSources
     end
 
     def test_require_source_too_few_extensions
-      # TODO:
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      source = ExtensionSource.new(path: fixture('dummy_too_few_extensions'))
+      files = loader.require_source(source)
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+
+      assert_empty(loader.loaded_extensions, 'Extensions loaded')
+      refute(loader.valid_measurement?)
+
+      assert_empty(@statistics.rows, 'Rows in stats')
     end
 
     def test_require_source_load_errors

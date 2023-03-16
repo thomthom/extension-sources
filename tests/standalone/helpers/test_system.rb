@@ -365,6 +365,8 @@ module TT::Plugins::ExtensionSources
       return false if extensions.any? { |ex| ex.name == extension.name }
 
       extension.register_from_sketchup
+      extensions << extension
+
       if load_on_start
         unless @system.require(extension.path)
           return false
@@ -373,7 +375,6 @@ module TT::Plugins::ExtensionSources
         extension.check
       end
 
-      extensions << extension
       true
     end
 

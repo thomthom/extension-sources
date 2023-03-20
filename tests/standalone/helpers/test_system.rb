@@ -1,3 +1,4 @@
+require 'tt_extension_sources/model/extension_loader'
 require 'tt_extension_sources/model/statistics'
 require 'tt_extension_sources/model/system_interface'
 require 'tt_extension_sources/model/version'
@@ -10,15 +11,23 @@ module TT::Plugins::ExtensionSources
 
   class TestSystem < SystemInterface
 
-    def initialize
+    attr_reader :sketchup
+
+    def initialize(use_require_hook: false)
       @os = TestOS.new
       @ui = TestUI.new
+      @sketchup = TestSketchUp.new(system: self)
       @extensions = TestExtensionManager.new
       @metadata = {
         extension_sources_version: Version.new(1, 2, 3),
         sketchup_version: Version.new(22, 1, 0),
         ruby_version: Version.new(2, 7, 2),
       }
+      @use_require_hook = use_require_hook
+
+      if @use_require_hook
+        ExtensionLoader::RequireHook.install_to(@sketchup)
+      end
     end
 
     def metadata
@@ -31,6 +40,19 @@ module TT::Plugins::ExtensionSources
       e = exception # Allowing VSCode debugger to inspect the error.
       # Simulate Sketchup.require.
       false
+    end
+
+    # @param [String] path
+    # @return [ExtensionLoader::RequireHook::RequireResult]
+    def require_with_errors(path)
+      if @use_require_hook
+        @sketchup.es_hook_require_with_errors(path)
+      else
+        ExtensionLoader::RequireHook::RequireResult.new(
+          value: @sketchup.require,
+          error: false,
+        )
+      end
     end
 
     # @return [TestExtensionManager]

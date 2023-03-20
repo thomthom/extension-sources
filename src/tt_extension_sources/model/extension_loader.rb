@@ -14,11 +14,16 @@ module TT::Plugins::ExtensionSources
     module RequireHook
 
       class RequireResult
-        attr_accessor :success, :error
-        def initialize(success:, error:)
-          @success = success
+        attr_accessor :value, :error
+        def initialize(value:, error:)
+          @value = value
           @error = error
         end
+
+        def success?
+          @value && !@error
+        end
+
       end # class
 
       # @example
@@ -40,7 +45,7 @@ module TT::Plugins::ExtensionSources
         # success = es_require_original(path)
         success = super(path)
         unless success
-          es_hook_record_require_errors(path, loaded_features)
+          self.es_hook_record_require_errors(path, loaded_features)
         end
         success
       end
@@ -55,13 +60,13 @@ module TT::Plugins::ExtensionSources
       #
       # @param [String] path
       def es_hook_require_with_errors(path)
-        es_hook_detect_require_errors = true
-        require_result = self.require(path)
+        self.es_hook_detect_require_errors = true
+        value = self.require(path)
         result = RequireResult.new(
-          success: require_result,
-          error: !es_hook_require_errors.empty?
+          value: value,
+          error: !self.es_hook_require_errors.empty?
         )
-        es_hook_detect_require_errors = false
+        self.es_hook_detect_require_errors = false
         result
       end
 
@@ -77,7 +82,7 @@ module TT::Plugins::ExtensionSources
       # @param [Boolean] value
       def es_hook_detect_require_errors=(value)
         @es_detect_require_errors = value
-        es_hook_require_errors.clear
+        self.es_hook_require_errors.clear
       end
 
       # @private
@@ -91,14 +96,14 @@ module TT::Plugins::ExtensionSources
       # @param [Array<String>] loaded_features
       def es_hook_record_require_errors(path, loaded_features)
         # TODO: Disable timing for this logic.
-        return unless es_hook_detect_require_errors?
+        return unless self.es_hook_detect_require_errors?
 
         # If the file was already loaded, then there was no error.
-        expanded_path = es_expand_required_path(path, loaded_features)
+        expanded_path = self.es_hook_expand_required_path(path, loaded_features)
         return if expanded_path && File.exist?(expanded_path)
 
         # Assume an error was the cause of the file failing to load.
-        es_hook_require_errors << path
+        self.es_hook_require_errors << path
       end
 
       # @private
@@ -152,11 +157,13 @@ module TT::Plugins::ExtensionSources
         # Check if an extension is already loaded for the given path.
         extension = find_extension(path)
 
-        require_result = nil
+        result = nil
         @timing.measure do
-          require_result = @system.require(path)
+          result = @system.require_with_errors(path)
         end
-        @errors_detected = true unless require_result
+        # @errors_detected = true if result.error
+        # @errors_detected ||= result.error
+        @errors_detected = true unless result.success?
 
         # Only keep track of new extensions registered.
         if extension.nil?

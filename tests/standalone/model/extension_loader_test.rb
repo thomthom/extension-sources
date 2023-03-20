@@ -16,15 +16,16 @@ module TT::Plugins::ExtensionSources
     include ExtensionSourcesFixtures
 
     def setup
-      @system = TestSystem.new
+      @system = TestSystem.new(use_require_hook: true)
       @statistics = TestStatistics.new
-      @sketchup = TestSketchUp.new(system: @system)
+      # @sketchup = TestSketchUp.new(system: @system)
 
       # Because the fixtures require files we want to reset the list of loaded
       # features between each tests.
       @loaded_features = $LOADED_FEATURES.dup
       # Make `TEST_SKETCHUP` available to the test files loaded.
-      Object.const_set(:TEST_SKETCHUP, @sketchup)
+      # Object.const_set(:TEST_SKETCHUP, @sketchup)
+      Object.const_set(:TEST_SKETCHUP, @system.sketchup)
       # Make `TestExample` available with `TestExtension`.
       Object.const_set(:TestExample, Module.new)
       Object::TestExample.const_set(:TestExtension, TT::Plugins::ExtensionSources::TestExtension)
@@ -204,7 +205,7 @@ module TT::Plugins::ExtensionSources
       source = ExtensionSource.new(path: fixture('dummy_extension_sketchup_require_error'))
       files = loader.require_source(source)
 
-      refute(loader.errors_detected?) # Sketchup.register_extension uses Sketchup.register.
+      assert(loader.errors_detected?) # Sketchup.register_extension uses Sketchup.register.
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')

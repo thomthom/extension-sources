@@ -5,21 +5,34 @@ require 'tt_extension_sources/utils/inspection'
 require 'tt_extension_sources/utils/timing'
 
 module TT::Plugins::ExtensionSources
+  # Loads the sources for an extension while tracking error and timings.
   class ExtensionLoader
 
     include Inspection
 
+    # @return [Array<SketchupExtension>]
     attr_reader :loaded_extensions
 
+    # Mix-in for installing a hook to `Sketchup.require` attempting to determine
+    # if there was any loading errors.
     module RequireHook
 
+      # Return value for the `es_hook_require_with_errors` hook.
       class RequireResult
-        attr_accessor :value, :error
+
+        # @return [Boolean] The return value of `Sketchup.require`.
+        attr_reader :value
+
+        # @return [Boolean] Indicating if a loading error was detected.
+        attr_reader :error
+
         def initialize(value:, error:)
           @value = value
           @error = error
         end
 
+        # Even if the `Sketchup.require` call returns true there could have
+        # been errors deeper into the require chain.
         def success?
           @value && !@error
         end
@@ -36,13 +49,13 @@ module TT::Plugins::ExtensionSources
         end
       end
 
-      # alias :es_require_original :require
-
+      # Hooks the original `require` method and attempts to determine if there
+      # were any load errors.
+      #
       # @param [String] path
       # @return [Boolean]
       def require(path)
         loaded_features = $LOADED_FEATURES.dup
-        # success = es_require_original(path)
         success = super(path)
         unless success
           self.es_hook_record_require_errors(path, loaded_features)
@@ -50,8 +63,6 @@ module TT::Plugins::ExtensionSources
         success
       end
 
-      # @private
-      #
       # @example
       #   result = Sketchup.es_hook_require_with_errors(path)
       #   if result.error
@@ -70,13 +81,10 @@ module TT::Plugins::ExtensionSources
         result
       end
 
-      ES_REQUIRE_EXT = ['.rbe', '.rbs', '.rb', '.so', '.bundle'].freeze
-
-      # @private
-      # @return [Boolean]
-      def es_hook_detect_require_errors?
-        !!@es_detect_require_errors
-      end
+      # @todo Move out of the module.
+      # List of extensions that `Sketchup.require` will attempt to resolve.
+      ES_HOOK_REQUIRE_EXT = ['.rbe', '.rbs', '.rb', '.so', '.bundle'].freeze
+      private_constant :ES_HOOK_REQUIRE_EXT
 
       # @private
       # @param [Boolean] value
@@ -91,12 +99,13 @@ module TT::Plugins::ExtensionSources
         @es_require_errors ||= []
       end
 
+      # @todo Move out of the module.
       # @private
       # @param [String] path
       # @param [Array<String>] loaded_features
       def es_hook_record_require_errors(path, loaded_features)
         # TODO: Disable timing for this logic.
-        return unless self.es_hook_detect_require_errors?
+        return unless @es_detect_require_errors
 
         # If the file was already loaded, then there was no error.
         expanded_path = self.es_hook_expand_required_path(path, loaded_features)
@@ -106,6 +115,7 @@ module TT::Plugins::ExtensionSources
         self.es_hook_require_errors << path
       end
 
+      # @todo Move out of this module.
       # @private
       # @param [String] path
       # @param [Array<String>] loaded_features
@@ -118,17 +128,18 @@ module TT::Plugins::ExtensionSources
         return path if loaded_features.include?(path)
 
         # Check absolute path with expanded file extension.
-        ES_REQUIRE_EXT.each { |ext|
+        ES_HOOK_REQUIRE_EXT.each { |ext|
           expanded_path = "#{path}.#{ext}"
           return expanded_path if loaded_features.include?(expanded_path)
         }
 
+        # TODO: Inject $LOAD_PATH
         # Check paths relative to $LOAD_PATH.
         $LOAD_PATH.each { |load_path|
           expanded_path = File.join(load_path, path)
           return expanded_path if loaded_features.include?(expanded_path)
 
-          ES_REQUIRE_EXT.each { |ext|
+          ES_HOOK_REQUIRE_EXT.each { |ext|
             expanded_path = File.join(load_path, "#{path}.#{ext}")
             return expanded_path if loaded_features.include?(expanded_path)
           }

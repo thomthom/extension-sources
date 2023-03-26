@@ -18,6 +18,13 @@ module TT::Plugins::ExtensionSources
       raise NotImplementedError
     end
 
+    # @param [String] path
+    # @param [Timing, nil] timing
+    # @return [ExtensionLoader::RequireHook::RequireResult]
+    def require_with_errors(path, timing)
+      raise NotImplementedError
+    end
+
     # @return [Sketchup::ExtensionsManager]
     def extensions
       raise NotImplementedError

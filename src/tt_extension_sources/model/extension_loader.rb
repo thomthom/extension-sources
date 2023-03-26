@@ -62,7 +62,13 @@ module TT::Plugins::ExtensionSources
       # @return [Boolean]
       def require(path)
         loaded_features = $LOADED_FEATURES.dup
-        success = super(path)
+        if @es_hook_timing
+          success = @es_hook_timing.measure do
+            super(path)
+          end
+        else
+          success = super(path)
+        end
         unless success
           RequireHook.record_require_errors(self, path, loaded_features)
         end
@@ -79,15 +85,19 @@ module TT::Plugins::ExtensionSources
       #   end
       #
       # @param [String] path
-      def es_hook_require_with_errors(path)
+      # @param [Timing, nil] timing
+      def es_hook_require_with_errors(path, timing = nil)
         self.es_hook_detect_require_errors = true
+        self.es_hook_timing = timing
         value = self.require(path)
         result = RequireResult.new(
           value: value,
           error: !self.es_hook_require_errors.empty?
         )
-        self.es_hook_detect_require_errors = false
         result
+      ensure
+        self.es_hook_timing = nil
+        self.es_hook_detect_require_errors = false
       end
 
       # @private
@@ -109,11 +119,16 @@ module TT::Plugins::ExtensionSources
       end
 
       # @private
+      # @param [Timing] value
+      def es_hook_timing=(value)
+        @es_hook_timing = value
+      end
+
+      # @private
       # @param [RequireHook] hook_target
       # @param [String] path
       # @return [Array<String>] loaded_features
       def self.record_require_errors(hook_target, path, loaded_features)
-        # TODO: Disable timing for this logic.
         return unless hook_target.es_hook_detect_require_errors?
 
         # If the file was already loaded, then there was no error.
@@ -128,7 +143,7 @@ module TT::Plugins::ExtensionSources
       # @param [String] path
       # @param [Array<String>] loaded_features
       # @return [String, nil]
-      def self.expand_required_path(path, loaded_features, load_paths = $LOAD_PATH)
+      def self.expand_required_path(path, loaded_features)
         # If the path was already in loaded features it's not an error.
         # Check with increasing costly search.
 
@@ -142,7 +157,7 @@ module TT::Plugins::ExtensionSources
         }
 
         # Check paths relative to $LOAD_PATH.
-        load_paths.each { |load_path|
+        $LOAD_PATH.each { |load_path|
           expanded_path = File.join(load_path, path)
           return expanded_path if loaded_features.include?(expanded_path)
 
@@ -175,12 +190,7 @@ module TT::Plugins::ExtensionSources
         # Check if an extension is already loaded for the given path.
         extension = find_extension(path)
 
-        result = nil
-        @timing.measure do
-          result = @system.require_with_errors(path)
-        end
-        # @errors_detected = true if result.error
-        # @errors_detected ||= result.error
+        result = @system.require_with_errors(path, @timing)
         @errors_detected = true unless result.success?
 
         # Only keep track of new extensions registered.

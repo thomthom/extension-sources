@@ -4,6 +4,7 @@ require 'logger'
 require 'observer'
 require 'time'
 
+require 'tt_extension_sources/model/extension_loader'
 require 'tt_extension_sources/model/extension_source'
 require 'tt_extension_sources/model/version'
 require 'tt_extension_sources/utils/inspection'
@@ -61,9 +62,7 @@ module TT::Plugins::ExtensionSources
 
       if source.enabled?
         add_load_path(source.path)
-        record_require_time(source) do
-          require_sources(source.path)
-        end
+        require_source(source)
       end
 
       source.add_observer(self, :on_source_changed)
@@ -125,9 +124,7 @@ module TT::Plugins::ExtensionSources
         source.path = path
         if source.enabled?
           add_load_path(source.path)
-          record_require_time(source) do
-            require_sources(source.path)
-          end
+          require_source(source)
         end
       end
 
@@ -334,17 +331,11 @@ module TT::Plugins::ExtensionSources
       @data.map(&:serialize_as_hash)
     end
 
-    # @param [String] source_path
+    # @param [ExtensionSource] source
     # @return [Array<String>]
-    def require_sources(source_path)
-      pattern = "#{source_path}/*.rb"
-      Dir.glob(pattern).each { |path|
-        # `Sketchup.require` doesn't throw errors when failing to load a file.
-        # So there's no need to disable the error handler.
-        # Would have been useful to know if the method failed or not, but at the
-        # moment that's not possible to detect.
-        @system.require(path)
-      }.to_a
+    def require_source(source)
+      loader = ExtensionLoader.new(system: @system, statistics: @statistics)
+      loader.require_source(source)
     end
 
     # @param [String] source_path
@@ -367,32 +358,6 @@ module TT::Plugins::ExtensionSources
     # @return [String]
     def storage_path
       @storage_path
-    end
-
-    # @param [ExtensionSource] source
-    def record_require_time(source, &block)
-      timing = Timing.new
-      timing.measure do
-        block.call
-      end
-      source.load_time = timing.lapsed
-      log_require_time(source)
-      nil
-    end
-
-    # @param [ExtensionSource] source
-    def log_require_time(source)
-      return if @statistics.nil?
-
-      sketchup_version = @system.metadata[:sketchup_version] || Version.new
-      row = Statistics::Record.new(
-        sketchup: sketchup_version.to_s,
-        path: source.path,
-        load_time: source.load_time,
-        timestamp: Time.now
-      )
-      @statistics.record(row)
-      nil
     end
 
     # Serializes the state of the manager to {storage_path}.

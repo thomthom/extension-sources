@@ -14,8 +14,19 @@ module TT::Plugins::ExtensionSources
       super(product_id)
     end
 
-    # Settings this will not automatically reflect the app's log level.
-    # It will take effect upon next start.
+    # Uses a hook on `Sketchup.require` to more accurately detect load errors.
+    # This will reduce quality of recorded data as timings as result of load
+    # errors will not be recorded.
+    #
+    # @note This setting takes effect upon next start of SketchUp.
+    #
+    # @example
+    #   TT::Plugins::ExtensionSources.app.settings.use_require_hook = false
+    #
+    # @return [Boolean]
+    define :use_require_hook, true
+
+    # @note This setting takes effect upon next start of SketchUp.
     #
     # @example
     #   TT::Plugins::ExtensionSources.app.settings.log_level = Logger::DEBUG
@@ -23,8 +34,7 @@ module TT::Plugins::ExtensionSources
     # @return [Integer]
     define :log_level, Logger::WARN
 
-    # Settings this will not automatically reflect the app's debug state.
-    # It will take effect upon next start.
+    # @note This setting takes effect upon next start of SketchUp.
     #
     # @example
     #   TT::Plugins::ExtensionSources.app.settings.debug = true

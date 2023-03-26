@@ -50,7 +50,7 @@ module TT::Plugins::ExtensionSources
     # @return [ExtensionSourcesController]
     def extension_sources_controller
       @extension_sources_controller ||= ExtensionSourcesController.new(
-        system: SketchUpSystem.new,
+        system: SketchUpSystem.new(use_require_hook: settings.use_require_hook?),
         settings: settings,
         logger: logger,
         error_handler: error_handler,

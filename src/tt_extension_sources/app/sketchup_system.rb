@@ -7,7 +7,8 @@ module TT::Plugins::ExtensionSources
   # Implementation of the system interface under SketchUp.
   class SketchUpSystem < SystemInterface
 
-    def initialize(use_require_hook: false) # TODO: On by default?
+    # @param [Boolean] use_require_hook
+    def initialize(use_require_hook: false)
       @os = SketchUpOS.new
       @ui = SketchUpUI.new
       @metadata = {
@@ -44,6 +45,11 @@ module TT::Plugins::ExtensionSources
           error: false,
         )
       end
+    end
+
+    # @return [Sketchup::ExtensionsManager]
+    def extensions
+      Sketchup.extensions
     end
 
     # return [OSInterface]

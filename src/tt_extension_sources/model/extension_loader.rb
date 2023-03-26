@@ -10,6 +10,9 @@ module TT::Plugins::ExtensionSources
 
     include Inspection
 
+    # List of extensions that `Sketchup.require` will attempt to resolve.
+    REQUIRE_EXTENSIONS = ['.rbe', '.rbs', '.rb', '.so', '.bundle'].freeze
+
     # @return [Array<SketchupExtension>]
     attr_reader :loaded_extensions
 
@@ -42,15 +45,18 @@ module TT::Plugins::ExtensionSources
       # @example
       #   ExtensionLoader::RequireHook.install_to(Sketchup)
       #
-      # @param [Module, Object] obj
-      def self.install_to(obj)
-        unless obj.is_a?(ExtensionLoader::RequireHook)
-          obj.singleton_class.prepend(ExtensionLoader::RequireHook)
+      # @param [Module, Object] target
+      # @return [void]
+      def self.install_to(target)
+        unless target.is_a?(ExtensionLoader::RequireHook)
+          target.singleton_class.prepend(ExtensionLoader::RequireHook)
         end
       end
 
       # Hooks the original `require` method and attempts to determine if there
-      # were any load errors.
+      # were any load errors if {#es_hook_detect_require_errors?} is enabled.
+      #
+      # @see #es_hook_require_with_errors
       #
       # @param [String] path
       # @return [Boolean]
@@ -58,11 +64,14 @@ module TT::Plugins::ExtensionSources
         loaded_features = $LOADED_FEATURES.dup
         success = super(path)
         unless success
-          self.es_hook_record_require_errors(path, loaded_features)
+          RequireHook.record_require_errors(self, path, loaded_features)
         end
         success
       end
 
+      # Similar to `Sketchup.require` but tries to detect if there were any
+      # load errors.
+      #
       # @example
       #   result = Sketchup.es_hook_require_with_errors(path)
       #   if result.error
@@ -81,10 +90,10 @@ module TT::Plugins::ExtensionSources
         result
       end
 
-      # @todo Move out of the module.
-      # List of extensions that `Sketchup.require` will attempt to resolve.
-      ES_HOOK_REQUIRE_EXT = ['.rbe', '.rbs', '.rb', '.so', '.bundle'].freeze
-      private_constant :ES_HOOK_REQUIRE_EXT
+      # @private
+      def es_hook_detect_require_errors?
+        !!@es_detect_require_errors
+      end
 
       # @private
       # @param [Boolean] value
@@ -94,33 +103,32 @@ module TT::Plugins::ExtensionSources
       end
 
       # @private
-      # @return [Boolean]
+      # @return [Array<String>]
       def es_hook_require_errors
         @es_require_errors ||= []
       end
 
-      # @todo Move out of the module.
       # @private
+      # @param [RequireHook] hook_target
       # @param [String] path
-      # @param [Array<String>] loaded_features
-      def es_hook_record_require_errors(path, loaded_features)
+      # @return [Array<String>] loaded_features
+      def self.record_require_errors(hook_target, path, loaded_features)
         # TODO: Disable timing for this logic.
-        return unless @es_detect_require_errors
+        return unless hook_target.es_hook_detect_require_errors?
 
         # If the file was already loaded, then there was no error.
-        expanded_path = self.es_hook_expand_required_path(path, loaded_features)
+        expanded_path = RequireHook.expand_required_path(path, loaded_features)
         return if expanded_path && File.exist?(expanded_path)
 
         # Assume an error was the cause of the file failing to load.
-        self.es_hook_require_errors << path
+        hook_target.es_hook_require_errors << path
       end
 
-      # @todo Move out of this module.
       # @private
       # @param [String] path
       # @param [Array<String>] loaded_features
       # @return [String, nil]
-      def es_hook_expand_required_path(path, loaded_features)
+      def self.expand_required_path(path, loaded_features, load_paths = $LOAD_PATH)
         # If the path was already in loaded features it's not an error.
         # Check with increasing costly search.
 
@@ -128,18 +136,17 @@ module TT::Plugins::ExtensionSources
         return path if loaded_features.include?(path)
 
         # Check absolute path with expanded file extension.
-        ES_HOOK_REQUIRE_EXT.each { |ext|
+        ExtensionLoader::REQUIRE_EXTENSIONS.each { |ext|
           expanded_path = "#{path}.#{ext}"
           return expanded_path if loaded_features.include?(expanded_path)
         }
 
-        # TODO: Inject $LOAD_PATH
         # Check paths relative to $LOAD_PATH.
-        $LOAD_PATH.each { |load_path|
+        load_paths.each { |load_path|
           expanded_path = File.join(load_path, path)
           return expanded_path if loaded_features.include?(expanded_path)
 
-          ES_HOOK_REQUIRE_EXT.each { |ext|
+          ExtensionLoader::REQUIRE_EXTENSIONS.each { |ext|
             expanded_path = File.join(load_path, "#{path}.#{ext}")
             return expanded_path if loaded_features.include?(expanded_path)
           }

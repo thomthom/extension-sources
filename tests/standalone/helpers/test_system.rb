@@ -43,10 +43,11 @@ module TT::Plugins::ExtensionSources
     end
 
     # @param [String] path
+    # @param [Timing, nil] timing
     # @return [ExtensionLoader::RequireHook::RequireResult]
-    def require_with_errors(path)
+    def require_with_errors(path, timing)
       if @use_require_hook
-        @sketchup.es_hook_require_with_errors(path)
+        @sketchup.es_hook_require_with_errors(path, timing)
       else
         ExtensionLoader::RequireHook::RequireResult.new(
           value: @sketchup.require,

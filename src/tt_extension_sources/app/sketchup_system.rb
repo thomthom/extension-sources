@@ -1,3 +1,4 @@
+require 'tt_extension_sources/model/extension_loader'
 require 'tt_extension_sources/model/system_interface'
 require 'tt_extension_sources/system/console'
 require 'tt_extension_sources/system/os'
@@ -6,7 +7,7 @@ module TT::Plugins::ExtensionSources
   # Implementation of the system interface under SketchUp.
   class SketchUpSystem < SystemInterface
 
-    def initialize
+    def initialize(use_require_hook: false) # TODO: On by default?
       @os = SketchUpOS.new
       @ui = SketchUpUI.new
       @metadata = {
@@ -14,6 +15,11 @@ module TT::Plugins::ExtensionSources
         sketchup_version: Version.parse(Sketchup.version),
         ruby_version: Version.parse(RUBY_VERSION),
       }
+      @use_require_hook = use_require_hook
+
+      if @use_require_hook
+        ExtensionLoader::RequireHook.install_to(Sketchup)
+      end
     end
 
     # return [Hash]
@@ -24,6 +30,20 @@ module TT::Plugins::ExtensionSources
     # return [Boolean]
     def require(path)
       Sketchup.require(path)
+    end
+
+    # @param [String] path
+    # @param [Timing, nil] timing
+    # @return [ExtensionLoader::RequireHook::RequireResult]
+    def require_with_errors(path, timing)
+      if @use_require_hook
+        Sketchup.es_hook_require_with_errors(path, timing)
+      else
+        ExtensionLoader::RequireHook::RequireResult.new(
+          value: Sketchup.require,
+          error: false,
+        )
+      end
     end
 
     # return [OSInterface]

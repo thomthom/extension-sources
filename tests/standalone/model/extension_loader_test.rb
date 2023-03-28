@@ -23,6 +23,8 @@ module TT::Plugins::ExtensionSources
       # Because the fixtures require files we want to reset the list of loaded
       # features between each tests.
       @loaded_features = $LOADED_FEATURES.dup
+      # Also restore $LOAD_PATH.
+      @load_path = $LOAD_PATH.dup
       # Make `TEST_SKETCHUP` available to the test files loaded.
       # Object.const_set(:TEST_SKETCHUP, @sketchup)
       Object.const_set(:TEST_SKETCHUP, @system.sketchup)
@@ -33,6 +35,7 @@ module TT::Plugins::ExtensionSources
 
     def teardown
       $LOADED_FEATURES.delete_if { |feature| !@loaded_features.include?(feature) }
+      $LOAD_PATH.delete_if { |feature| !@load_path.include?(feature) }
       Object.class_eval do
         remove_const(:TEST_SKETCHUP)
         # The fixtures uses a TestExample module to sandbox the test logic.
@@ -48,6 +51,60 @@ module TT::Plugins::ExtensionSources
       )
 
       source = ExtensionSource.new(path: fixture('dummy_valid_extension'))
+      files = loader.require_source(source)
+
+      refute(loader.errors_detected?)
+      assert_kind_of(Float, source.load_time)
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+      assert_equal(File.join(source.path, 'dummy_valid_extension.rb'), files[0])
+
+      assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      assert(loader.loaded_extensions[0].loaded?)
+      assert(loader.valid_measurement?)
+
+      assert_equal(1, @statistics.rows.size, 'Rows in stats')
+      assert_equal(source.path, @statistics.rows[0].path)
+    end
+
+    def test_require_source_valid_measurement_with_relative_paths
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      fixture_path = fixture('dummy_extension_require_relative_paths')
+      $LOAD_PATH << fixture_path
+
+      source = ExtensionSource.new(path: fixture_path)
+      files = loader.require_source(source)
+
+      refute(loader.errors_detected?)
+      assert_kind_of(Float, source.load_time)
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+      assert_equal(File.join(source.path, 'dummy_valid_extension.rb'), files[0])
+
+      assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      assert(loader.loaded_extensions[0].loaded?)
+      assert(loader.valid_measurement?)
+
+      assert_equal(1, @statistics.rows.size, 'Rows in stats')
+      assert_equal(source.path, @statistics.rows[0].path)
+    end
+
+    def test_require_source_valid_measurement_with_relative_paths_already_loaded
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      fixture_path = fixture('dummy_extension_require_relative_paths_already_loaded')
+      $LOAD_PATH << fixture_path
+
+      source = ExtensionSource.new(path: fixture_path)
       files = loader.require_source(source)
 
       refute(loader.errors_detected?)

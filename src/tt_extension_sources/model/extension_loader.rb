@@ -152,7 +152,7 @@ module TT::Plugins::ExtensionSources
 
         # Check absolute path with expanded file extension.
         ExtensionLoader::REQUIRE_EXTENSIONS.each { |ext|
-          expanded_path = "#{path}.#{ext}"
+          expanded_path = "#{path}#{ext}"
           return expanded_path if loaded_features.include?(expanded_path)
         }
 
@@ -162,7 +162,7 @@ module TT::Plugins::ExtensionSources
           return expanded_path if loaded_features.include?(expanded_path)
 
           ExtensionLoader::REQUIRE_EXTENSIONS.each { |ext|
-            expanded_path = File.join(load_path, "#{path}.#{ext}")
+            expanded_path = File.join(load_path, "#{path}#{ext}")
             return expanded_path if loaded_features.include?(expanded_path)
           }
         }

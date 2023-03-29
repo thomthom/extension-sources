@@ -1,0 +1,54 @@
+REQUIRE: C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD.rb
+  REQUIRE: C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/bootstrap
+    REQUIRE: TT_SUbD/third-party/error-reporter/error_reporter
+    REQUIRE: TT_SUbD/translator
+      REQUIRE: TT_SUbD/settings
+    REQUIRE: TT_SUbD/core
+      REQUIRE: TT_SUbD/c_extension_manager
+      REQUIRE: TT_SUbD/commands
+        REQUIRE: TT_SUbD/error_handlers/subdivision
+          REQUIRE: TT_SUbD/ui/license_error_window
+            REQUIRE: TT_SUbD/ui/dialog_window
+              REQUIRE: TT_SUbD/ui/window
+                REQUIRE: TT_SUbD/object_utils
+                REQUIRE: TT_SUbD/dpi
+                  REQUIRE: TT_SUbD/settings
+                    expand_required_path: "TT_SUbD/settings"
+                    # ...
+                    "C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/settings.rbe"
+                    "C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/settings.rbs"
+                    "C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/settings.rb"
+              REQUIRE: TT_SUbD/win32_helper
+                REQUIRE: C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/win32/win32_impl
+                REQUIRE: C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/win32/win32_impl_fiddle
+                  REQUIRE: C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/win32/win32_impl
+            REQUIRE: TT_SUbD/commands
+expand_required_path: "TT_SUbD/commands"
+# ...
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/third-party/error-reporter/error_reporter.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/settings.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/translator.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/c_extension_manager.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/libraries/2.1.10.0/2.7/win64/SUbD.so
+C:/Program Files/SketchUp/SketchUp 2023/Tools/RubyStdLib/singleton.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/object_utils.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/dpi.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/ui/window.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/win32/win32_impl.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/win32/win32_impl_fiddle.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/win32_helper.rb
+C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/ui/dialog_window.rb
+# ...
+"C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/commands.rbe"
+"C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/commands.rbs"
+"C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/commands.rb"
+"C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/commands.so"
+"C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD/commands.bundle"
+# ...
+FAILED: assuming load error for "TT_SUbD/commands"
+# ...
+Load errors while loading: C:/Users/Thomas/SourceTree/subd-release/Ruby/src/TT_SUbD.rb
+TT_SUbD/commands
+
+# TODO: This is loading an .rb file, which calls Ruby's `require`.
+#       Maybe .rbe files behave differently?

@@ -20,11 +20,13 @@ module TT::Plugins::ExtensionSources
     #
     # @note This setting takes effect upon next start of SketchUp.
     #
+    # @todo This is currently treating recursive includes as failures.
+    #
     # @example
     #   TT::Plugins::ExtensionSources.app.settings.use_require_hook = false
     #
     # @return [Boolean]
-    define :use_require_hook, true
+    define :use_require_hook, false
 
     # @note This setting takes effect upon next start of SketchUp.
     #

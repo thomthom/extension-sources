@@ -346,6 +346,7 @@ module TT::Plugins::ExtensionSources
 
       refute(loader.errors_detected?)
       assert_kind_of(Float, source.load_time)
+      refute_equal(0.0, source.load_time)
 
       assert_kind_of(Array, files)
       assert_equal(1, files.size, 'Files iterated')

@@ -328,5 +328,36 @@ module TT::Plugins::ExtensionSources
       assert_empty(@statistics.rows, 'Rows in stats')
     end
 
+    def test_require_source_valid_measurement_without_require_hook
+      # Kludge to avoid the default test setup.
+      @system = TestSystem.new(use_require_hook: false)
+      Object.class_eval do
+        remove_const(:TEST_SKETCHUP)
+      end
+      Object.const_set(:TEST_SKETCHUP, @system.sketchup)
+
+      loader = ExtensionLoader.new(
+        system: @system,
+        statistics: @statistics,
+      )
+
+      source = ExtensionSource.new(path: fixture('dummy_valid_extension'))
+      files = loader.require_source(source)
+
+      refute(loader.errors_detected?)
+      assert_kind_of(Float, source.load_time)
+
+      assert_kind_of(Array, files)
+      assert_equal(1, files.size, 'Files iterated')
+      assert_equal(File.join(source.path, 'dummy_valid_extension.rb'), files[0])
+
+      assert_equal(1, loader.loaded_extensions.size, 'Extensions loaded')
+      assert(loader.loaded_extensions[0].loaded?)
+      assert(loader.valid_measurement?)
+
+      assert_equal(1, @statistics.rows.size, 'Rows in stats')
+      assert_equal(source.path, @statistics.rows[0].path)
+    end
+
   end # class
 end # module

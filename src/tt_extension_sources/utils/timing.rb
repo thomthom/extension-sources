@@ -7,14 +7,17 @@ module TT::Plugins::ExtensionSources
     # Immutable measurement data for timing results.
     class Measurement
 
+      # @return [Time]
+      attr_reader :start, :end
+
       # @return [Float]
-      attr_reader :start, :end, :lapsed
+      attr_reader :lapsed
 
       # @return [String, nil]
       attr_reader :label
 
-      # @param [Float] start_time
-      # @param [Float] end_time
+      # @param [Time] start_time
+      # @param [Time] end_time
       # @param [String, nil] label
       def initialize(start_time, end_time, label: nil)
         @label = label
@@ -74,13 +77,15 @@ module TT::Plugins::ExtensionSources
 
     # @return [Float, nil]
     def lapsed
-      if @measurements.respond_to?(:sum)
+      value = if @measurements.respond_to?(:sum)
         @measurements.sum(&:lapsed)
       else
         # Array#sum was added in Ruby 2.4. Fall back to manual, possibly slower
         # sum.
-        @measurements.inject(0) { |sum, measurement| sum + measurement.lapsed }
+        return nil if @measurements.empty?
+        @measurements.inject(0.0) { |sum, measurement| sum + measurement.lapsed }
       end
+      value.nil? ? nil : value.to_f
     end
 
     # @return [String]

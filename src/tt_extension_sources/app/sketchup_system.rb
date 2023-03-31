@@ -40,8 +40,11 @@ module TT::Plugins::ExtensionSources
       if @use_require_hook
         Sketchup.es_hook_require_with_errors(path, timing)
       else
+        value = timing.measure do
+          Sketchup.require(path)
+        end
         ExtensionLoader::RequireHook::RequireResult.new(
-          value: Sketchup.require,
+          value: value,
           error: false,
         )
       end

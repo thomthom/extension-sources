@@ -17,7 +17,6 @@ let app = new Vue({
   data: {
     filter: "",
     report: [],
-    showVersions: false,
   },
   computed: {
     is_filtered() {
@@ -68,6 +67,7 @@ let app = new Vue({
         versions.sort((a, b) => b.values.median - a.values.median);
 
         data.push({
+          reactive: item, // Access to reactive properties.
           path: path,
           label: path.replace(pattern, ''),
           total: this.graph_data(item.total, max_range),
@@ -109,6 +109,10 @@ let app = new Vue({
     update(report) {
       console.log('update...');
       console.log(report);
+      // Inject properties before assigning to Vue data so they become reactive.
+      for (const [_key, value] of Object.entries(report)) {
+        value.showVersions = false
+      }
       this.report = report;
     },
     trace(message) {

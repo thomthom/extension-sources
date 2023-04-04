@@ -145,7 +145,7 @@
                 </div>
                 <!-- Total stats -->
                 <div class="graph-bars">
-                  <div class="graph-bar" v-on:click="showVersions = !showVersions">
+                  <div class="graph-bar" v-on:click="item.reactive.showVersions = !item.reactive.showVersions">
                     <div class="graph-item graph-minmax" :style="item.total.styles.minmax"></div>
                     <div class="graph-item graph-mean" :style="item.total.styles.mean"></div>
                     <div class="graph-item graph-median" :style="item.total.styles.median"></div>
@@ -159,7 +159,7 @@
                   </div>
                   <!-- Per-SketchUp stats -->
                   <div class="graph-bar secondary" v-for="su in item.versions" v-bind:key="su.version"
-                    v-show="showVersions">
+                    v-show="item.reactive.showVersions">
                     <div class="graph-item graph-minmax" :style="su.styles.minmax"></div>
                     <div class="graph-item graph-mean" :style="su.styles.mean"></div>
                     <div class="graph-item graph-median" :style="su.styles.median"></div>

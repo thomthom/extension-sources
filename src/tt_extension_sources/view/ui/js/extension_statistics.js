@@ -12,9 +12,17 @@ const OS = {
   isMac: navigator.platform.toUpperCase().indexOf('MAC') >= 0,
 };
 
+// src/tt_extension_sources/model/statistics_reporter.rb
+const GroupBy = {
+  major: 1,
+  major_minor: 2,
+  major_minor_patch: 3,
+};
+
 let app = new Vue({
   el: '#app',
   data: {
+    groupBy: GroupBy.major_minor_patch,
     filter: "",
     report: [],
   },
@@ -106,14 +114,20 @@ let app = new Vue({
         },
       };
     },
-    update(report) {
-      console.log('update...');
+    update(report, group_by) {
+      console.log('update', `group_by: ${group_by}`);
       console.log(report);
+      this.groupBy = group_by;
       // Inject properties before assigning to Vue data so they become reactive.
+      // TODO: These are lost when updating Group By...
       for (const [_key, value] of Object.entries(report)) {
         value.showVersions = false
       }
       this.report = report;
+    },
+    on_group_by_change(event) {
+      console.log('on_group_by_change', event, event.target.value);
+      sketchup.group_by(event.target.value);
     },
     trace(message) {
       console.log(message);

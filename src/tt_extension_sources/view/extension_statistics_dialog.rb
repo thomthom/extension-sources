@@ -15,36 +15,22 @@ module TT::Plugins::ExtensionSources
         :boot,
         :accept,
         :cancel,
+        :group_by,
       ]
       super(event_names)
-      @report = []
+      @report = [] # TODO: Move to controller.
+      @group_by = StatisticsReporter::GROUP_BY_MAJOR_MINOR # TODO: Move to controller.
     end
 
     # @param [Hash] report
-    def update(report)
-      call_js('app.update', report)
+    def update(report, group_by: StatisticsReporter::GROUP_BY_MAJOR_MINOR)
+      call_js('app.update', report, group_by)
     end
 
     # @param [Hash] _report
     def show(_report)
-      # TODO: Pass in stats.
-
-      app_data = File.join(OS.app_data_path, 'CookieWare', 'Extension Source Manager')
-      timing_log_path = File.join(app_data, 'extension-sources-timings.csv')
-      puts timing_log_path
-
-      records = []
-      File.open(timing_log_path, 'r:UTF-8') { |file|
-        statistics = StatisticsCSV.new(io: file)
-        records = statistics.read
-      }
-      puts "Records: #{records.size}"
-
-      reporter = StatisticsReporter.new
-      report = reporter.report(records)
-      puts "Report: #{report.size}"
-
-      @report = report
+      # TODO: Pass in stats from controller.
+      @report = generate_report(group_by: @group_by)
       super()
     end
 
@@ -75,6 +61,7 @@ module TT::Plugins::ExtensionSources
       })
       html_file = File.join(ui_path, 'html', 'extension_statistics.html')
       dialog.set_file(html_file)
+      on(:group_by) { |_dialog, value| update_group_by(value) } # TODO: Should be done by controller.
       dialog
     end
 
@@ -89,6 +76,35 @@ module TT::Plugins::ExtensionSources
       dialog.add_action_callback('cancel') do
         trigger(:cancel, self)
       end
+      dialog.add_action_callback('group_by') do |context, value|
+        trigger(:group_by, self, value.to_i)
+      end
+    end
+
+    # TODO: This should be handled by controller.
+    def update_group_by(group_by)
+      @report = generate_report(group_by: group_by)
+      @group_by = group_by
+      update(@report, group_by: group_by)
+    end
+
+    def generate_report(group_by: StatisticsReporter::GROUP_BY_MAJOR_MINOR)
+      app_data = File.join(OS.app_data_path, 'CookieWare', 'Extension Source Manager')
+      timing_log_path = File.join(app_data, 'extension-sources-timings.csv')
+      puts timing_log_path
+
+      records = []
+      File.open(timing_log_path, 'r:UTF-8') { |file|
+        statistics = StatisticsCSV.new(io: file)
+        records = statistics.read
+      }
+      puts "Records: #{records.size} (Grouped by: #{group_by})"
+
+      reporter = StatisticsReporter.new
+      report = reporter.report(records, group_by: group_by)
+      puts "Report: #{report.size}"
+
+      report
     end
 
   end

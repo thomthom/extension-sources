@@ -188,10 +188,11 @@
               Group by:
             </label>
             <div class="col-sm-3">
-              <select id="groupBy" class="custom-select form-control">
-                <option>Major</option>
-                <option>Major.Minor</option>
-                <option selected>Major.Minor.Patch</option>
+              <select id="groupBy" class="custom-select form-control" v-bind:value="groupBy"
+                v-on:change="on_group_by_change">
+                <option value="1">Major</option>
+                <option value="2">Major.Minor</option>
+                <option value="3">Major.Minor.Patch</option>
               </select>
             </div>
 

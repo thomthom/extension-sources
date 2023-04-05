@@ -1,9 +1,26 @@
+require 'tt_extension_sources/model/version'
+
 module TT::Plugins::ExtensionSources
   # Processes the raw data from {Statistics#read} into a nested hierarchy based
   # on path (extension) and SketchUp version.
   #
   # @see #report
   class StatisticsReporter
+
+    module Constants
+
+      # Group SketchUp versions by Major.Minor.Patch.
+      GROUP_BY_MAJOR_MINOR_PATCH = 3
+
+      # Group SketchUp versions by Major.Minor.
+      GROUP_BY_MAJOR_MINOR = 2
+
+      # Group SketchUp versions by Major.
+      GROUP_BY_MAJOR = 1
+
+    end # module Constants
+
+    include Constants
 
     # The returned nested hash has the following structure:
     #
@@ -37,16 +54,19 @@ module TT::Plugins::ExtensionSources
     #
     # @param [Array<Statistics::Record>] records
     # @return [Hash]
-    def report(records)
+    def report(records, group_by: GROUP_BY_MAJOR_MINOR_PATCH)
       report = {}
 
       grouped = {}
       records.each { |record|
         sketchup, path, load_time, _timestamp = record.values
 
+        version = Version.parse(sketchup)
+        version_group = version.to_a.take(group_by).join('.')
+
         grouped[path] ||= {}
-        grouped[path][sketchup] ||= []
-        grouped[path][sketchup] << load_time.to_f
+        grouped[path][version_group] ||= []
+        grouped[path][version_group] << load_time.to_f
       }
 
       grouped.each { |path, sketchup_versions|

@@ -1,0 +1,427 @@
+{
+  "C:/Users/Thomas/SourceTree/tt-library-2": {
+    "total": {
+      "min": 0.002251,
+      "max": 0.2714013,
+      "mean": 0.1468014818181818,
+      "median": 0.2633819,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.2633819,
+        "max": 0.2714013,
+        "mean": 0.26709603333333337,
+        "median": 0.26722285,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.002251,
+        "max": 0.0027093,
+        "mean": 0.00244802,
+        "median": 0.0024012,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/TestUp2/src": {
+    "total": {
+      "min": 0.2772595,
+      "max": 0.4690219,
+      "mean": 0.30458256363636366,
+      "median": 0.2880492,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.2772595,
+        "max": 0.3003618,
+        "mean": 0.29078488333333335,
+        "median": 0.29158495,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.2820894,
+        "max": 0.4690219,
+        "mean": 0.32113978000000004,
+        "median": 0.2836984,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/SpeedUp/src": {
+    "total": {
+      "min": 0.0569899,
+      "max": 0.1006046,
+      "mean": 0.08050775454545454,
+      "median": 0.0901212,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0901212,
+        "max": 0.1006046,
+        "mean": 0.09723135,
+        "median": 0.0987287,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.0569899,
+        "max": 0.0657588,
+        "mean": 0.06043944,
+        "median": 0.0590859,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/SolidInspector/src": {
+    "total": {
+      "min": 0.000175,
+      "max": 0.0003296,
+      "mean": 0.00021822727272727271,
+      "median": 0.0002108,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0001826,
+        "max": 0.0002301,
+        "mean": 0.00020648333333333333,
+        "median": 0.0002091,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.000175,
+        "max": 0.0003296,
+        "mean": 0.00023232,
+        "median": 0.0002199,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/transformation-inspector/src": {
+    "total": {
+      "min": 0.0610186,
+      "max": 0.0730146,
+      "mean": 0.06474497272727273,
+      "median": 0.06437,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0610186,
+        "max": 0.0652662,
+        "mean": 0.0625126,
+        "median": 0.0614876,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.0624249,
+        "max": 0.0730146,
+        "mean": 0.06742382,
+        "median": 0.0674479,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/selection-tools/src": {
+    "total": {
+      "min": 0.002878,
+      "max": 0.0804214,
+      "mean": 0.041279754545454544,
+      "median": 0.0677061,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0677061,
+        "max": 0.0804214,
+        "mean": 0.07308916666666666,
+        "median": 0.07142209999999999,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.002878,
+        "max": 0.003342,
+        "mean": 0.00310846,
+        "median": 0.0030512,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/bitmap-2-mesh/src": {
+    "total": {
+      "min": 0.0758714,
+      "max": 0.0855026,
+      "mean": 0.0799287909090909,
+      "median": 0.0800786,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0758714,
+        "max": 0.0809229,
+        "mean": 0.07749351666666666,
+        "median": 0.0770814,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.0800786,
+        "max": 0.0855026,
+        "mean": 0.08285112,
+        "median": 0.0828268,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/traceup/src": {
+    "total": {
+      "min": 0.0344751,
+      "max": 0.0505278,
+      "mean": 0.03718125454545454,
+      "median": 0.0356706,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0344751,
+        "max": 0.0505278,
+        "mean": 0.0378518,
+        "median": 0.03550735,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.035068,
+        "max": 0.0375646,
+        "mean": 0.036376599999999995,
+        "median": 0.0360259,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/sketchup-attribute-helper/src": {
+    "total": {
+      "min": 0.0050619,
+      "max": 0.0066177,
+      "mean": 0.005886227272727273,
+      "median": 0.0060153,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0060153,
+        "max": 0.0066177,
+        "mean": 0.006342883333333334,
+        "median": 0.0063787,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.0050619,
+        "max": 0.0055904,
+        "mean": 0.005338239999999999,
+        "median": 0.0054101,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/TrueBend/src": {
+    "total": {
+      "min": 0.0021326,
+      "max": 0.1909144,
+      "mean": 0.1020817,
+      "median": 0.1808259,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.1808259,
+        "max": 0.1909144,
+        "mean": 0.18507808333333334,
+        "median": 0.184075,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.0021326,
+        "max": 0.0030725,
+        "mean": 0.00248604,
+        "median": 0.0022839,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/quadface-tools/src": {
+    "total": {
+      "min": 0.2162924,
+      "max": 0.499082,
+      "mean": 0.33996902727272726,
+      "median": 0.235676,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.2162924,
+        "max": 0.235676,
+        "mean": 0.22205054999999999,
+        "median": 0.2202742,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.4728547,
+        "max": 0.499082,
+        "mean": 0.4814712,
+        "median": 0.4800839,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/subd-release/Ruby/src": {
+    "total": {
+      "min": 0.0020544,
+      "max": 0.3982555,
+      "mean": 0.21007664545454546,
+      "median": 0.3752395,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.3752395,
+        "max": 0.3982555,
+        "mean": 0.38321981666666666,
+        "median": 0.38078294999999995,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.0020544,
+        "max": 0.003146,
+        "mean": 0.00230484,
+        "median": 0.002098,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/vertex-tools/src": {
+    "total": {
+      "min": 0.6181219,
+      "max": 0.7158758,
+      "mean": 0.6599807272727273,
+      "median": 0.6772519,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.6772519,
+        "max": 0.7158758,
+        "mean": 0.6863910833333334,
+        "median": 0.68138555,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.6181219,
+        "max": 0.6380038,
+        "mean": 0.6282883,
+        "median": 0.6283272,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/ese-license-workaround/src": {
+    "total": {
+      "min": 0.0097184,
+      "max": 0.1357876,
+      "mean": 0.03392950909090909,
+      "median": 0.0121933,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0097184,
+        "max": 0.0121933,
+        "mean": 0.010633716666666668,
+        "median": 0.0102594,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.0428071,
+        "max": 0.1357876,
+        "mean": 0.06188446000000001,
+        "median": 0.0438269,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/wave-function-collapse/src": {
+    "total": {
+      "min": 0.0727208,
+      "max": 0.0817012,
+      "mean": 0.07567912727272728,
+      "median": 0.0747789,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0740995,
+        "max": 0.0817012,
+        "mean": 0.07695293333333333,
+        "median": 0.0762681,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.0727208,
+        "max": 0.0767768,
+        "mean": 0.07415056,
+        "median": 0.0739284,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/sketchup-console-plus/src": {
+    "total": {
+      "min": 0.2397997,
+      "max": 0.2755042,
+      "mean": 0.2542210272727273,
+      "median": 0.2513258,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.2397997,
+        "max": 0.2729974,
+        "mean": 0.25282221666666665,
+        "median": 0.25051504999999996,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.2425549,
+        "max": 0.2755042,
+        "mean": 0.2558996,
+        "median": 0.251862,
+        "count": 5
+      }
+    }
+  },
+  "C:/Users/Thomas/SourceTree/sketchup-interactive-ruby-api-documentation/src": {
+    "total": {
+      "min": 0.0146118,
+      "max": 0.0183824,
+      "mean": 0.016254963636363636,
+      "median": 0.0159557,
+      "count": 11
+    },
+    "versions": {
+      "22.0.354": {
+        "min": 0.0147914,
+        "max": 0.0183824,
+        "mean": 0.01650001666666667,
+        "median": 0.01600695,
+        "count": 6
+      },
+      "21.1.332": {
+        "min": 0.0146118,
+        "max": 0.0173196,
+        "mean": 0.0159609,
+        "median": 0.0159516,
+        "count": 5
+      }
+    }
+  }
+}

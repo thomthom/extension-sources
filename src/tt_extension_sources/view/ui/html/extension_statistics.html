@@ -12,9 +12,48 @@
   <link rel="stylesheet" href="../css/dialog.css">
   <script src="../js/vue.js"></script>
   <style>
+    .es-list-header {
+      padding: 4px 16px 1px 16px;
+      border-bottom: 1px solid #cbcdd6;
+    }
+
+    .es-graph-legend {
+      /* float: left; */
+      position: absolute;
+      left: 10px;
+    }
+
+    .es-graph-legend>span {
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .es-graph-legend>span::before {
+      display: inline-block;
+      width: 0.75rem;
+      height: 0.75rem;
+      margin-right: 5px;
+      content: '';
+      background: #61636c;
+    }
+
+    .es-graph-legend>.es-legend-median::before {
+      background: #7dc9ff;
+    }
+
+    .es-graph-legend>.es-legend-mean::before {
+      background: #185a87;
+    }
+
+    .es-graph-legend>.es-legend-minmax::before {
+      background: #217cbb;
+    }
+
     .record {
       padding: 5px;
-      border: 1px solid rgba(0, 0, 0, .125);
+      /* border: 1px solid rgba(0, 0, 0, .125); */
+      /* The above rule is from Modus, but it appear too dark in this scenario. */
+      border: 1px solid rgba(0, 0, 0, .07);
       padding: .4375rem 1rem;
     }
 
@@ -132,6 +171,32 @@
             </div>
           </div>
         </div>
+        <!-- Content (List Header) -->
+        <div class="es-list-header">
+          <div class="form-row">
+            <label for="sortBy" class="col-form-label">
+              Sort by:
+            </label>
+            <div class="col-sm-2">
+              <select id="sortBy" class="custom-select form-control">
+                <option>Median</option>
+                <option>Mean</option>
+              </select>
+            </div>
+
+            <label for="groupBy" class="col-form-label" title="Group SketchUp version">
+              Group by:
+            </label>
+            <div class="col-sm-3">
+              <select id="groupBy" class="custom-select form-control">
+                <option>Major</option>
+                <option>Major.Minor</option>
+                <option selected>Major.Minor.Patch</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
         <!-- Content (List) -->
         <div class="modus-content-columns">
           <div class="modus-content">
@@ -180,6 +245,11 @@
         </div>
         <!-- Footer -->
         <div class="modal-footer">
+          <div class="es-graph-legend">
+            <span class="es-legend-median">Median</span>
+            <span class="es-legend-mean">Mean</span>
+            <span class="es-legend-minmax">Min/Max</span>
+          </div>
           <button class="btn btn-outline-primary" v-on:click.prevent="cancel">Close</button>
         </div>
       </div>

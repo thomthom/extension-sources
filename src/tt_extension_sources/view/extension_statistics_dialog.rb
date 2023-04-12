@@ -88,6 +88,7 @@ module TT::Plugins::ExtensionSources
       update(@report, group_by: group_by)
     end
 
+    # @param [Integer] group_by One of `GROUP_BY_*` values in {StatisticsReporter::Constants}.
     def generate_report(group_by: StatisticsReporter::GROUP_BY_MAJOR_MINOR)
       app_data = File.join(OS.app_data_path, 'CookieWare', 'Extension Source Manager')
       timing_log_path = File.join(app_data, 'extension-sources-timings.csv')

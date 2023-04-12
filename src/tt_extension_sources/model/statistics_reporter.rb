@@ -7,6 +7,10 @@ module TT::Plugins::ExtensionSources
   # @see #report
   class StatisticsReporter
 
+    # Constants related to {StatisticsReporter}.
+    #
+    # @note The group-by constants is mirrored in:
+    #   `src\tt_extension_sources\view\ui\js\extension_statistics.js`.
     module Constants
 
       # Group SketchUp versions by Major.Minor.Patch.

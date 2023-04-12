@@ -178,9 +178,11 @@
               Sort by:
             </label>
             <div class="col-sm-2">
-              <select id="sortBy" class="custom-select form-control">
-                <option>Median</option>
-                <option>Mean</option>
+              <select id="sortBy" class="custom-select form-control" v-model="sortBy">
+                <option value="median">Median</option>
+                <option value="mean">Mean</option>
+                <option value="min">Minimum</option>
+                <option value="max">Maximum</option>
               </select>
             </div>
 
@@ -205,10 +207,10 @@
               <li class="record" v-for="(item, index) in filtered_chart_data" v-bind:key="item.path">
                 <!-- Label -->
                 <div class="graph-label"><span :title="item.path">{{ item.label }}</span>
-                  <!-- TODO: sort-by value -->
                   <span style="float: right;">
-                    Median: <samp>{{ item.total.values.median.toFixed(3) }}s</samp>
+                    {{ sort_by_label }}: <samp>{{ item.total.values[sortBy].toFixed(3) }}s</samp>
                   </span>
+                  <!-- TODO: sort-by direction -->
                 </div>
                 <!-- Total stats -->
                 <div class="graph-bars">

@@ -19,10 +19,21 @@ const GroupBy = {
   major_minor_patch: 3,
 };
 
+const SortBy = {
+  median: 'median',
+  mean: 'mean',
+  min: 'min',
+  max: 'max',
+};
+
 let app = new Vue({
   el: '#app',
   data: {
     groupBy: GroupBy.major_minor_patch,
+    // Median is a good default accounting for outliers due to load errors
+    // that could impact the extension load time.
+    // TODO: Persist option.
+    sortBy: SortBy.median,
     filter: "",
     report: [],
   },
@@ -41,11 +52,18 @@ let app = new Vue({
       });
     },
     sorted_filtered_paths() {
-      // TODO: Sort by user options.
       // TODO: Filter on label (sans common prefix?)
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator/Collator#options
       return this.filtered_paths.sort(
         (a, b) => a.localeCompare(b, undefined, { sensitivity: 'accent' }));
+    },
+    sort_by_label() {
+      switch (this.sortBy) {
+        case SortBy.median: return 'Median';
+        case SortBy.mean: return 'Mean';
+        case SortBy.min: return 'Min';
+        case SortBy.max: return 'Max';
+      }
     },
     filtered_chart_data() {
       const paths = this.sorted_filtered_paths;
@@ -86,9 +104,7 @@ let app = new Vue({
       // TODO: Sort by user config. Ascending/descending.
       // Median is a good default accounting for outliers due to load errors
       // that could impact the extension load time.
-      // TODO: Don't record load time when extension is disabled.
-      // TODO: Don't record load time if require reports errors.
-      data.sort((a, b) => b.total.values.median - a.total.values.median);
+      data.sort((a, b) => b.total.values[this.sortBy] - a.total.values[this.sortBy]);
 
       return data;
     }

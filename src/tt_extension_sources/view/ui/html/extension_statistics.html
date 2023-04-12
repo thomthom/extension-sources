@@ -185,6 +185,10 @@
                 <option value="max">Maximum</option>
               </select>
             </div>
+            <button type="button" class="btn btn-icon-only btn-text-dark" v-on:click="sortAscending = !sortAscending">
+              <i class="modus-icons" v-if="sortAscending">sort_amount_up</i>
+              <i class="modus-icons" v-else>sort_amount_down</i>
+            </button>
 
             <label for="groupBy" class="col-form-label" title="Group SketchUp version">
               Group by:
@@ -197,7 +201,6 @@
                 <option value="3">Major.Minor.Patch</option>
               </select>
             </div>
-
           </div>
         </div>
         <!-- Content (List) -->
@@ -210,7 +213,6 @@
                   <span style="float: right;">
                     {{ sort_by_label }}: <samp>{{ item.total.values[sortBy].toFixed(3) }}s</samp>
                   </span>
-                  <!-- TODO: sort-by direction -->
                 </div>
                 <!-- Total stats -->
                 <div class="graph-bars">

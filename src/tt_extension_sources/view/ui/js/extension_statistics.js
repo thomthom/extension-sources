@@ -32,8 +32,8 @@ let app = new Vue({
     groupBy: GroupBy.major_minor_patch,
     // Median is a good default accounting for outliers due to load errors
     // that could impact the extension load time.
-    // TODO: Persist option.
-    sortBy: SortBy.median,
+    sortBy: SortBy.median, // TODO: Persist option.
+    sortAscending: false, // TODO: Persist option.
     filter: "",
     report: [],
   },
@@ -101,10 +101,13 @@ let app = new Vue({
         });
       }
 
-      // TODO: Sort by user config. Ascending/descending.
       // Median is a good default accounting for outliers due to load errors
       // that could impact the extension load time.
-      data.sort((a, b) => b.total.values[this.sortBy] - a.total.values[this.sortBy]);
+      if (this.sortAscending) {
+        data.sort((a, b) => a.total.values[this.sortBy] - b.total.values[this.sortBy]);
+      } else {
+        data.sort((a, b) => b.total.values[this.sortBy] - a.total.values[this.sortBy]);
+      }
 
       return data;
     }
@@ -135,7 +138,8 @@ let app = new Vue({
       console.log(report);
       this.groupBy = group_by;
       // Inject properties before assigning to Vue data so they become reactive.
-      // TODO: These are lost when updating Group By...
+      // Note: These are lost when updating Group By, but for now that's ok.
+      //       It's not something that's expected to be done frequently.
       for (const [_key, value] of Object.entries(report)) {
         value.showVersions = false
       }

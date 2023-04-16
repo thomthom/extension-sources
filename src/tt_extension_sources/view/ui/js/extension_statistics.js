@@ -51,6 +51,7 @@ let app = new Vue({
         return upper_case_path.includes(upper_case_filter);
       });
     },
+    /** @return {Array<string>} */
     sorted_filtered_paths() {
       // TODO: Filter on label (sans common prefix?)
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator/Collator#options
@@ -70,7 +71,6 @@ let app = new Vue({
       // console.log('paths', paths);
 
       // TODO: Improve. Might not be a single common prefix.
-      // TODO: Account for only one item.
       const common_prefix = this.longest_common_prefix(Object.keys(this.report));
       const pattern = new RegExp(`^${common_prefix}`, 'i');
       // const labels = paths.map(x => x.replace(pattern, ''));
@@ -85,6 +85,7 @@ let app = new Vue({
         const item = this.report[path];
         // console.log(`> item:`, item, Object.values(item));
 
+        // Sort the data for the SketchUp versions by the version number.
         let versions = Object.keys(item.versions).map(version => {
           let version_data = this.graph_data(item.versions[version], max_range);
           version_data.version = version;
@@ -101,8 +102,6 @@ let app = new Vue({
         });
       }
 
-      // Median is a good default accounting for outliers due to load errors
-      // that could impact the extension load time.
       if (this.sortAscending) {
         data.sort((a, b) => a.total.values[this.sortBy] - b.total.values[this.sortBy]);
       } else {
@@ -155,32 +154,29 @@ let app = new Vue({
     cancel() {
       sketchup.cancel();
     },
-    // https://www.geeksforgeeks.org/longest-common-prefix-using-sorting/
-    longest_common_prefix(a) {
-      let size = a.length;
+    /** @param {Array<string>} strings */
+    longest_common_prefix(strings) {
+      // https://www.geeksforgeeks.org/longest-common-prefix-using-sorting/
+      let num_strings = strings.length;
 
-      /* if size is 0, return empty string */
-      if (size == 0)
-        return "";
+      if (num_strings == 0)
+        return '';
 
-      if (size == 1)
-        return a[0];
+      if (num_strings == 1)
+        return strings[0];
 
-      /* sort the array of strings */
-      // a.sort();
-      const s = [...a].sort(); // https://stackoverflow.com/a/42442909/486990
+      const sorted = [...strings].sort(); // https://stackoverflow.com/a/42442909/486990
 
-      /* find the minimum length from first and last string */
-      let end = Math.min(s[0].length, s[size - 1].length);
+      // Find the minimum length from first and last string.
+      let end = Math.min(sorted[0].length, sorted[num_strings - 1].length);
 
-      /* find the common prefix between the first and
-         last string */
+      // Find the common prefix between the first and last string.
       let i = 0;
-      while (i < end && s[0][i] == s[size - 1][i])
+      while (i < end && sorted[0][i] == sorted[num_strings - 1][i])
         i++;
 
-      let pre = s[0].substring(0, i);
-      return pre;
+      let prefix = sorted[0].substring(0, i);
+      return prefix;
     }
   },
   mounted() {

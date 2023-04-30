@@ -70,7 +70,6 @@ let app = new Vue({
       const paths = this.sorted_filtered_paths;
       // console.log('paths', paths);
 
-      // TODO: Improve. Might not be a single common prefix.
       const common_prefix = this.longest_common_prefix(Object.keys(this.report));
       const pattern = new RegExp(`^${common_prefix}`, 'i');
       // const labels = paths.map(x => x.replace(pattern, ''));

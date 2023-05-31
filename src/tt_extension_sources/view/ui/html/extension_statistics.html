@@ -201,6 +201,17 @@
                 <option value="3">Major.Minor.Patch</option>
               </select>
             </div>
+
+            <label for="filterBy" class="col-form-label" title="Filter SketchUp versions">
+              Filter:
+            </label>
+            <div class="col-sm-2">
+              <select id="filterBy" class="custom-select form-control" v-bind:value="filterBy"
+                v-on:change="on_filter_by_change">
+                <option>None</option>
+                <option v-for="item in filter_by_options">{{ item }}</option>
+              </select>
+            </div>
           </div>
         </div>
         <!-- Content (List) -->

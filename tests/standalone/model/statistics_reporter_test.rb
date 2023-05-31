@@ -73,5 +73,11 @@ module TT::Plugins::ExtensionSources
         group_by: StatisticsReporter::GROUP_BY_MAJOR)
     end
 
+    def test_report_filter_major_minor
+      records_path = File.join(__dir__, 'load-times_filter.csv')
+      expected_path = File.join(__dir__, 'load-times_filter_major_minor.json')
+      compare_report_data(records_path, expected_path, filters: ["21.1", "21.0"])
+    end
+
   end # class
 end # module

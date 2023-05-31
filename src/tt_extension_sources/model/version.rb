@@ -44,6 +44,14 @@ module TT::Plugins::ExtensionSources
       return version.major >= @major
     end
 
+    # @param [String] version_string
+    def match?(version_string)
+      components = version_string.split('.').map(&:to_i)
+      components.each { |n| check_argument(n) }
+
+      to_a.take(components.size) == components
+    end
+
     # @return [Array(Integer, Integer, Integer)]
     def to_a
       [major, minor, patch]

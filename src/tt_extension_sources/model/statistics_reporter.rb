@@ -57,8 +57,10 @@ module TT::Plugins::ExtensionSources
     # ```
     #
     # @param [Array<Statistics::Record>] records
+    # @param [Integer] group_by
+    # @param [String, nil] filter A version string. Ex: +"1.2.3"+, +"1.2"+
     # @return [Hash]
-    def report(records, group_by: GROUP_BY_MAJOR_MINOR_PATCH)
+    def report(records, group_by: GROUP_BY_MAJOR_MINOR_PATCH, filters: nil)
       report = {}
 
       grouped = {}
@@ -66,6 +68,10 @@ module TT::Plugins::ExtensionSources
         sketchup, path, load_time, _timestamp = record.values
 
         version = Version.parse(sketchup)
+        if filters
+          next unless filters.any? { |filter| version.match?(filter) }
+        end
+
         version_group = version.to_a.take(group_by).join('.')
 
         grouped[path] ||= {}

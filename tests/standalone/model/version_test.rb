@@ -154,5 +154,71 @@ module TT::Plugins::ExtensionSources
       assert_equal("[\n  1,\n  2,\n  3\n]", result)
     end
 
+    def test_match_Query_major_minor_patch
+      version = Version.new(1, 2, 3)
+      result = version.match?("1.2.3")
+      assert_kind_of(TrueClass, result)
+    end
+
+    def test_match_Query_major_minor
+      version = Version.new(1, 2, 3)
+      result = version.match?("1.2")
+      assert_kind_of(TrueClass, result)
+    end
+
+    def test_match_Query_major
+      version = Version.new(1, 2, 3)
+      result = version.match?("1")
+      assert_kind_of(TrueClass, result)
+    end
+
+    def test_match_Query_major_minor_patch_mismatch_patch
+      version = Version.new(1, 2, 3)
+      result = version.match?("1.2.4")
+      assert_kind_of(FalseClass, result)
+    end
+
+    def test_match_Query_major_minor_patch_mismatch_minor
+      version = Version.new(1, 2, 3)
+      result = version.match?("1.3.3")
+      assert_kind_of(FalseClass, result)
+    end
+
+    def test_match_Query_major_minor_patch_mismatch_major
+      version = Version.new(1, 2, 3)
+      result = version.match?("2.2.3")
+      assert_kind_of(FalseClass, result)
+    end
+
+    def test_match_Query_major_minor
+      version = Version.new(1, 2, 3)
+      result = version.match?("1.2")
+      assert_kind_of(TrueClass, result)
+    end
+
+    def test_match_Query_major_minor_mismatch_minor
+      version = Version.new(1, 2, 3)
+      result = version.match?("1.3")
+      assert_kind_of(FalseClass, result)
+    end
+
+    def test_match_Query_major_minor_mismatch_minor
+      version = Version.new(1, 2, 3)
+      result = version.match?("2.2")
+      assert_kind_of(FalseClass, result)
+    end
+
+    def test_match_Query_major
+      version = Version.new(1, 2, 3)
+      result = version.match?("1")
+      assert_kind_of(TrueClass, result)
+    end
+
+    def test_match_Query_major_mismatch_major
+      version = Version.new(1, 2, 3)
+      result = version.match?("2")
+      assert_kind_of(FalseClass, result)
+    end
+
   end # class
 end # module

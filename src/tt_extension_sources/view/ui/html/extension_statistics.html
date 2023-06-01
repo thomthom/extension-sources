@@ -202,16 +202,21 @@
               </select>
             </div>
 
-            <label for="filterBy" class="col-form-label" title="Filter SketchUp versions">
-              Filter:
-            </label>
-            <div class="col-sm-2">
-              <select id="filterBy" class="custom-select form-control" v-bind:value="filterBy"
-                v-on:change="on_filter_by_change">
-                <option>None</option>
-                <option v-for="item in filter_by_options">{{ item }}</option>
-              </select>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                {{ filtered_by_label }}
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item form-check" href="#" v-for="filter in versions">
+                  <input class="form-check-input" type="checkbox" id="defaultCheck1"
+                    v-on:change="toggle_filter($event, filter)" v-bind:checked="filter.enabled">
+                  <label class="form-check-label" for="defaultCheck1">
+                    {{ filter.name }}
+                  </label>
+                </a>
+              </div>
             </div>
+
           </div>
         </div>
         <!-- Content (List) -->

@@ -26,8 +26,6 @@ const SortBy = {
   max: 'max',
 };
 
-const FilterByNone = "None";
-
 let app = new Vue({
   el: '#app',
   data: {
@@ -36,7 +34,8 @@ let app = new Vue({
     // that could impact the extension load time.
     sortBy: SortBy.median, // TODO: Persist option.
     sortAscending: false, // TODO: Persist option.
-    filterBy: FilterByNone, // SketchUp version filter.
+    filterBy: null, // SketchUp version filter.
+    versions: {}, // SketchUp version filter.
     filter: "", // Path filter.
     report: [],
   },
@@ -69,7 +68,19 @@ let app = new Vue({
         }
       }
       // console.log('filter_by_options', versions);
-      return Array.from(versions).sort((a, b) => b - a);
+      // return Array.from(versions).sort((a, b) => b - a);
+      const sorted_version = Array.from(versions).sort((a, b) => b - a);
+      return sorted_version.map(n => { return { name: n, enabled: true }});
+    },
+    filtered_by_label() {
+      const num_versions = this.versions.filter(v => v.enabled).length;
+      return `Versions (${num_versions})`;
+    },
+    is_filtered_by(version) {
+      if (this.filterBy === null) {
+        return false;
+      }
+      return this.filterBy.includes(version);
     },
     sort_by_label() {
       switch (this.sortBy) {
@@ -90,6 +101,8 @@ let app = new Vue({
 
       const max_range = Math.max(...Object.values(this.report).map(item => item.total.max))
 
+      // console.log('filtered_chart_data');
+      // console.log(this.versions);
       let data = [];
       for (path of paths) {
         // console.log(`> path: ${path}`);
@@ -97,20 +110,25 @@ let app = new Vue({
         const item = this.report[path];
         // console.log(`> item:`, item, Object.values(item));
 
+        const versions = Object.keys(item.versions).filter(version => {
+          return this.include_version(version);
+        });
+        // console.log('versions', versions);
+
         // Sort the data for the SketchUp versions by the version number.
-        let versions = Object.keys(item.versions).map(version => {
+        let version_stats = versions.map(version => {
           let version_data = this.graph_data(item.versions[version], max_range);
           version_data.version = version;
           return version_data;
         });
-        versions.sort((a, b) => b.values.median - a.values.median);
+        version_stats.sort((a, b) => b.values.median - a.values.median);
 
         data.push({
           reactive: item, // Access to reactive properties.
           path: path,
           label: path.replace(pattern, ''),
           total: this.graph_data(item.total, max_range),
-          versions: versions,
+          versions: version_stats,
         });
       }
 
@@ -156,12 +174,20 @@ let app = new Vue({
       }
       this.report = report;
 
-      const app = this;
-      const filter = (filter_by === null) ? 'None' : filter_by[0];
-      this.$nextTick(() => {
-        // console.log('nextTick', filter);
-        app.filterBy = filter;
-      });
+      this.update_sketchup_versions();
+    },
+    update_sketchup_versions() {
+      let versions = new Set;
+      for (item of Object.values(this.report)) {
+        for (version of Object.keys(item.versions)) {
+          versions.add(version);
+        }
+      }
+      const sorted_version = Array.from(versions).sort((a, b) => b - a);
+      this.versions = sorted_version.map(n => { return { name: n, enabled: true }});
+    },
+    include_version(version) {
+      return this.versions.find(v => v.name == version && v.enabled) !== undefined;
     },
     on_group_by_change(event) {
       console.log('on_group_by_change', event, event.target.value);
@@ -169,9 +195,13 @@ let app = new Vue({
     },
     on_filter_by_change(event) {
       console.log('on_filter_by_change', event, event.target.value);
-      let filter_by = event.target.value;
-      filter_by = (filter_by == FilterByNone) ? null : [filter_by]
-      sketchup.filter_by(filter_by);
+      sketchup.filter_by(event.target.value);
+    },
+    toggle_filter(event, filter) {
+      console.log('toggle_filter', event, filter, event.target.checked);
+      console.log(filter);
+      filter.enabled = event.target.checked;
+      this.versions.__ob__.dep.notify(); // Hack: Force reactivity.
     },
     trace(message) {
       console.log(message);
@@ -203,6 +233,11 @@ let app = new Vue({
       let prefix = sorted[0].substring(0, i);
       return prefix;
     }
+  },
+  watch: {
+    versions: function(_) {
+      console.log('watch', 'version');
+    },
   },
   mounted() {
     // Disable the context menu, except on input elements.

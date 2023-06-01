@@ -68,6 +68,7 @@ let app = new Vue({
           versions.add(version);
         }
       }
+      // console.log('filter_by_options', versions);
       return Array.from(versions).sort((a, b) => b - a);
     },
     sort_by_label() {
@@ -143,8 +144,8 @@ let app = new Vue({
         },
       };
     },
-    update(report, group_by) {
-      console.log('update', `group_by: ${group_by}`);
+    update(report, group_by, filter_by) {
+      console.log('update', `group_by: ${group_by}`, `filter_by: ${filter_by}`);
       console.log(report);
       this.groupBy = group_by;
       // Inject properties before assigning to Vue data so they become reactive.
@@ -154,6 +155,13 @@ let app = new Vue({
         value.showVersions = false
       }
       this.report = report;
+
+      const app = this;
+      const filter = (filter_by === null) ? 'None' : filter_by[0];
+      this.$nextTick(() => {
+        // console.log('nextTick', filter);
+        app.filterBy = filter;
+      });
     },
     on_group_by_change(event) {
       console.log('on_group_by_change', event, event.target.value);
@@ -161,7 +169,9 @@ let app = new Vue({
     },
     on_filter_by_change(event) {
       console.log('on_filter_by_change', event, event.target.value);
-      // sketchup.filter_by(event.target.value);
+      let filter_by = event.target.value;
+      filter_by = (filter_by == FilterByNone) ? null : [filter_by]
+      sketchup.filter_by(filter_by);
     },
     trace(message) {
       console.log(message);

@@ -50,12 +50,29 @@ module TT::Plugins::ExtensionSources
     cmd.small_icon = self.toolbar_icon('extension_sources-32x32')
     cmd_open_extension_sources_dialog = cmd
 
+    cmd = self.create_command('Extension Sources…') {
+      self.app.toggle_ruby_console
+    }
+    cmd.set_validation_proc {
+      # TODO: Ideally this proc logic should be in /app.
+      SKETCHUP_CONSOLE.visible? ? MF_CHECKED : MF_ENABLED
+    }
+    cmd.tooltip = 'Ruby Console'
+    cmd.status_bar_text = 'Toggle the Ruby Console.'
+    cmd.large_icon = self.toolbar_icon('ruby_console-32x32')
+    cmd.small_icon = self.toolbar_icon('ruby_console-32x32')
+    cmd_toggle_ruby_console = cmd
+
     menu_name = Sketchup.version.to_f < 21.1 ? 'Plugins' : 'Developer'
     menu = UI.menu(menu_name)
     menu.add_item(cmd_open_extension_sources_dialog)
 
     toolbar = UI::Toolbar.new('Extension Sources')
     toolbar.add_item(cmd_open_extension_sources_dialog)
+    toolbar.show if toolbar.get_last_state != TB_HIDDEN
+
+    toolbar = UI::Toolbar.new('Ruby Console')
+    toolbar.add_item(cmd_toggle_ruby_console)
     toolbar.show if toolbar.get_last_state != TB_HIDDEN
 
     file_loaded(__FILE__)

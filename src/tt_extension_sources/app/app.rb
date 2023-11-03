@@ -74,5 +74,10 @@ module TT::Plugins::ExtensionSources
       controller.close_extension_sources_dialog
     end
 
+    # @return [void]
+    def toggle_ruby_console
+      SKETCHUP_CONSOLE.visible? ? SKETCHUP_CONSOLE.hide : SKETCHUP_CONSOLE.show
+    end
+
   end # class
 end # module

@@ -18,9 +18,20 @@ module TT::Plugins::ExtensionSources
     # @!attribute timestamp
     #   @return [Time] The time the record was created.
     #
-    Record = Struct.new(:sketchup, :path, :load_time, :timestamp,
-      keyword_init: true
-    )
+    Record = if RUBY_VERSION.to_f >= 2.5
+      Struct.new(:sketchup, :path, :load_time, :timestamp,
+        keyword_init: true
+      )
+    else
+      Struct.new(:sketchup, :path, :load_time, :timestamp) do
+        def initialize(sketchup: nil, path: nil, load_time: nil, timestamp: nil)
+          self.sketchup = sketchup
+          self.path = path
+          self.load_time = load_time
+          self.timestamp = timestamp
+        end
+      end
+    end
 
     # @abstract
     # @return [Array<Statistics::Record>]

@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'logger'
 
 require 'tt_extension_sources/model/extension_source'
@@ -280,6 +281,7 @@ module TT::Plugins::ExtensionSources
 
     # @return [ExtensionSourcesManager]
     def create_extension_sources_manager
+      FileUtils.mkdir_p(File.dirname(timing_log_path))
       statistics_file = File.open(timing_log_path, 'a:UTF-8')
       statistics = StatisticsCSV.new(io: statistics_file)
 
